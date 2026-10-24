@@ -11,305 +11,347 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 </style>
 <title>LayerWing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..600&display=swap">
 <style>
-/* Layout: Bauplan-Bogen. Papier mit Raster, Tuschelinien, Schriftfeld oben rechts, der Profilschnitt läuft über den rechten Rand hinaus.
-   Modelle stehen als Draufsichten mit Maßlinie in einer Typenliste aus Haarlinien. Farbig ist nur das Filament und Signalgelb. */
+/* Layout: ruhige Produktbühne im Apple-Stil. Zentrierter Kopf über einer großen Bühne mit dem Profilschnitt,
+   darunter Modellkacheln, die beim Überfahren abheben, ein Bento-Raster für den Lieferumfang und schlichte Panels.
+   Schrift: nur Geist (Geist Mono ausschließlich für Zahlenspalten). Signalgelb nur als kleiner Markenakzent. */
 :root{
-  --paper:#F1F3F0; --surface:#FAFBF9; --ink:#1A2330; --muted:#58626E; --line:#C6CDD2; --grid:#E2E6E2;
-  --accent:#F2C100; --accent-ink:#1A2330; --ok:#2B7A4B; --overlay:rgba(20,28,38,.45);
-  --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
-  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-  --t12:.75rem; --t14:.875rem; --t16:1rem; --t20:1.25rem; --t28:1.75rem; --t40:2.5rem; --t56:3.5rem;
-  --s8:8px; --s16:16px; --s24:24px; --s32:32px; --s48:48px; --s72:72px;
+  --bg:#FBFBFD; --bg-alt:#F5F5F7; --surface:#FFFFFF; --ink:#1D1D1F; --muted:#6E6E73; --line:#D9D9DE;
+  --accent:#F2C100; --accent-ink:#1D1D1F; --pill:#1D1D1F; --pill-ink:#FFFFFF; --ok:#248A3D;
+  --stage-a:#F7F7F9; --stage-b:#ECECF0; --header-bg:rgba(251,251,253,.72); --overlay:rgba(0,0,0,.32);
+  --glow:rgba(242,193,0,.16); --plane-shadow:rgba(0,0,0,.16);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.05);
+  --shadow-lg:0 22px 48px rgba(0,0,0,.12),0 6px 16px rgba(0,0,0,.06);
+  --f-sans:"Geist",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-num:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r-xl:28px; --r-lg:22px; --r-md:14px; --r-sm:10px;
+  --ease:cubic-bezier(.22,1,.36,1);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#111A24; --surface:#17222E; --ink:#E1E6EA; --muted:#97A3AF; --line:#2C3847; --grid:#18232F;
-    --accent:#F4C61F; --accent-ink:#111A24; --ok:#62C08A; --overlay:rgba(0,0,0,.6);
+    --bg:#000000; --bg-alt:#0D0D0F; --surface:#1C1C1E; --ink:#F5F5F7; --muted:#A1A1A6; --line:#38383C;
+    --accent:#F5C61F; --accent-ink:#1D1D1F; --pill:#F5F5F7; --pill-ink:#1D1D1F; --ok:#30D158;
+    --stage-a:#232326; --stage-b:#18181A; --header-bg:rgba(22,22,24,.72); --overlay:rgba(0,0,0,.55);
+    --glow:rgba(245,198,31,.12); --plane-shadow:rgba(0,0,0,.5);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+    --shadow-lg:0 22px 48px rgba(0,0,0,.6),0 6px 16px rgba(0,0,0,.4);
     color-scheme:dark;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#111A24; --surface:#17222E; --ink:#E1E6EA; --muted:#97A3AF; --line:#2C3847; --grid:#18232F;
-  --accent:#F4C61F; --accent-ink:#111A24; --ok:#62C08A; --overlay:rgba(0,0,0,.6);
+  --bg:#000000; --bg-alt:#0D0D0F; --surface:#1C1C1E; --ink:#F5F5F7; --muted:#A1A1A6; --line:#38383C;
+  --accent:#F5C61F; --accent-ink:#1D1D1F; --pill:#F5F5F7; --pill-ink:#1D1D1F; --ok:#30D158;
+  --stage-a:#232326; --stage-b:#18181A; --header-bg:rgba(22,22,24,.72); --overlay:rgba(0,0,0,.55);
+  --glow:rgba(245,198,31,.12); --plane-shadow:rgba(0,0,0,.5);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 14px rgba(0,0,0,.3);
+  --shadow-lg:0 22px 48px rgba(0,0,0,.6),0 6px 16px rgba(0,0,0,.4);
   color-scheme:dark;
 }
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
 @media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
-body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:var(--t16);line-height:1.55;-webkit-font-smoothing:antialiased}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-sans);font-size:1.0625rem;line-height:1.5;letter-spacing:-.003em;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
 a{color:inherit}
-button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.wrap{max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.mono{font-family:var(--f-mono)}
-.label{font-family:var(--f-mono);font-size:var(--t12);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0}
-h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:800}
-h2{font-size:clamp(var(--t28),3.4vw,var(--t40));font-stretch:118%;line-height:1.08;letter-spacing:-.01em}
-h3{font-size:var(--t20);font-stretch:112%;line-height:1.2}
-.section{padding-block:var(--s72) 0}
-.section:last-of-type{padding-bottom:var(--s72)}
-.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:var(--s16) var(--s48);align-items:end;padding-bottom:var(--s24);margin-bottom:var(--s32);border-bottom:1.5px solid var(--ink)}
-.sec-head > div{display:flex;flex-direction:column;gap:var(--s8)}
-.sec-head p.intro{margin:0;color:var(--muted);max-width:60ch}
-@media (max-width:820px){.sec-head{grid-template-columns:1fr}}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:700}
+h2{font-size:clamp(2rem,4.4vw,3rem);line-height:1.06;letter-spacing:-.028em}
+h3{font-size:1.25rem;line-height:1.2;letter-spacing:-.015em;font-weight:650}
+.kicker{margin:0;color:var(--muted);font-size:1.0625rem;font-weight:500}
+.section{padding-block:96px 0}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px 40px;margin-bottom:36px}
+.sec-head > div{display:flex;flex-direction:column;gap:8px;max-width:640px}
+.sec-head p.intro{margin:0;color:var(--muted);max-width:52ch}
 
-/* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border:1.5px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);font-weight:600;font-size:var(--t14);text-decoration:none;line-height:1.2;transition:background .15s}
-.btn:hover{background:var(--grid)}
-.btn-primary{background:var(--accent);color:var(--accent-ink)}
-.btn-primary:hover{background:var(--accent);filter:brightness(.94)}
-.btn.in-cart{background:transparent;border-style:dashed}
-.btn[disabled]{opacity:.55;cursor:default}
+/* Pill-Buttons mit Feedback beim Drücken */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 22px;border-radius:999px;border:1px solid transparent;font-size:.9375rem;font-weight:600;text-decoration:none;line-height:1;
+  background:var(--bg-alt);color:var(--ink);transition:transform .12s ease-out,background .2s,box-shadow .3s var(--ease)}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--pill);color:var(--pill-ink)}
+.btn-ghost{background:transparent;border-color:var(--line)}
+.btn.in-cart{background:var(--accent);color:var(--accent-ink)}
+@media (hover:hover){
+  .btn:hover{box-shadow:var(--shadow-sm)}
+  .btn-primary:hover{transform:translateY(-1px)}
+  .btn-primary:active{transform:scale(.97)}
+  .btn-ghost:hover{border-color:var(--ink)}
+}
 
-/* Header */
-.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:1.5px solid var(--ink)}
-.site-header .wrap{display:flex;align-items:center;gap:var(--s32);height:60px}
-.logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:var(--t20);letter-spacing:-.01em}
-.logo svg{width:30px;height:auto;color:var(--ink)}
-.nav{display:flex;gap:var(--s24);margin-left:auto}
-.nav a{text-decoration:none;font-size:var(--t14);font-weight:500;color:var(--muted);padding-block:4px;border-bottom:2px solid transparent}
-.nav a:hover{color:var(--ink);border-bottom-color:var(--accent)}
-.cart-btn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:transparent;border-radius:2px;padding:7px 12px;font-weight:600;font-size:var(--t14)}
-.cart-count{font-family:var(--f-mono);font-size:var(--t12);min-width:22px;height:22px;display:inline-grid;place-items:center;padding:0 6px;background:var(--accent);color:var(--accent-ink);border-radius:2px;font-variant-numeric:tabular-nums}
-.cart-count[data-zero="1"]{background:transparent;color:var(--muted);border:1px solid var(--line)}
-@media (max-width:1000px){.nav{display:none}.cart-btn{margin-left:auto}}
+/* Kopfleiste: durchscheinendes Material, Inhalt scrollt darunter */
+.site-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--header-bg);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid transparent;transition:border-color .3s}
+.site-header.scrolled{border-bottom-color:var(--line)}
+.site-header .wrap{display:flex;align-items:center;gap:28px;height:56px}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:700;font-size:1.1875rem;letter-spacing:-.02em}
+.logo svg{width:28px;height:auto}
+.nav{display:flex;gap:26px;margin-left:auto}
+.nav a{text-decoration:none;font-size:.875rem;color:var(--muted);font-weight:500;transition:color .2s}
+.nav a:hover{color:var(--ink)}
+.cart-btn{display:flex;align-items:center;gap:8px;min-height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--bg-alt);font-size:.875rem;font-weight:600;transition:transform .12s ease-out,background .2s}
+.cart-btn:active{transform:scale(.96)}
+.cart-count{min-width:22px;height:22px;border-radius:11px;display:inline-grid;place-items:center;padding:0 6px;font-size:.75rem;font-weight:700;background:var(--pill);color:var(--pill-ink);font-variant-numeric:tabular-nums}
+.cart-count[data-zero="1"]{background:var(--line);color:var(--muted)}
+@media (max-width:980px){.nav{display:none}.cart-btn{margin-left:auto}}
 
 /* Hero */
-.hero{padding-top:var(--s48)}
-.hero-top{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:var(--s48);align-items:end}
-.hero h1{font-size:clamp(2.1rem,5vw,var(--t56));font-stretch:125%;line-height:1.04;letter-spacing:-.015em;margin-top:var(--s16)}
-mark{background:linear-gradient(transparent 80%,var(--accent) 80%,var(--accent) 95%,transparent 95%);color:inherit;padding:0 .04em}
-.lead{font-size:1.125rem;color:var(--muted);max-width:56ch;margin:var(--s24) 0 var(--s24)}
-.ctas{display:flex;flex-wrap:wrap;gap:12px}
-.titleblock{width:100%;border-collapse:collapse;border:1.5px solid var(--ink);font-size:var(--t14);background:var(--paper)}
-.titleblock caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:var(--t12);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-bottom:6px}
-.titleblock th,.titleblock td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}
-.titleblock th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;width:34%;white-space:nowrap}
-.titleblock td{font-weight:600}
-.titleblock tr:first-child td{font-family:var(--f-display);font-stretch:120%;font-weight:800;font-size:var(--t16)}
-@media (max-width:860px){.hero-top{grid-template-columns:1fr;gap:var(--s32)}}
-
-.foil-band{margin-top:var(--s48);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;
-  background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px}
-.foil-band .wrap{padding-block:var(--s24) var(--s16)}
-.foil-band svg{display:block;width:118%;max-width:none;height:auto;margin-left:-1%}
-.foil-cap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);margin-top:var(--s8)}
-@media (max-width:700px){.foil-band svg{width:150%;margin-left:-8%}}
-.foil-outline{fill:var(--paper);stroke:var(--ink);stroke-width:2.2;stroke-linejoin:round}
-.foil-rib{stroke:var(--muted);stroke-width:1;opacity:.5}
+.hero{padding-top:72px;text-align:center}
+.hero .kicker{font-weight:600;color:var(--ink)}
+.hero .kicker span{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:1px}
+.hero h1{font-size:clamp(2.6rem,7vw,5rem);line-height:1.02;letter-spacing:-.04em;max-width:16ch;margin:14px auto 0;font-weight:750}
+.hero .lead{font-size:clamp(1.125rem,2vw,1.375rem);line-height:1.4;color:var(--muted);max-width:40ch;margin:20px auto 0;letter-spacing:-.01em}
+.ctas{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+.stage-panel{margin-top:56px;border-radius:var(--r-xl);background:linear-gradient(180deg,var(--stage-a),var(--stage-b));overflow:hidden;position:relative}
+.stage-panel svg{display:block;width:100%;height:auto;max-width:980px;margin:0 auto}
+.stage-meta{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;padding:0 20px 26px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow-sm);font-size:.8125rem;font-weight:500;color:var(--ink)}
+.chip b{font-weight:650}
+.foil-outline{fill:var(--surface);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.foil-rib{stroke:var(--muted);stroke-width:1;opacity:.45}
 .foil-spar{fill:var(--ink)}
-.foil-spar-in{fill:var(--paper)}
+.foil-spar-in{fill:var(--surface)}
 .foil-leader{stroke:var(--muted);stroke-width:1;fill:none}
-.foil-center{stroke:var(--muted);stroke-width:1;stroke-dasharray:14 4 2 4;fill:none}
-.foil-label{fill:var(--ink);font-family:var(--f-mono);font-size:12px}
+.foil-label{fill:var(--ink);font-family:var(--f-sans);font-size:13px;font-weight:500}
 .foil-label.dim{fill:var(--muted)}
 .foil-nozzle{fill:var(--accent);stroke:var(--ink);stroke-width:1.2}
 
-/* Filter tabs */
-.tabs{display:flex;flex-wrap:wrap;gap:4px 28px;align-items:baseline;margin-bottom:var(--s24)}
-.tab-group{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline}
-.tab-group > span{font-family:var(--f-mono);font-size:var(--t12);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.tab{border:0;background:none;padding:4px 0;font-size:var(--t14);font-weight:500;color:var(--muted);border-bottom:2px solid transparent}
-.tab:hover{color:var(--ink)}
-.tab[aria-pressed="true"]{color:var(--ink);font-weight:700;border-bottom-color:var(--accent)}
-.count{margin-left:auto;font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);font-variant-numeric:tabular-nums}
+/* Segmentierte Filter */
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;margin-bottom:28px}
+.segmented{display:inline-flex;flex-wrap:wrap;gap:2px;padding:3px;border-radius:999px;background:var(--bg-alt)}
+.seg{border:0;background:transparent;padding:7px 15px;border-radius:999px;font-size:.875rem;font-weight:500;color:var(--muted);transition:background .25s var(--ease),color .2s,box-shadow .25s}
+.seg:hover{color:var(--ink)}
+.seg[aria-pressed="true"]{background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow-sm)}
+.count{margin-left:auto;color:var(--muted);font-size:.875rem;font-variant-numeric:tabular-nums}
 
-/* Typenliste */
-.types{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));column-gap:var(--s48)}
-.type{display:flex;flex-direction:column;gap:12px;padding-block:var(--s24) var(--s32);border-bottom:1px solid var(--line);min-width:0}
-.type-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:24px}
-.type-no{font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);letter-spacing:.04em}
-.tag{font-family:var(--f-mono);font-size:11px;border:1px solid var(--ink);padding:2px 7px;border-radius:2px;white-space:nowrap}
-.drawing{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:5/4;border:1px solid var(--line);padding:0;color:var(--ink);
-  background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px}
-.drawing svg{position:absolute;inset:4% 8%;width:84%;height:92%}
-.drawing:hover{border-color:var(--ink)}
-.type-title{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:4px}
-.type-title h3{font-size:var(--t28);font-stretch:118%;letter-spacing:-.01em;line-height:1.05}
-.price{font-family:var(--f-mono);font-weight:600;font-size:var(--t20);white-space:nowrap;font-variant-numeric:tabular-nums}
-.type-sub{margin:-6px 0 0;color:var(--muted);font-size:var(--t14)}
-.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin:0;border-top:1px solid var(--line)}
-.specs div{display:flex;flex-direction:column;padding:7px 0;border-bottom:1px dotted var(--line);min-width:0}
-.specs div:nth-child(odd){padding-right:12px}
-.specs div:nth-child(even){padding-left:12px;border-left:1px solid var(--line)}
-.specs dt{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
-.specs dd{margin:0;font-family:var(--f-mono);font-weight:500;font-size:var(--t14);font-variant-numeric:tabular-nums}
-.type-actions{display:flex;gap:8px;margin-top:4px}
-.type-actions .btn{flex:1}
-.empty{grid-column:1/-1;padding:var(--s48) 0;color:var(--muted);border-bottom:1px solid var(--line)}
+/* Kacheln */
+.tile{position:relative;background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);--mx:50%;--my:30%}
+.tile::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:opacity .4s;
+  background:radial-gradient(420px circle at var(--mx) var(--my),var(--glow),transparent 45%)}
+@media (hover:hover) and (prefers-reduced-motion: no-preference){
+  .tile{transition:transform .5s var(--ease),box-shadow .5s var(--ease)}
+  .tile:hover{transform:translateY(-6px) scale(1.012);box-shadow:var(--shadow-lg)}
+  .tile:hover::after{opacity:1}
+}
 
-/* Ablauf: echte Reihenfolge */
-.sequence{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s32);border-top:1.5px solid var(--ink)}
-.sequence li{position:relative;padding-top:var(--s24);display:flex;flex-direction:column;gap:8px;min-width:0}
-.sequence li::before{content:"";position:absolute;top:-7px;left:0;width:12px;height:12px;border-radius:50%;background:var(--accent);border:1.5px solid var(--ink)}
-.sequence p{margin:0;color:var(--muted);max-width:42ch}
-@media (max-width:820px){.sequence{grid-template-columns:1fr;border-top:0;border-left:1.5px solid var(--ink);padding-left:var(--s24);gap:var(--s24)}.sequence li{padding-top:0}.sequence li::before{top:6px;left:calc(-1 * var(--s24) - 7px)}}
+/* Modelle */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:24px}
+@media (max-width:380px){.grid{grid-template-columns:1fr}}
+.model{display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.stage{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:4/3;border:0;padding:0;border-radius:var(--r-lg) var(--r-lg) 0 0;
+  background:radial-gradient(120% 90% at 50% 20%,var(--stage-a),var(--stage-b));color:var(--ink);overflow:hidden}
+.stage svg{position:absolute;inset:8% 12%;width:76%;height:84%;filter:drop-shadow(0 16px 14px var(--plane-shadow));transition:transform .6s var(--ease),filter .6s var(--ease)}
+@media (hover:hover) and (prefers-reduced-motion: no-preference){
+  .model:hover .stage svg{transform:translateY(-10px) rotate(-4deg) scale(1.05);filter:drop-shadow(0 30px 22px var(--plane-shadow))}
+}
+.badge{position:absolute;top:14px;left:14px;padding:5px 11px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow-sm);font-size:.75rem;font-weight:650;color:var(--ink)}
+.badge.hot{background:var(--accent);color:var(--accent-ink)}
+.model-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:14px;flex:1}
+.model-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.model-head h3{font-size:1.5rem;letter-spacing:-.025em;font-weight:700}
+.price{font-weight:650;font-size:1.0625rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.model-sub{margin:-8px 0 0;color:var(--muted);font-size:.9375rem}
+.specs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0}
+.specs div{background:var(--bg-alt);border-radius:var(--r-sm);padding:9px 10px;min-width:0}
+.specs dt{font-size:.6875rem;color:var(--muted);font-weight:500}
+.specs dd{margin:2px 0 0;font-size:.875rem;font-weight:650;font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.model-actions{display:flex;gap:8px;margin-top:auto}
+.model-actions .btn{flex:1;padding:0 14px}
+@media (max-width:420px){.specs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.empty{grid-column:1/-1;padding:48px 24px;text-align:center;color:var(--muted);background:var(--bg-alt);border-radius:var(--r-lg)}
 
-/* Lieferumfang */
-.file-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:var(--s48);align-items:start}
-.file-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.file-list li{display:grid;grid-template-columns:64px minmax(0,1fr);gap:16px;padding:14px 0;border-bottom:1px solid var(--line)}
-.ext{font-family:var(--f-mono);font-size:var(--t12);font-weight:600;padding-top:2px}
-.file-list strong{display:block;font-size:var(--t16)}
-.file-list span.d{color:var(--muted);font-size:var(--t14)}
-@media (max-width:860px){.file-grid{grid-template-columns:1fr}}
-.table-wrap{overflow-x:auto;border-top:1.5px solid var(--ink)}
-table.data{width:100%;border-collapse:collapse;font-size:var(--t14)}
-table.data th,table.data td{text-align:left;padding:9px 10px 9px 0;border-bottom:1px solid var(--line);white-space:nowrap}
-table.data th{font-family:var(--f-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
-table.data .num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--f-mono)}
-table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
-.mat{font-family:var(--f-mono);font-size:var(--t12)}
-.table-cap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:10px 0;font-size:var(--t14)}
-.table-cap strong{font-family:var(--f-display);font-stretch:112%;font-weight:800}
+/* Ablauf */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;list-style:none;margin:0;padding:0}
+.step{padding:28px 26px 30px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.step-no{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:var(--pill);color:var(--pill-ink);font-weight:700;font-size:.9375rem;margin-bottom:6px}
+.step p{margin:0;color:var(--muted)}
+@media (max-width:860px){.steps{grid-template-columns:1fr}}
 
-/* Checkliste */
-.checklist{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--ink);max-width:880px;counter-reset:cl}
-.checklist li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line);counter-increment:cl;align-items:baseline}
-.checklist li::before{content:counter(cl);font-family:var(--f-mono);font-size:var(--t12);color:var(--muted)}
-.cl-item{display:flex;align-items:baseline;gap:10px;font-family:var(--f-display);font-stretch:112%;font-weight:800;text-transform:uppercase;letter-spacing:.02em;font-size:var(--t14);min-width:0}
-.cl-item::after{content:"";flex:1;border-bottom:2px dotted var(--muted);opacity:.6;transform:translateY(-3px);min-width:24px}
-.cl-val{font-family:var(--f-mono);font-size:var(--t14);font-weight:600;text-transform:uppercase}
-.checklist p{grid-column:2/-1;margin:2px 0 0;color:var(--muted);font-size:var(--t14);max-width:64ch}
-@media (max-width:560px){.checklist li{grid-template-columns:24px minmax(0,1fr)}.cl-val{grid-column:2}.cl-item::after{display:none}}
+/* Bento */
+.bento{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.bento .tile{padding:26px;display:flex;flex-direction:column;gap:10px;min-width:0;overflow:hidden}
+.bento .big{grid-column:span 2;grid-row:span 2}
+.bento .wide{grid-column:1/-1}
+.bento p{margin:0;color:var(--muted)}
+.ext{align-self:flex-start;padding:4px 10px;border-radius:999px;background:var(--bg-alt);font-size:.75rem;font-weight:650}
+.big .ext{background:var(--accent);color:var(--accent-ink)}
+.big h3{font-size:clamp(1.5rem,2.6vw,2rem);letter-spacing:-.03em}
+.preset-mini{margin-top:auto;border-radius:var(--r-md);background:var(--bg-alt);padding:6px 14px}
+.preset-mini div{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:.875rem}
+.preset-mini div:last-child{border-bottom:0}
+.preset-mini span:first-child{color:var(--muted)}
+.preset-mini span:last-child{font-weight:600;font-variant-numeric:tabular-nums;text-align:right}
+@media (max-width:980px){.bento{grid-template-columns:repeat(2,minmax(0,1fr))}.bento .big{grid-row:auto}}
+@media (max-width:620px){.bento{grid-template-columns:1fr}.bento .big,.bento .wide{grid-column:auto}}
+.table-wrap{overflow-x:auto;margin:4px -6px 0;padding:0 6px}
+table.data{width:100%;border-collapse:collapse;font-size:.9375rem}
+table.data th,table.data td{text-align:left;padding:11px 12px 11px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+table.data th{font-size:.8125rem;color:var(--muted);font-weight:500}
+table.data td.n,table.data th.n{text-align:right;font-variant-numeric:tabular-nums}
+table.data tfoot td{font-weight:700;border-bottom:0}
+table.data tbody tr{transition:background .2s}
+@media (hover:hover){table.data tbody tr:hover{background:var(--bg-alt)}}
 
-/* Druckermatrix */
-.matrix td:first-child{font-weight:600}
+/* Checkliste & Matrix */
+.panel{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--shadow-sm);padding:10px 28px}
+.checklist{list-style:none;margin:0;padding:0}
+.checklist li{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:4px 14px;padding:18px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.checklist li:last-child{border-bottom:0}
+.tick{width:22px;height:22px;border-radius:50%;background:var(--accent);display:grid;place-items:center;transform:translateY(4px)}
+.tick svg{width:12px;height:12px}
+.cl-item{font-weight:650;font-size:1.0625rem}
+.cl-val{font-weight:600;font-size:.9375rem;padding:4px 12px;border-radius:999px;background:var(--bg-alt);white-space:nowrap}
+.checklist p{grid-column:2/-1;margin:2px 0 0;color:var(--muted);font-size:.9375rem;max-width:64ch}
+@media (max-width:560px){.checklist li{grid-template-columns:28px minmax(0,1fr)}.cl-val{grid-column:2;justify-self:start;white-space:normal}}
 .matrix th:not(:first-child),.matrix td:not(:first-child){text-align:center;padding-right:0}
+.matrix td:first-child{font-weight:600}
 .yes{color:var(--ok);font-weight:700}
 .no{color:var(--muted)}
 
 /* FAQ */
-.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--s48);border-top:1.5px solid var(--ink)}
-.faq details{border-bottom:1px solid var(--line);padding:14px 0}
-.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:16px}
+.faq{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.faq details{background:var(--surface);border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:0 22px;transition:box-shadow .3s var(--ease)}
+.faq details[open]{box-shadow:var(--shadow-lg)}
+.faq summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:18px 0}
 .faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";font-family:var(--f-mono);font-size:var(--t20);line-height:1}
-.faq details[open] summary::after{content:"−"}
-.faq p{margin:10px 0 0;color:var(--muted);max-width:60ch}
+.faq summary::after{content:"";width:10px;height:10px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .3s var(--ease);flex:none}
+.faq details[open] summary::after{transform:rotate(225deg) translateY(-3px)}
+.faq p{margin:0 0 18px;color:var(--muted);max-width:60ch}
 @media (max-width:820px){.faq{grid-template-columns:1fr}}
 
 /* Footer */
-.site-footer{border-top:1.5px solid var(--ink);padding-block:var(--s32);font-size:var(--t14);color:var(--muted);margin-top:var(--s72)}
-.site-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s16)}
+.site-footer{margin-top:96px;background:var(--bg-alt);padding-block:28px;font-size:.8125rem;color:var(--muted)}
+.site-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:14px;align-items:center}
 .foot-links{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
 .foot-links a{text-decoration:none}
 .foot-links a:hover{color:var(--ink);text-decoration:underline}
-.foot-wd{border:1.5px solid var(--ink);color:var(--ink);border-radius:2px;padding:6px 12px;font-weight:600}
-.foot-wd:hover{background:var(--accent);color:var(--accent-ink);text-decoration:none!important}
+.foot-wd{padding:8px 14px;border-radius:999px;background:var(--surface);color:var(--ink);font-weight:600;box-shadow:var(--shadow-sm)}
+.foot-wd:hover{text-decoration:none!important}
 
-/* Overlay, Modal, Warenkorb */
-.overlay{position:fixed;inset:0;background:var(--overlay);z-index:40}
+/* Datenblatt als Sheet, Warenkorb als Seitenleiste */
+.overlay{position:fixed;inset:0;background:var(--overlay);z-index:40;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .modal{position:fixed;z-index:50;inset:0;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
-.modal-panel{pointer-events:auto;position:relative;background:var(--surface);border:1.5px solid var(--ink);border-radius:3px;width:min(940px,100%);max-height:100%;overflow:auto}
-.modal-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid var(--line)}
-.modal-top .drawing{aspect-ratio:auto;min-height:300px;height:100%;border:0;border-right:1px solid var(--line);cursor:default}
-.modal-info{padding:var(--s24);display:flex;flex-direction:column;gap:14px}
-.modal-info h3{font-size:var(--t40);font-stretch:120%;line-height:1}
+.modal-panel{pointer-events:auto;position:relative;background:var(--surface);border-radius:var(--r-xl);width:min(960px,100%);max-height:100%;overflow:auto;box-shadow:0 40px 90px rgba(0,0,0,.28)}
+.modal-top{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
+.modal-top .stage{aspect-ratio:auto;min-height:340px;height:100%;border-radius:0;cursor:default}
+.modal-info{padding:32px 30px 28px;display:flex;flex-direction:column;gap:14px}
+.modal-info h3{font-size:clamp(2rem,4vw,2.75rem);letter-spacing:-.035em;line-height:1.02;font-weight:750}
 .modal-info p{margin:0;color:var(--muted)}
-.modal-buy{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:auto;padding-top:var(--s8)}
-.modal-buy .price{font-size:var(--t28)}
-.modal-sec{padding:var(--s24);display:flex;flex-direction:column;gap:12px}
-.modal-sec h4{margin:12px 0 0;font-family:var(--f-mono);font-size:var(--t12);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.modal-sec h4:first-child{margin-top:0}
-.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));column-gap:var(--s24);margin:0;border-top:1px solid var(--line)}
-.kv div{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px dotted var(--line);font-size:var(--t14)}
-.kv dt{color:var(--muted)}
-.kv dd{margin:0;font-family:var(--f-mono);font-weight:500;text-align:right;min-width:0;overflow-wrap:anywhere}
-.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1.5px solid var(--ink);border-bottom:1px solid var(--line)}
-.stat-row div{display:flex;flex-direction:column;padding:10px 0;min-width:0}
-.stat-row div + div{padding-left:12px;border-left:1px solid var(--line)}
-.stat-row b{font-family:var(--f-mono);font-weight:600;font-size:var(--t16);font-variant-numeric:tabular-nums}
-.stat-row span{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.modal-buy{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:auto;padding-top:8px}
+.modal-buy .price{font-size:1.5rem}
+.modal-sec{padding:6px 30px 30px;display:flex;flex-direction:column;gap:14px}
+.modal-sec h4{margin:18px 0 0;font-size:1.0625rem;font-weight:650;letter-spacing:-.01em}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:0}
+.kv div{background:var(--bg-alt);border-radius:var(--r-sm);padding:10px 12px;min-width:0}
+.kv dt{font-size:.75rem;color:var(--muted)}
+.kv dd{margin:2px 0 0;font-weight:600;font-size:.9375rem;overflow-wrap:anywhere}
+.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat-row div{background:var(--bg-alt);border-radius:var(--r-md);padding:12px;display:flex;flex-direction:column;min-width:0}
+.stat-row b{font-size:1.0625rem;font-weight:700;font-variant-numeric:tabular-nums}
+.stat-row span{font-size:.75rem;color:var(--muted)}
 .file-chips{display:flex;flex-wrap:wrap;gap:6px}
-.shop-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));column-gap:var(--s24);row-gap:var(--s16)}
-.shop-list > div{border-top:1px solid var(--ink);padding-top:8px;min-width:0}
+.file-chips span{padding:5px 11px;border-radius:999px;background:var(--bg-alt);font-size:.8125rem;font-weight:500}
+.shop-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.shop-list > div{background:var(--bg-alt);border-radius:var(--r-md);padding:14px 16px;min-width:0}
 .shop-list .wide{grid-column:1/-1}
-.shop-list h5{margin:0 0 6px;font-size:var(--t14);font-weight:700}
-.shop-list p{margin:0;font-size:var(--t14)}
-.shop-list .small{font-size:11.5px;color:var(--muted);margin-top:4px;font-family:var(--f-mono)}
-.shop-list ul{list-style:none;margin:0;padding:0;font-size:var(--t14)}
-.shop-list ul li{display:flex;justify-content:space-between;gap:12px;padding:3px 0;border-bottom:1px dotted var(--line)}
-.shop-list ul li:last-child{border-bottom:0}
+.shop-list h5{margin:0 0 8px;font-size:.9375rem;font-weight:650}
+.shop-list p{margin:0;font-size:.875rem}
+.shop-list .small{font-size:.8125rem;color:var(--muted);margin-top:4px}
+.shop-list ul{list-style:none;margin:0;padding:0;font-size:.875rem}
+.shop-list ul li{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
 .shop-list ul li span:first-child{color:var(--muted)}
 .shop-list ul.plain{columns:2 220px;column-gap:24px}
-.shop-list ul.plain li{display:list-item;list-style:"– ";margin-left:14px;border:0;break-inside:avoid}
-.fine{font-size:12.5px;color:var(--muted);margin:0}
-.close-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:2px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);font-size:18px;line-height:1;display:grid;place-items:center;z-index:2}
-.close-x:hover{background:var(--accent);color:var(--accent-ink)}
-@media (max-width:720px){.modal-top{grid-template-columns:1fr}.modal-top .drawing{min-height:240px;aspect-ratio:5/4;border-right:0;border-bottom:1px solid var(--line)}}
+.shop-list ul.plain li{display:list-item;list-style:"– ";margin-left:14px;break-inside:avoid}
+.fine{font-size:.8125rem;color:var(--muted);margin:0}
+.close-x{position:absolute;top:14px;right:14px;width:36px;height:36px;border-radius:50%;border:0;background:var(--surface);box-shadow:var(--shadow-sm);color:var(--ink);font-size:20px;line-height:1;display:grid;place-items:center;z-index:2;transition:transform .12s ease-out}
+.close-x:active{transform:scale(.92)}
+@media (max-width:720px){.modal-top{grid-template-columns:1fr}.modal-top .stage{min-height:240px;aspect-ratio:4/3}}
 
-.drawer{position:fixed;z-index:50;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--surface);border-left:1.5px solid var(--ink);display:flex;flex-direction:column;
+.drawer{position:fixed;z-index:50;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--surface);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.18);
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
-.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1.5px solid var(--ink)}
-.icon-btn{width:34px;height:34px;border-radius:2px;border:1.5px solid var(--ink);background:transparent;font-size:18px;display:grid;place-items:center}
-.icon-btn:hover{background:var(--accent);color:var(--accent-ink)}
-.drawer-body{flex:1;overflow:auto;padding:8px 20px}
-.cart-item{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
-.cart-thumb{width:72px;height:56px;position:relative;border:1px solid var(--line);color:var(--ink);background:var(--paper)}
-.cart-thumb svg{position:absolute;inset:4px;width:calc(100% - 8px);height:calc(100% - 8px)}
-.cart-item strong{display:block;font-size:var(--t16)}
-.cart-item small{color:var(--muted);font-family:var(--f-mono);font-size:11.5px}
-.cart-item .rm{border:0;background:none;color:var(--muted);font-size:var(--t14);text-decoration:underline;padding:4px 0}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px}
+.drawer-head h3{font-size:1.375rem;letter-spacing:-.02em}
+.icon-btn{width:36px;height:36px;border-radius:50%;border:0;background:var(--bg-alt);font-size:20px;display:grid;place-items:center;transition:transform .12s ease-out}
+.icon-btn:active{transform:scale(.92)}
+.drawer-body{flex:1;overflow:auto;padding:0 22px}
+.cart-item{display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.cart-thumb{width:76px;height:60px;position:relative;border-radius:var(--r-sm);color:var(--ink);background:linear-gradient(180deg,var(--stage-a),var(--stage-b));overflow:hidden}
+.cart-thumb svg{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px)}
+.cart-item strong{display:block;font-size:1rem}
+.cart-item small{color:var(--muted);font-size:.8125rem}
+.cart-item .rm{border:0;background:none;color:var(--muted);font-size:.8125rem;text-decoration:underline;padding:4px 0}
 .cart-item .rm:hover{color:var(--ink)}
-.cart-item .p{font-family:var(--f-mono);font-weight:600;text-align:right}
-.drawer-foot{border-top:1.5px solid var(--ink);padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px}
-.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:var(--t20);font-variant-numeric:tabular-nums}
-.total span:last-child{font-family:var(--f-mono)}
-.cart-empty{padding:40px 0;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:flex-start}
-.form{display:flex;flex-direction:column;gap:14px;padding:12px 0}
-.form label.t{font-weight:600;font-size:var(--t14);display:flex;flex-direction:column;gap:6px}
-.form input[type=email]{font:inherit;padding:10px 12px;border-radius:2px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
-.form input[type=email]:focus{outline:none;border-color:var(--ink)}
-.check{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;font-size:13.5px;color:var(--muted);align-items:start}
-.check input{margin-top:3px;accent-color:var(--ink);width:16px;height:16px}
+.cart-item .p{font-weight:650;text-align:right;font-variant-numeric:tabular-nums}
+.drawer-foot{padding:18px 22px 22px;display:flex;flex-direction:column;gap:12px;border-top:1px solid var(--line)}
+.total{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.cart-empty{padding:48px 0;color:var(--muted);display:flex;flex-direction:column;gap:14px;align-items:flex-start}
+.form{display:flex;flex-direction:column;gap:14px;padding:6px 0 16px}
+.form label.t{font-weight:600;font-size:.9375rem;display:flex;flex-direction:column;gap:6px}
+.form input[type=email]{font:inherit;font-size:16px;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.form input[type=email]:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px var(--glow)}
+.check{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;font-size:.875rem;color:var(--muted);align-items:start}
+.check input{margin-top:3px;accent-color:var(--ink);width:17px;height:17px}
 .check a{color:var(--ink)}
-.notice{border:1.5px solid var(--ink);background:var(--paper);border-left:6px solid var(--accent);padding:12px 14px;font-size:var(--t14)}
+.notice{border-radius:var(--r-md);background:var(--bg-alt);padding:14px 16px;font-size:.9375rem;border-left:4px solid var(--accent)}
 .notice strong{display:block;margin-bottom:4px}
-.back-link{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:var(--t14);padding:0;align-self:flex-start}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:2px;font-size:var(--t14);font-weight:500;max-width:calc(100% - 32px)}
+.back-link{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:.875rem;padding:0;align-self:flex-start}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--pill);color:var(--pill-ink);padding:12px 20px;border-radius:999px;font-size:.9375rem;font-weight:600;box-shadow:var(--shadow-lg);max-width:calc(100% - 32px)}
 
-/* Bewegung: ein Druckmoment beim Laden, sonst nur als Antwort auf Klicks */
+/* Bewegung: Druckmoment beim Laden, sonst Antworten auf Klicks; Öffnen und Schließen auf demselben Weg */
 @media (prefers-reduced-motion: no-preference){
-  .overlay{animation:lw-fade .2s ease-out}
-  .modal-panel{animation:lw-panel .24s cubic-bezier(.2,.8,.2,1)}
-  .drawer{animation:lw-drawer .28s cubic-bezier(.2,.8,.2,1)}
-  .toast{animation:lw-toast .22s ease-out}
-  .cart-count.bump{animation:lw-bump .42s ease-out}
-  .types.refresh .type{animation:lw-type .32s ease-out both;animation-delay:calc(var(--i,0) * 40ms)}
-  .btn,.tab,.drawing{transition:background .15s,border-color .15s,color .15s}
+  .overlay{animation:lw-fade .3s var(--ease)}
+  .overlay.closing{animation:lw-fade-out .22s ease-in forwards}
+  .modal .modal-panel{animation:lw-sheet-in .45s var(--ease)}
+  .modal.closing .modal-panel{animation:lw-sheet-out .24s ease-in forwards}
+  .drawer{animation:lw-drawer-in .42s var(--ease)}
+  .drawer.closing{animation:lw-drawer-out .26s ease-in forwards}
+  .toast{animation:lw-toast .35s var(--ease)}
+  .cart-count.bump{animation:lw-bump .5s var(--ease)}
+  .grid.refresh .model{animation:lw-rise .45s var(--ease) both;animation-delay:calc(var(--i,0) * 45ms)}
+}
+@media (prefers-reduced-motion: reduce){
+  .overlay,.modal .modal-panel,.drawer{animation:lw-fade .2s ease-out}
+  .overlay.closing,.modal.closing .modal-panel,.drawer.closing{animation:lw-fade-out .15s ease-in forwards}
 }
 @keyframes lw-fade{from{opacity:0}}
-@keyframes lw-panel{from{opacity:0;transform:translateY(10px) scale(.985)}}
-@keyframes lw-drawer{from{transform:translateX(100%)}}
-@keyframes lw-toast{from{opacity:0;transform:translate(-50%,8px)}}
+@keyframes lw-fade-out{to{opacity:0}}
+@keyframes lw-sheet-in{from{opacity:0;transform:translateY(28px) scale(.96)}}
+@keyframes lw-sheet-out{to{opacity:0;transform:translateY(28px) scale(.96)}}
+@keyframes lw-drawer-in{from{transform:translateX(100%)}}
+@keyframes lw-drawer-out{to{transform:translateX(100%)}}
+@keyframes lw-toast{from{opacity:0;transform:translate(-50%,14px) scale(.96)}}
 @keyframes lw-bump{30%{transform:scale(1.35)}100%{transform:scale(1)}}
-@keyframes lw-type{from{opacity:0;transform:translateY(8px)}}
+@keyframes lw-rise{from{opacity:0;transform:translateY(14px)}}
+@media (prefers-reduced-transparency: reduce){
+  .site-header{background:var(--bg);-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom-color:var(--line)}
+  .overlay{-webkit-backdrop-filter:none;backdrop-filter:none}
+}
+@media (prefers-contrast: more){
+  .tile,.panel,.faq details{box-shadow:none;border:1px solid var(--ink)}
+}
 
 /* Rechtstexte */
-.legal-wrap{padding-block:var(--s48) 0}
-.legal{max-width:74ch}
-.legal .back{display:inline-block;font-size:var(--t14);color:var(--muted);margin-bottom:var(--s24)}
-.legal h2{margin-bottom:6px}
-.legal .stand{font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);margin:0 0 var(--s32);padding-bottom:var(--s16);border-bottom:1.5px solid var(--ink)}
-.legal h3{font-size:var(--t16);font-stretch:112%;margin:var(--s32) 0 8px}
-.legal p,.legal li{font-size:15.5px}
+.legal-wrap{padding-block:56px 0}
+.legal{max-width:72ch}
+.legal .back{display:inline-block;font-size:.9375rem;color:var(--muted);margin-bottom:24px}
+.legal h2{margin-bottom:8px}
+.legal .stand{color:var(--muted);font-size:.875rem;margin:0 0 32px}
+.legal h3{font-size:1.125rem;margin:32px 0 8px}
+.legal p,.legal li{font-size:1rem}
 .legal p{margin:0 0 12px}
 .legal ul,.legal ol{margin:0 0 12px;padding-left:22px}
 .legal li{margin-bottom:4px}
-.legal .box{border:1.5px solid var(--ink);padding:16px 18px;margin:12px 0 16px;background:var(--surface)}
+.legal .box{background:var(--bg-alt);border-radius:var(--r-md);padding:18px 20px;margin:12px 0 16px}
 .legal .box p:last-child{margin-bottom:0}
-.ph{background:var(--accent);color:var(--accent-ink);padding:0 5px;font-family:var(--f-mono);font-size:.88em;white-space:nowrap}
-.todo{border:1.5px dashed var(--ink);padding:10px 14px;font-size:var(--t14);margin:8px 0 16px}
+.ph{background:var(--accent);color:var(--accent-ink);padding:0 6px;border-radius:6px;font-size:.9em;white-space:nowrap}
+.todo{border:1px dashed var(--muted);border-radius:var(--r-sm);padding:10px 14px;font-size:.9375rem;margin:8px 0 16px}
 .todo::before{content:"Hinweis für dich, vor Veröffentlichung löschen: ";font-weight:700}
 .wd-form{display:flex;flex-direction:column;gap:14px;max-width:440px;margin-top:8px}
-.wd-form label{font-weight:600;font-size:var(--t14);display:flex;flex-direction:column;gap:6px}
-.wd-form input{font:inherit;padding:10px 12px;border-radius:2px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
-.wd-form input:focus{outline:none;border-color:var(--ink)}
+.wd-form label{font-weight:600;font-size:.9375rem;display:flex;flex-direction:column;gap:6px}
+.wd-form input{font:inherit;font-size:16px;padding:12px 14px;border-radius:var(--r-sm);border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.wd-form input:focus{outline:none;border-color:var(--ink);box-shadow:0 0 0 4px var(--glow)}
 .wd-form .btn{align-self:flex-start}
 </style>
 
@@ -317,91 +359,87 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <defs>
-    <pattern id="layers" width="4" height="2.6" patternUnits="userSpaceOnUse"><rect width="4" height=".9" fill="rgba(0,0,0,.12)"/></pattern>
+    <pattern id="layers" width="4" height="2.6" patternUnits="userSpaceOnUse"><rect width="4" height=".9" fill="rgba(0,0,0,.08)"/></pattern>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".6" stop-color="#fff" stop-opacity="0"/></linearGradient>
   </defs>
 </svg>
 
-<header class="site-header">
+<header class="site-header" id="site-header">
   <div class="wrap">
     <a class="logo" href="#top" aria-label="LayerWing Startseite">
-      <svg viewBox="0 0 36 20" aria-hidden="true"><path d="M2 12 C 8 4, 20 3, 34 10 C 20 12, 10 14, 2 12 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 16.5h22M11 19h12" stroke="currentColor" stroke-width="1.6"/></svg>
+      <svg viewBox="0 0 36 20" aria-hidden="true"><path d="M2 12 C 8 4, 20 3, 34 10 C 20 12, 10 14, 2 12 Z" fill="var(--accent)" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 16.5h20M12 19h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       LayerWing
     </a>
     <nav class="nav" aria-label="Hauptnavigation">
       <a href="#modelle">Modelle</a>
-      <a href="#ablauf">Ablauf</a>
+      <a href="#ablauf">So geht's</a>
       <a href="#datei">Lieferumfang</a>
       <a href="#erster-druck">Checkliste</a>
       <a href="#drucker">Drucker</a>
-      <a href="#faq">FAQ</a>
+      <a href="#faq">Fragen</a>
     </nav>
-    <button class="cart-btn" id="open-cart" aria-label="Warenkorb öffnen">Warenkorb <span class="cart-count" id="cart-count">0</span></button>
+    <button class="cart-btn" id="open-cart" aria-label="Warenkorb öffnen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
   </div>
 </header>
 
 <main id="top">
   <section class="hero">
-    <div class="wrap hero-top">
-      <div>
-        <p class="label">Druckdateien für RC-Flugzeuge</p>
-        <h1>Flugmodelle zum Selbstdrucken, mit <mark>fertigen Profilen</mark> für deinen Bambu.</h1>
-        <p class="lead">Du kaufst die Datei, kein gedrucktes Modell. Jedes Flugzeug kommt als Bambu-Studio-Projekt mit allen Platten, Temperaturen und Flow-Werten für LW-PLA, PETG und PLA. Öffnen, Platte wählen, drucken.</p>
-        <div class="ctas">
-          <a class="btn btn-primary" href="#modelle">Modelle ansehen</a>
-          <a class="btn" href="#datei">Was in der Datei steckt</a>
-        </div>
+    <div class="wrap">
+      <p class="kicker"><span aria-hidden="true"></span>Druckdateien für RC-Flugzeuge</p>
+      <h1>Flugmodelle zum Selbstdrucken.</h1>
+      <p class="lead">Jedes Modell kommt als Bambu-Studio-Projekt mit allen Platten und fertigen Profilen. Öffnen, Platte wählen, drucken.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="#modelle">Modelle ansehen</a>
+        <a class="btn btn-ghost" href="#datei">Was in der Datei steckt</a>
       </div>
-      <table class="titleblock">
-        <caption>Schriftfeld</caption>
-        <tr><th scope="row">Projekt</th><td>LayerWing</td></tr>
-        <tr><th scope="row">Inhalt</th><td>6 Flugmodelle</td></tr>
-        <tr><th scope="row">Format</th><td>.3mf, .stl, PDF</td></tr>
-        <tr><th scope="row">Drucker</th><td>Bambu Lab A1 mini bis H2D</td></tr>
-        <tr><th scope="row">Düse</th><td>0,4 mm</td></tr>
-        <tr><th scope="row">Preise</th><td>ab 9,90 €, Download</td></tr>
-      </table>
-    </div>
-    <figure class="foil-band" style="margin-inline:0;margin-bottom:0">
-      <div class="wrap">
-        <svg id="foil" viewBox="0 0 640 290" role="img" aria-label="Querschnitt durch ein Flügelsegment mit Kohlefaserholm, Hilfsholm und diagonalen Innenrippen">
+      <figure class="stage-panel" style="margin-inline:0;margin-bottom:0">
+        <svg id="foil" viewBox="0 0 640 290" role="img" aria-label="Querschnitt durch ein Flügelsegment mit Kohlefaserholm, Hilfsholm und diagonalen Innenrippen, gedruckt Schicht für Schicht">
           <defs><clipPath id="foil-clip"><path id="foil-clip-path"/></clipPath><clipPath id="build-clip"><rect id="build-rect" x="0" y="0" width="640" height="290"/></clipPath></defs>
           <path class="foil-outline" id="foil-outline"/>
           <g clip-path="url(#foil-clip)"><g clip-path="url(#build-clip)" id="foil-ribs"></g></g>
           <path class="foil-outline" id="foil-outline-top" style="fill:none"/>
           <g id="foil-spar"></g>
           <g id="foil-anno"></g>
-          <circle class="foil-nozzle" id="nozzle" r="4" cx="-20" cy="-20"/>
+          <circle class="foil-nozzle" id="nozzle" r="4.5" cx="-20" cy="-20"/>
         </svg>
-        <figcaption class="foil-cap"><span>Schnitt F2, Flügel Möwe 1500, Maßstab ca. 1:2</span><span>Schicht 0,25 mm · LW-PLA · 240 °C · 1 Wandlinie</span></figcaption>
-      </div>
-    </figure>
+        <figcaption class="stage-meta">
+          <span class="chip">Flügel Möwe 1500</span>
+          <span class="chip"><b>0,25 mm</b> Schicht</span>
+          <span class="chip"><b>240 °C</b> LW-PLA</span>
+          <span class="chip"><b>1</b> Wandlinie</span>
+        </figcaption>
+      </figure>
+    </div>
   </section>
 
   <section class="section" id="modelle">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Typenliste</p><h2>Modelle</h2></div>
-        <p class="intro">Jede Datei gilt als private Drucklizenz. Verbesserte Profile und überarbeitete Teile bekommst du kostenlos nachgeliefert.</p>
+        <div><p class="kicker">Modelle</p><h2>Such dir deinen Flieger aus.</h2></div>
+        <p class="intro">Jede Datei ist eine private Drucklizenz. Verbesserte Profile und überarbeitete Teile bekommst du kostenlos nachgeliefert.</p>
       </div>
-      <div class="tabs">
-        <div class="tab-group" id="cat-filter" role="group" aria-label="Typ"><span>Typ</span></div>
-        <div class="tab-group" id="printer-filter" role="group" aria-label="Drucker"><span>Drucker</span></div>
+      <div class="toolbar">
+        <div class="segmented" id="cat-filter" role="group" aria-label="Flugzeugtyp"></div>
+        <div class="segmented" id="printer-filter" role="group" aria-label="Drucker"></div>
         <div class="count" id="result-count"></div>
       </div>
-      <div class="types" id="grid"></div>
+      <div class="grid" id="grid"></div>
     </div>
   </section>
 
   <section class="section" id="ablauf">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Ablauf</p><h2>Vom Kauf zum Erstflug</h2></div>
-        <p class="intro">Drei Schritte, für die du außer deinem Drucker nur Kohlerohre, Elektronik und Sekundenkleber brauchst.</p>
+        <div><p class="kicker">So geht's</p><h2>Vom Kauf zum Erstflug in drei Schritten.</h2></div>
+        <p class="intro">Außer deinem Drucker brauchst du nur Kohlerohre, Elektronik und Sekundenkleber.</p>
       </div>
-      <ol class="sequence">
-        <li><p class="label">Schritt 1</p><h3>Kaufen</h3><p>Datei in den Warenkorb legen und bezahlen. Der Download-Link kommt sofort per E-Mail.</p></li>
-        <li><p class="label">Schritt 2</p><h3>In Bambu Studio öffnen</h3><p>Die .3mf-Datei enthält alle Platten, die Filamentzuordnung fürs AMS und die Prozessprofile. Du musst nichts einstellen.</p></li>
-        <li><p class="label">Schritt 3</p><h3>Drucken und bauen</h3><p>Platte für Platte drucken, verkleben, Elektronik einsetzen. Die Bauanleitung zeigt Schwerpunkt und Ruderausschläge.</p></li>
+      <ol class="steps">
+        <li class="tile step"><span class="step-no">1</span><h3>Kaufen</h3><p>Datei in den Warenkorb legen und bezahlen. Der Download-Link kommt sofort per E-Mail.</p></li>
+        <li class="tile step"><span class="step-no">2</span><h3>In Bambu Studio öffnen</h3><p>Alle Platten, die Filamentzuordnung fürs AMS und die Prozessprofile sind schon drin. Du musst nichts einstellen.</p></li>
+        <li class="tile step"><span class="step-no">3</span><h3>Drucken und bauen</h3><p>Platte für Platte drucken, verkleben, Elektronik einsetzen. Die Bauanleitung zeigt Schwerpunkt und Ruderausschläge.</p></li>
       </ol>
     </div>
   </section>
@@ -409,28 +447,36 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
   <section class="section" id="datei">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Lieferumfang</p><h2>Was in einer Datei steckt</h2></div>
+        <div><p class="kicker">Lieferumfang</p><h2>Alles drin, was du zum Drucken brauchst.</h2></div>
         <p class="intro">Am Beispiel der Möwe 1500: neun Druckplatten, rund 27 Stunden Druckzeit auf einem X1C.</p>
       </div>
-      <div class="file-grid">
-        <ul class="file-list">
-          <li><span class="ext">.3mf</span><div><strong>Bambu-Studio-Projekt</strong><span class="d">Alle Teile auf Platten verteilt, mit Temperatur, Flow, Wandlinien, Naht und Kühlung pro Teil.</span></div></li>
-          <li><span class="ext">.3mf</span><div><strong>Variante A1 mini</strong><span class="d">Eigene Aufteilung für die 180-mm-Platte, wo das Modell es zulässt.</span></div></li>
-          <li><span class="ext">.stl</span><div><strong>Einzelteile als STL</strong><span class="d">Für andere Slicer oder eigene Anpassungen, plus ein Testwürfel zum Einstellen des Flows.</span></div></li>
-          <li><span class="ext">.pdf</span><div><strong>Bauplan und Bauanleitung</strong><span class="d">Klebereihenfolge, Schwerpunkt, Ruderausschläge und Fotos jedes Schritts.</span></div></li>
-          <li><span class="ext">.pdf</span><div><strong>Stückliste</strong><span class="d">Motor, Regler, Servos, Akku, Kohlerohre und Schrauben mit Maßen.</span></div></li>
-          <li><span class="ext">.step</span><div><strong>Servo- und Motorhalter</strong><span class="d">Zum Anpassen an andere Komponenten in deinem CAD-Programm.</span></div></li>
-        </ul>
-        <div>
+      <div class="bento">
+        <article class="tile big">
+          <span class="ext">.3mf</span>
+          <h3>Bambu-Studio-Projekt mit fertigen Profilen</h3>
+          <p>Alle Teile liegen schon auf Platten verteilt. Für jedes Teil sind Material, Temperatur, Flow, Wandlinien, Naht und Kühlung eingestellt.</p>
+          <div class="preset-mini">
+            <div><span>Flügelsegmente</span><span>LW-PLA · 240 °C · Flow 50 %</span></div>
+            <div><span>Rumpfsektionen</span><span>LW-PLA · 235 °C · Flow 55 %</span></div>
+            <div><span>Motorspant</span><span>PETG · 250 °C · 4 Wände</span></div>
+            <div><span>Ruderhörner</span><span>PLA · 220 °C · 30 % Gyroid</span></div>
+          </div>
+        </article>
+        <article class="tile"><span class="ext">.3mf</span><h3>Variante A1 mini</h3><p>Eigene Aufteilung für die 180-mm-Platte, wo das Modell es zulässt.</p></article>
+        <article class="tile"><span class="ext">.stl</span><h3>Einzelteile</h3><p>Für andere Slicer oder eigene Anpassungen, plus ein Testwürfel für den Flow.</p></article>
+        <article class="tile"><span class="ext">.pdf</span><h3>Bauanleitung</h3><p>Klebereihenfolge, Schwerpunkt, Ruderausschläge und Fotos jedes Schritts.</p></article>
+        <article class="tile"><span class="ext">.pdf</span><h3>Stückliste</h3><p>Motor, Regler, Servos, Akku, Kohlerohre und Schrauben mit Maßen.</p></article>
+        <article class="tile wide">
+          <h3>Plattenübersicht Möwe 1500</h3>
+          <p>Gerechnet für den X1C mit 0,4-mm-Düse.</p>
           <div class="table-wrap">
-            <div class="table-cap"><strong>Plattenübersicht Möwe 1500</strong><span class="mono" style="color:var(--muted);font-size:12px">X1C · 0,4-mm-Düse</span></div>
             <table class="data">
-              <thead><tr><th>Platte</th><th>Teile</th><th>Material</th><th class="num">Druckzeit</th></tr></thead>
+              <thead><tr><th>Platte</th><th>Teile</th><th>Material</th><th class="n">Druckzeit</th></tr></thead>
               <tbody id="plates-body"></tbody>
-              <tfoot><tr><td colspan="3">Gesamt, 9 Platten</td><td class="num" id="plates-total"></td></tr></tfoot>
+              <tfoot><tr><td colspan="3">Gesamt, 9 Platten</td><td class="n" id="plates-total"></td></tr></tfoot>
             </table>
           </div>
-        </div>
+        </article>
       </div>
     </div>
   </section>
@@ -438,33 +484,35 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
   <section class="section" id="erster-druck">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Vor dem ersten Druck</p><h2>Checkliste LW-PLA</h2></div>
-        <p class="intro">Leicht-PLA schäumt beim Drucken auf und verhält sich anders als normales PLA. Diese fünf Punkte entscheiden, ob dein Flieger leicht und stabil wird.</p>
+        <div><p class="kicker">Vor dem ersten Druck</p><h2>Fünf Dinge, die bei LW-PLA zählen.</h2></div>
+        <p class="intro">Leicht-PLA schäumt beim Drucken auf und verhält sich anders als normales PLA. Mit diesen Punkten wird dein Flieger leicht und stabil.</p>
       </div>
-      <ol class="checklist">
-        <li><span class="cl-item">Filament</span><span class="cl-val">trocken, unter 20 % rF</span><p>Feuchtes LW-PLA schäumt ungleichmäßig und wird spröde. Lagere die Rolle mit Trockenmittel oder im AMS mit frischen Trockenperlen.</p></li>
-        <li><span class="cl-item">Flow</span><span class="cl-val">Testwürfel, Wand 0,45 mm</span><p>Jede Rolle schäumt etwas anders. Drucke den beiliegenden Würfel und miss die Wandstärke, bevor du Flügel druckst.</p></li>
-        <li><span class="cl-item">Druckplatte</span><span class="cl-val">Textured PEI, entfettet</span><p>Dünnwandige Teile halten auf der texturierten PEI-Platte am besten. Mit Isopropanol reinigen, Kleber ist nicht nötig.</p></li>
-        <li><span class="cl-item">Düse</span><span class="cl-val">0,4 mm, sauber</span><p>Die Profile sind für die 0,4-mm-Düse gerechnet. Rückstände von PETG an der Düse führen bei LW-PLA zu Fäden.</p></li>
-        <li><span class="cl-item">Teile lösen</span><span class="cl-val">Platte abgekühlt</span><p>Biege die Federstahlplatte erst, wenn sie kalt ist. Warme Flügelsegmente mit einer Wand verziehen sich sonst leicht.</p></li>
-      </ol>
+      <div class="panel">
+        <ol class="checklist">
+          <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span><span class="cl-item">Filament trocken halten</span><span class="cl-val">unter 20 % Luftfeuchte</span><p>Feuchtes LW-PLA schäumt ungleichmäßig und wird spröde. Lagere die Rolle mit Trockenmittel oder im AMS mit frischen Trockenperlen.</p></li>
+          <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span><span class="cl-item">Flow einmal prüfen</span><span class="cl-val">Wand 0,45 mm</span><p>Jede Rolle schäumt etwas anders. Drucke den beiliegenden Testwürfel und miss die Wandstärke, bevor du Flügel druckst.</p></li>
+          <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span><span class="cl-item">Die richtige Druckplatte</span><span class="cl-val">Textured PEI</span><p>Dünnwandige Teile halten auf der texturierten PEI-Platte am besten. Mit Isopropanol reinigen, Kleber ist nicht nötig.</p></li>
+          <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span><span class="cl-item">Saubere Düse</span><span class="cl-val">0,4 mm</span><p>Die Profile sind für die 0,4-mm-Düse gerechnet. Reste von PETG an der Düse führen bei LW-PLA zu Fäden.</p></li>
+          <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="#1D1D1F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 6.2l2.3 2.3 4.7-4.9"/></svg></span><span class="cl-item">Teile kalt lösen</span><span class="cl-val">Platte abgekühlt</span><p>Biege die Federstahlplatte erst, wenn sie kalt ist. Warme Flügelsegmente mit einer Wand verziehen sich sonst leicht.</p></li>
+        </ol>
+      </div>
     </div>
   </section>
 
   <section class="section" id="drucker">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Kompatibilität</p><h2>Welches Modell passt auf deinen Drucker</h2></div>
-        <p class="intro">Bauraum in Millimetern. Die Profile sind für die 0,4-mm-Düse abgestimmt.</p>
+        <div><p class="kicker">Kompatibilität</p><h2>Passt auf deinen Drucker.</h2></div>
+        <p class="intro">Bauraum in Millimetern. Alle Profile sind für die 0,4-mm-Düse abgestimmt.</p>
       </div>
-      <div class="table-wrap"><table class="data matrix" id="matrix"></table></div>
+      <div class="panel" style="padding-block:6px"><div class="table-wrap"><table class="data matrix" id="matrix"></table></div></div>
     </div>
   </section>
 
   <section class="section" id="faq">
     <div class="wrap">
       <div class="sec-head">
-        <div><p class="label">Fragen</p><h2>Häufige Fragen</h2></div>
+        <div><p class="kicker">Fragen</p><h2>Gut zu wissen.</h2></div>
         <p class="intro">Deine Frage ist nicht dabei? Schreib an fabio.bertram@web.de.</p>
       </div>
       <div class="faq">
@@ -640,7 +688,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 
 <footer class="site-footer">
   <div class="wrap">
-    <span>© 2026 LayerWing · Fabio Bertram · Gemäß § 19 UStG wird keine Umsatzsteuer berechnet · Digitale Ware, kein Versand</span>
+    <span>© 2026 LayerWing, Fabio Bertram. Gemäß § 19 UStG wird keine Umsatzsteuer berechnet. Digitale Ware, kein Versand.</span>
     <div class="foot-links"><a href="#impressum">Impressum</a><a href="#datenschutz">Datenschutz</a><a href="#agb">AGB</a><a href="#widerruf">Widerrufsbelehrung</a><a class="foot-wd" href="#widerrufen">Vertrag widerrufen</a></div>
   </div>
 </footer>
@@ -684,12 +732,12 @@ const SHAPES={
   mini:{span:150,wy:66,root:30,tip:20,sw:2,fl:128,fw:16,ts:56,tr:20,tt:14,ty:138,tsw:1,te:.25}
 };
 const PRODUCTS=[
-  {id:'moewe',no:'LW-01',name:'Möwe 1500',cat:'Segler',kind:'Thermiksegler',price:24.90,color:'#ECEAE2',shape:'glider',
+  {id:'moewe',no:'LW-01',name:'Möwe 1500',cat:'Segler',kind:'Thermiksegler',price:24.90,color:'#F4F2EC',shape:'glider',
    span:1500,weight:620,pw:410,time:'27 h',plates:9,parts:34,printers:['a1','p1','x1','h2d'],
    motor:'2212 · 1000 KV',esc:'30 A',akku:'3S 1300 mAh',servos:'4 × 9 g',prop:'Klapp 10 × 6',cg:'68 mm hinter Nasenleiste',
    desc:'Gutmütiger Thermiksegler mit Klappluftschraube. Steckflügel aus vier Segmenten, Holm aus 8-mm-Kohlerohr.',
    presets:['rumpf','fluegel','leit','spant','klein']},
-  {id:'falke',no:'LW-02',name:'Falke Trainer',cat:'Trainer',kind:'Schulterdecker',price:19.90,color:'#F2C230',shape:'trainer',tag:'Einsteiger',
+  {id:'falke',no:'LW-02',name:'Falke Trainer',cat:'Trainer',kind:'Schulterdecker',price:19.90,color:'#F2C230',shape:'trainer',tag:'Für Einsteiger',
    span:1100,weight:780,pw:520,time:'22 h',plates:8,parts:29,printers:['a1','p1','x1','h2d'],
    motor:'2216 · 1100 KV',esc:'40 A',akku:'3S 2200 mAh',servos:'4 × 9 g',prop:'10 × 5',cg:'75 mm hinter Nasenleiste',
    desc:'Schulterdecker für den Einstieg: hoher Flügel, viel V-Form und ein gutmütiges Abreißverhalten. Gut als erstes Druckmodell.',
@@ -704,7 +752,7 @@ const PRODUCTS=[
    motor:'2814 · 900 KV',esc:'50 A',akku:'4S 1800 mAh',servos:'4 × 9 g',prop:'11 × 7',cg:'62 mm hinter Nasenleiste',
    desc:'Tiefdecker im Stil der 1940er mit eckigen Flügelenden, Kühlerwanne und Cockpithaube als eigenem PETG-Teil.',
    presets:['rumpf','fluegel','leit','haube','spant','klein']},
-  {id:'pfeil',no:'LW-05',name:'Pfeil EDF',cat:'Jet',kind:'Delta-Jet',price:34.90,color:'#3D7DD6',shape:'jet',tag:'Neu',
+  {id:'pfeil',no:'LW-05',name:'Pfeil EDF',cat:'Jet',kind:'Delta-Jet',price:34.90,color:'#3D7DD6',shape:'jet',tag:'Neu',hot:true,
    span:800,weight:1050,pw:690,time:'29 h',plates:10,parts:38,printers:['a1','p1','x1','h2d'],
    motor:'Impeller 64 mm · 12 Blatt',esc:'60 A',akku:'4S 2200 mAh',servos:'3 × 9 g',prop:'–',cg:'210 mm ab Nasenspitze',
    desc:'Delta-Jet mit 64-mm-Impeller. Einlaufkanäle und Schubrohr sind strömungsoptimiert und werden in PETG gedruckt.',
@@ -732,7 +780,7 @@ const PLATES=[
   ['7','Flügel rechts außen (F3–F4)','LW-PLA',185],['8','Höhen- und Seitenleitwerk','LW-PLA',135],['9','Motorspant, Servorahmen, Ruderhörner','PETG',110]
 ];
 const CATS=['Alle','Segler','Trainer','Nurflügel','Warbird','Jet'];
-const PFILTER=[{k:'alle',n:'Alle'},{k:'a1m',n:'A1 mini'},{k:'a1',n:'A1 · P1 · X1'},{k:'h2d',n:'H2D'}];
+const PFILTER=[{k:'alle',n:'Alle Drucker'},{k:'a1m',n:'A1 mini'},{k:'a1',n:'A1, P1, X1'},{k:'h2d',n:'H2D'}];
 
 const $=s=>document.querySelector(s);
 const eur=n=>n.toLocaleString('de-DE',{style:'currency',currency:'EUR'});
@@ -740,8 +788,9 @@ const mm=n=>n.toLocaleString('de-DE')+' mm';
 const hm=m=>Math.floor(m/60)+' h '+String(m%60).padStart(2,'0');
 const byId=id=>PRODUCTS.find(p=>p.id===id);
 const pname=k=>PRINTERS.find(p=>p.k===k).n;
+const reduceMotion=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* Draufsicht im Bauplan-Stil: Tuschekontur, Filamentfarbe, Mittellinie, Maßlinie für die Spannweite */
+/* Draufsicht: Filamentfarbe, feine Kontur, leichter Glanz; im Datenblatt mit Maßlinie */
 function planeSVG(p,opt){
   opt=opt||{};
   const s=SHAPES[p.shape], cx=100, out=[];
@@ -749,25 +798,23 @@ function planeSVG(p,opt){
   out.push(wingPoly(s.wy,s.root,s.tip,s.span/2,s.sw));
   if(s.flying){
     const hs=s.span/2, y=s.wy+s.sw;
-    out.push(`<rect x="${cx+hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="1"/>`,`<rect x="${cx-hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="1"/>`);
+    out.push(`<rect x="${cx+hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="2"/>`,`<rect x="${cx-hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="2"/>`);
     const y0=s.wy-12;
     out.push(`<path d="M${cx},${y0} Q${cx+s.fw/2},${y0} ${cx+s.fw/2},${y0+18} L${cx+s.fw/2},${y0+s.fl} L${cx-s.fw/2},${y0+s.fl} L${cx-s.fw/2},${y0+18} Q${cx-s.fw/2},${y0} ${cx},${y0} Z"/>`);
   } else {
     out.push(wingPoly(s.ty,s.tr,s.tt,s.ts/2,s.tsw));
     const y0=100-s.fl/2-8, h=s.fw/2, t=s.fw*s.te, f=s.fl;
     out.push(`<path d="M${cx},${y0} Q${cx+h},${y0} ${cx+h},${y0+f*.17} L${cx+h},${y0+f*.55} L${cx+t},${y0+f} L${cx-t},${y0+f} L${cx-h},${y0+f*.55} L${cx-h},${y0+f*.17} Q${cx-h},${y0} ${cx},${y0} Z"/>`);
-    out.push(`<rect x="${cx-1.2}" y="${s.ty-4}" width="2.4" height="${s.tr+8}"/>`);
+    out.push(`<rect x="${cx-1.3}" y="${s.ty-4}" width="2.6" height="${s.tr+8}" rx="1"/>`);
   }
   const shapes=out.join('');
-  let extra='';
+  let dim='';
   if(opt.dim){
     const hs=s.span/2, y=190;
-    extra=`<line x1="${cx}" y1="4" x2="${cx}" y2="182" stroke="currentColor" stroke-width=".6" stroke-dasharray="8 2.5 1.5 2.5" opacity=".55"/>
-      <g stroke="currentColor" stroke-width=".7" opacity=".8"><line x1="${cx-hs}" y1="${y}" x2="${cx+hs}" y2="${y}"/><line x1="${cx-hs}" y1="${y-5}" x2="${cx-hs}" y2="${y+3}"/><line x1="${cx+hs}" y1="${y-5}" x2="${cx+hs}" y2="${y+3}"/></g>
-      <rect x="${cx-17}" y="${y-5}" width="34" height="10" fill="var(--paper)"/>
-      <text x="${cx}" y="${y+3}" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="8" fill="currentColor">${p.span.toLocaleString('de-DE')}</text>`;
+    dim=`<g stroke="currentColor" stroke-width=".7" opacity=".55"><line x1="${cx-hs}" y1="${y}" x2="${cx+hs}" y2="${y}"/><line x1="${cx-hs}" y1="${y-5}" x2="${cx-hs}" y2="${y+3}"/><line x1="${cx+hs}" y1="${y-5}" x2="${cx+hs}" y2="${y+3}"/></g>
+      <text x="${cx}" y="${y-4}" text-anchor="middle" font-family="Geist, system-ui, sans-serif" font-size="8" font-weight="600" fill="currentColor" opacity=".7">${p.span.toLocaleString('de-DE')} mm</text>`;
   }
-  return `<svg viewBox="0 0 200 200" aria-hidden="true">${opt.dim?extra:''}<g fill="${p.color}" stroke="currentColor" stroke-width=".9" stroke-linejoin="round">${shapes}</g><g fill="url(#layers)">${shapes}</g></svg>`;
+  return `<svg viewBox="0 0 200 200" aria-hidden="true">${dim}<g fill="${p.color}" stroke="currentColor" stroke-width=".7" stroke-linejoin="round" stroke-opacity=".55">${shapes}</g><g fill="url(#layers)">${shapes}</g><g fill="url(#sheen)">${shapes}</g></svg>`;
 }
 
 /* Warenkorb */
@@ -783,43 +830,54 @@ function addToCart(id){
 }
 function removeFromCart(id){cart=cart.filter(x=>x!==id);save();syncCart()}
 
-/* Typenliste */
+/* Modelle */
 const state={cat:'Alle',printer:'alle'};
 function renderFilters(){
-  $('#cat-filter').insertAdjacentHTML('beforeend',CATS.map(c=>`<button class="tab" data-cat="${c}" aria-pressed="${c===state.cat}">${c}</button>`).join(''));
-  $('#printer-filter').insertAdjacentHTML('beforeend',PFILTER.map(f=>`<button class="tab" data-printer="${f.k}" aria-pressed="${f.k===state.printer}">${f.n}</button>`).join(''));
+  $('#cat-filter').innerHTML=CATS.map(c=>`<button class="seg" data-cat="${c}" aria-pressed="${c===state.cat}">${c}</button>`).join('');
+  $('#printer-filter').innerHTML=PFILTER.map(f=>`<button class="seg" data-printer="${f.k}" aria-pressed="${f.k===state.printer}">${f.n}</button>`).join('');
   $('#cat-filter').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;state.cat=b.dataset.cat;document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid(true)});
   $('#printer-filter').addEventListener('click',e=>{const b=e.target.closest('[data-printer]');if(!b)return;state.printer=b.dataset.printer;document.querySelectorAll('[data-printer]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid(true)});
 }
-function cartBtn(p){const inC=cart.includes(p.id);return `<button class="btn ${inC?'in-cart':'btn-primary'}" data-add="${p.id}">${inC?'Liegt im Warenkorb':'In den Warenkorb'}</button>`}
+function cartBtn(p){const inC=cart.includes(p.id);return `<button class="btn ${inC?'in-cart':'btn-primary'}" data-add="${p.id}">${inC?'Im Warenkorb ✓':'In den Warenkorb'}</button>`}
 function renderGrid(animate){
   const g=$('#grid');
   g.classList.remove('refresh');
   if(animate){void g.offsetWidth;g.classList.add('refresh')}
   const list=PRODUCTS.filter(p=>(state.cat==='Alle'||p.cat===state.cat)&&(state.printer==='alle'||p.printers.includes(state.printer)));
   $('#result-count').textContent=list.length+(list.length===1?' Modell':' Modelle');
-  $('#grid').innerHTML=list.length?list.map((p,i)=>`
-    <article class="type" style="--i:${i}">
-      <div class="type-meta"><span class="type-no">${p.no} · ${p.cat}</span>${p.tag?`<span class="tag">${p.tag}</span>`:''}</div>
-      <button class="drawing" data-open="${p.id}" aria-label="Details zu ${p.name}">${planeSVG(p,{dim:true})}</button>
-      <div class="type-title"><h3>${p.name}</h3><span class="price">${eur(p.price)}</span></div>
-      <p class="type-sub">${p.kind}, ${mm(p.span)} Spannweite, ${p.plates} Druckplatten</p>
-      <dl class="specs">
-        <div><dt>Abfluggewicht</dt><dd>${p.weight} g</dd></div>
-        <div><dt>Flächenlast</dt><dd>${p.load} g/dm²</dd></div>
-        <div><dt>Druckzeit</dt><dd>${p.time}</dd></div>
-        <div><dt>Bauraum ab</dt><dd>${p.bed.split(' ')[0]} mm</dd></div>
-      </dl>
-      <div class="type-actions"><button class="btn" data-open="${p.id}">Datenblatt</button>${cartBtn(p)}</div>
-    </article>`).join(''):`<div class="empty">Für diese Kombination gibt es noch kein Modell. Wähle einen anderen Typ oder Drucker.</div>`;
+  g.innerHTML=list.length?list.map((p,i)=>`
+    <article class="tile model" style="--i:${i}">
+      <button class="stage" data-open="${p.id}" aria-label="Datenblatt zu ${p.name} öffnen">${planeSVG(p)}${p.tag?`<span class="badge${p.hot?' hot':''}">${p.tag}</span>`:''}</button>
+      <div class="model-body">
+        <div class="model-head"><h3>${p.name}</h3><span class="price">${eur(p.price)}</span></div>
+        <p class="model-sub">${p.kind}, ${mm(p.span)} Spannweite</p>
+        <dl class="specs">
+          <div><dt>Gewicht</dt><dd>${p.weight} g</dd></div>
+          <div><dt>Flächenlast</dt><dd>${p.load}</dd></div>
+          <div><dt>Druckzeit</dt><dd>${p.time}</dd></div>
+          <div><dt>Platten</dt><dd>${p.plates}</dd></div>
+        </dl>
+        <div class="model-actions"><button class="btn" data-open="${p.id}">Datenblatt</button>${cartBtn(p)}</div>
+      </div>
+    </article>`).join(''):`<div class="empty">Für diese Kombination gibt es noch kein Modell. Wähl einen anderen Typ oder Drucker.</div>`;
 }
 
 function renderTables(){
   let tot=0;
-  $('#plates-body').innerHTML=PLATES.map(r=>{tot+=r[3];return `<tr><td class="mono">${r[0]}</td><td>${r[1]}</td><td class="mat">${r[2]}</td><td class="num">${hm(r[3])}</td></tr>`}).join('');
+  $('#plates-body').innerHTML=PLATES.map(r=>{tot+=r[3];return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="n">${hm(r[3])}</td></tr>`}).join('');
   $('#plates-total').textContent=hm(tot);
-  $('#matrix').innerHTML=`<thead><tr><th>Modell</th>${PRINTERS.map(p=>`<th>${p.n}<br><span style="text-transform:none;letter-spacing:0">${p.bed}</span></th>`).join('')}</tr></thead>
+  $('#matrix').innerHTML=`<thead><tr><th>Modell</th>${PRINTERS.map(p=>`<th>${p.n}<br><span style="font-weight:400">${p.bed}</span></th>`).join('')}</tr></thead>
   <tbody>${PRODUCTS.map(p=>`<tr><td>${p.name}</td>${PRINTERS.map(pr=>p.printers.includes(pr.k)?'<td class="yes" aria-label="passt">✓</td>':'<td class="no" aria-label="passt nicht">–</td>').join('')}</tr>`).join('')}</tbody>`;
+}
+
+/* Öffnen und Schließen auf demselben Weg, jederzeit unterbrechbar */
+function show(el){el.classList.remove('closing');el.hidden=false}
+function hide(el){
+  if(el.hidden)return;
+  el.classList.add('closing');
+  const done=()=>{if(el.classList.contains('closing')){el.hidden=true;el.classList.remove('closing')}};
+  el.addEventListener('animationend',done,{once:true});
+  setTimeout(done,400);
 }
 
 /* Datenblatt */
@@ -827,11 +885,11 @@ let lastFocus=null;
 function openModal(id){
   const p=byId(id); lastFocus=document.activeElement;
   $('#modal-panel').innerHTML=`
-    <button class="close-x" data-close aria-label="Schließen">×</button>
+    <button class="close-x" data-close aria-label="Datenblatt schließen">×</button>
     <div class="modal-top">
-      <div class="drawing">${planeSVG(p,{dim:true})}</div>
+      <div class="stage">${planeSVG(p,{dim:true})}</div>
       <div class="modal-info">
-        <p class="label">${p.no} · ${p.kind}</p>
+        <p class="kicker">${p.kind}</p>
         <h3 id="modal-title">${p.name}</h3>
         <p>${p.desc}</p>
         <div class="stat-row">
@@ -839,7 +897,7 @@ function openModal(id){
           <div><b>${p.weight} g</b><span>Abfluggewicht</span></div>
           <div><b>${p.load} g/dm²</b><span>Flächenlast</span></div>
         </div>
-        <div class="file-chips">${['.3mf Bambu Studio','.stl','Bauplan .pdf','Bauanleitung .pdf'].map(f=>`<span class="tag">${f}</span>`).join('')}</div>
+        <div class="file-chips">${['.3mf für Bambu Studio','.stl','Bauplan als PDF','Bauanleitung als PDF'].map(f=>`<span>${f}</span>`).join('')}</div>
         <div class="modal-buy"><span class="price">${eur(p.price)}</span>${cartBtn(p)}</div>
       </div>
     </div>
@@ -852,49 +910,50 @@ function openModal(id){
         <div><dt>Streckung</dt><dd>${p.ar}</dd></div>
         <div><dt>Abfluggewicht</dt><dd>${p.weight} g</dd></div>
         <div><dt>Druckgewicht</dt><dd>${p.pw} g</dd></div>
-        <div><dt>Mindestgeschw.</dt><dd>ca. ${p.stall} km/h</dd></div>
-        <div><dt>Druckzeit</dt><dd>${p.time} · ${p.plates} Platten</dd></div>
+        <div><dt>Mindestgeschwindigkeit</dt><dd>ca. ${p.stall} km/h</dd></div>
+        <div><dt>Druckzeit</dt><dd>${p.time}, ${p.plates} Platten</dd></div>
         <div><dt>Schwerpunkt</dt><dd>${p.cg}</dd></div>
       </dl>
       <h4>Einkaufsliste</h4>
       <div class="shop-list">
-        <div><h5>3D-Drucker</h5><p>Bauraum ab ${p.bed}, 0,4-mm-Düse</p><p class="small">${p.printers.map(pname).join(' · ')}</p></div>
-        <div><h5>Filament</h5><ul>${Object.entries(p.fil).map(([k,v])=>`<li><span>${k}</span><span class="mono">${v} g</span></li>`).join('')}</ul></div>
+        <div><h5>3D-Drucker</h5><p>Bauraum ab ${p.bed}, 0,4-mm-Düse</p><p class="small">${p.printers.map(pname).join(', ')}</p></div>
+        <div><h5>Filament</h5><ul>${Object.entries(p.fil).map(([k,v])=>`<li><span>${k}</span><span>${v} g</span></li>`).join('')}</ul></div>
         <div><h5>Antrieb</h5><ul><li><span>Motor</span><span>${p.motor}</span></li><li><span>Regler</span><span>${p.esc}</span></li><li><span>Luftschraube</span><span>${p.prop}</span></li><li><span>Servos</span><span>${p.servos}</span></li></ul></div>
         <div><h5>Akku und Sender</h5><ul><li><span>Akku</span><span>${p.akku}</span></li><li><span>Sender</span><span>ab ${p.ch} Kanäle</span></li></ul></div>
         <div class="wide"><h5>Kleinteile</h5><ul class="plain">${[...p.carbon,...COMMON_PARTS].map(x=>`<li>${x}</li>`).join('')}</ul></div>
       </div>
       <h4>Voreinstellungen in der .3mf</h4>
       <div class="table-wrap"><table class="data">
-        <thead><tr><th>Teil</th><th>Material</th><th>Schicht</th><th class="num">Wände</th><th>Infill</th><th class="num">Düse</th><th class="num">Flow</th></tr></thead>
-        <tbody>${p.presets.map(k=>{const r=PS[k];return `<tr><td>${r[0]}</td><td class="mat">${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td><td class="num">${r[5]}</td><td class="num">${r[6]}</td></tr>`}).join('')}</tbody>
+        <thead><tr><th>Teil</th><th>Material</th><th>Schicht</th><th class="n">Wände</th><th>Infill</th><th class="n">Düse</th><th class="n">Flow</th></tr></thead>
+        <tbody>${p.presets.map(k=>{const r=PS[k];return `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="n">${r[3]}</td><td>${r[4]}</td><td class="n">${r[5]}</td><td class="n">${r[6]}</td></tr>`}).join('')}</tbody>
       </table></div>
       <p class="fine">Werte für die 0,4-mm-Düse. Die LW-PLA-Profile gehen von einem aufschäumenden Leicht-PLA aus, z. B. Bambu PLA Aero oder ColorFabb LW-PLA.</p>
     </div>`;
-  $('#overlay').hidden=false; $('#modal').hidden=false;
+  show($('#overlay')); show($('#modal'));
   document.body.style.overflow='hidden';
   setTimeout(()=>{const c=$('#modal-panel [data-close]');c&&c.focus()},10);
 }
 function closeAll(){
-  $('#modal').hidden=true; $('#drawer').hidden=true; $('#overlay').hidden=true;
+  hide($('#modal')); hide($('#drawer')); hide($('#overlay'));
   document.body.style.overflow='';
-  if(lastFocus&&lastFocus.focus){try{lastFocus.focus()}catch(e){}}
+  if(lastFocus&&lastFocus.focus){try{lastFocus.focus({preventScroll:true})}catch(e){}}
 }
 
 /* Warenkorb-Leiste */
 let view='cart';
-function openCart(){lastFocus=document.activeElement;view='cart';renderDrawer();$('#modal').hidden=true;$('#overlay').hidden=false;$('#drawer').hidden=false;document.body.style.overflow='hidden';setTimeout(()=>$('#close-cart').focus(),10)}
+function openCart(){lastFocus=document.activeElement;view='cart';renderDrawer();hide($('#modal'));show($('#overlay'));show($('#drawer'));document.body.style.overflow='hidden';setTimeout(()=>$('#close-cart').focus(),10)}
 function total(){return cart.reduce((s,id)=>s+byId(id).price,0)}
 function renderDrawer(){
   const body=$('#drawer-body'), foot=$('#drawer-foot');
   $('#drawer-title').textContent=view==='cart'?'Warenkorb':'Kasse';
-  if(!cart.length){body.innerHTML=`<div class="cart-empty"><p style="margin:0">Dein Warenkorb ist leer.</p><button class="btn" data-close>Modelle ansehen</button></div>`;foot.innerHTML='';return}
+  if(!cart.length){body.innerHTML=`<div class="cart-empty"><p style="margin:0">Dein Warenkorb ist leer.</p><button class="btn btn-primary" data-close>Modelle ansehen</button></div>`;foot.innerHTML='';foot.hidden=true;return}
+  foot.hidden=false;
   if(view==='cart'){
-    body.innerHTML=cart.map(id=>{const p=byId(id);return `<div class="cart-item"><div class="cart-thumb">${planeSVG(p)}</div><div><strong>${p.name}</strong><small>${p.no} · .3mf, .stl, PDF</small><br><button class="rm" data-rm="${p.id}">Entfernen</button></div><div class="p">${eur(p.price)}</div></div>`}).join('');
-    foot.innerHTML=`<div class="total"><span>Summe</span><span>${eur(total())}</span></div><p class="fine">Endpreis, keine Umsatzsteuer gemäß § 19 UStG · Download nach Zahlungseingang</p><button class="btn btn-primary" id="to-checkout">Zur Kasse</button>`;
+    body.innerHTML=cart.map(id=>{const p=byId(id);return `<div class="cart-item"><div class="cart-thumb">${planeSVG(p)}</div><div><strong>${p.name}</strong><small>Digitale Datei, .3mf, .stl, PDF</small><br><button class="rm" data-rm="${p.id}">Entfernen</button></div><div class="p">${eur(p.price)}</div></div>`}).join('');
+    foot.innerHTML=`<div class="total"><span>Summe</span><span>${eur(total())}</span></div><p class="fine">Endpreis, keine Umsatzsteuer gemäß § 19 UStG. Download nach Zahlungseingang.</p><button class="btn btn-primary" id="to-checkout">Zur Kasse</button>`;
   } else {
     body.innerHTML=`<form class="form" id="co-form" novalidate>
-      <button type="button" class="back-link" id="back-cart">← Zurück zum Warenkorb</button>
+      <button type="button" class="back-link" id="back-cart">Zurück zum Warenkorb</button>
       <label class="t" for="co-email">E-Mail für den Download-Link<input type="email" id="co-email" required autocomplete="email" placeholder="name@beispiel.de"></label>
       <label class="check"><input type="checkbox" id="co-agb" required><span>Ich akzeptiere die <a href="#agb">AGB</a>. Die <a href="#datenschutz">Datenschutzerklärung</a> und die <a href="#widerruf">Widerrufsbelehrung</a> habe ich zur Kenntnis genommen.</span></label>
       <label class="check"><input type="checkbox" id="co-consent" required><span>Ich stimme ausdrücklich zu, dass LayerWing vor Ablauf der Widerrufsfrist mit der Bereitstellung der Dateien beginnt. Mir ist bekannt, dass ich durch diese Zustimmung mit Beginn der Bereitstellung mein Widerrufsrecht verliere.</span></label>
@@ -907,12 +966,12 @@ function renderDrawer(){
 function syncCart(){
   const n=cart.length, c=$('#cart-count');
   c.textContent=n; c.dataset.zero=n?'0':'1';
-  document.querySelectorAll('[data-add]').forEach(b=>{const inC=cart.includes(b.dataset.add);b.textContent=inC?'Liegt im Warenkorb':'In den Warenkorb';b.classList.toggle('in-cart',inC);b.classList.toggle('btn-primary',!inC)});
+  document.querySelectorAll('[data-add]').forEach(b=>{const inC=cart.includes(b.dataset.add);b.textContent=inC?'Im Warenkorb ✓':'In den Warenkorb';b.classList.toggle('in-cart',inC);b.classList.toggle('btn-primary',!inC)});
   if(!$('#drawer').hidden)renderDrawer();
 }
 
 let tt;
-function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2200)}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;t.style.animation='none';void t.offsetWidth;t.style.animation='';clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2400)}
 
 document.addEventListener('click',e=>{
   const add=e.target.closest('[data-add]');
@@ -951,9 +1010,23 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(!$('#modal').hidde
 $('#open-cart').addEventListener('click',openCart);
 $('#close-cart').addEventListener('click',closeAll);
 
-/* Profilschnitt NACA 2412 mit Druckdüse */
+/* Lichtschein folgt dem Zeiger, nur mit Maus */
+if(window.matchMedia&&window.matchMedia('(hover: hover)').matches){
+  document.addEventListener('pointermove',e=>{
+    const t=e.target.closest&&e.target.closest('.tile'); if(!t)return;
+    const r=t.getBoundingClientRect();
+    t.style.setProperty('--mx',(e.clientX-r.left)+'px');t.style.setProperty('--my',(e.clientY-r.top)+'px');
+  },{passive:true});
+}
+
+/* Kopfleiste: Trennlinie erst, wenn Inhalt darunter liegt */
+const header=$('#site-header');
+const onScroll=()=>header.classList.toggle('scrolled',window.scrollY>4);
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* Profilschnitt NACA 2412: Schicht für Schicht gedruckt, danach Konturfahrt */
 function drawFoil(){
-  const m=.02,p=.4,t=.12,n=80,X0=30,C=520,Y0=150, up=[],lo=[];
+  const m=.02,p=.4,t=.12,n=80,X0=60,C=520,Y0=150, up=[],lo=[];
   const camber=x=>x<p?[m/(p*p)*(2*p*x-x*x),2*m/(p*p)*(p-x)]:[m/((1-p)*(1-p))*((1-2*p)+2*p*x-x*x),2*m/((1-p)*(1-p))*(p-x)];
   for(let i=0;i<=n;i++){
     const x=(1-Math.cos(i/n*Math.PI))/2;
@@ -966,32 +1039,28 @@ function drawFoil(){
   const d='M'+pts.map(q=>q[0].toFixed(1)+' '+q[1].toFixed(1)).join(' L')+' Z';
   ['#foil-outline','#foil-clip-path','#foil-outline-top'].forEach(s=>$(s).setAttribute('d',d));
   let ribs='';
-  for(let x=-150;x<640;x+=36)ribs+=`<line class="foil-rib" x1="${x}" y1="60" x2="${x+150}" y2="240"/><line class="foil-rib" x1="${x+150}" y1="60" x2="${x}" y2="240"/>`;
+  for(let x=-150;x<680;x+=36)ribs+=`<line class="foil-rib" x1="${x}" y1="60" x2="${x+150}" y2="240"/><line class="foil-rib" x1="${x+150}" y1="60" x2="${x}" y2="240"/>`;
   ribs+=`<line class="foil-rib" x1="${X0+.6*C}" y1="60" x2="${X0+.6*C}" y2="240" style="opacity:.9;stroke-width:1.6"/>`;
   $('#foil-ribs').innerHTML=ribs;
   const sx=X0+.3*C, sy=Y0-camber(.3)[0]*C, r=9.5;
   $('#foil-spar').innerHTML=`<circle class="foil-spar-in" cx="${sx}" cy="${sy}" r="${r+3}"/><circle class="foil-spar" cx="${sx}" cy="${sy}" r="${r}"/><circle class="foil-spar-in" cx="${sx}" cy="${sy}" r="${r-2.8}"/>`;
   const uw=up[52];
   $('#foil-anno').innerHTML=`
-    <line class="foil-center" x1="${X0-14}" y1="${Y0}" x2="${X0+C+14}" y2="${Y0}"/>
-    <path class="foil-leader" d="M${sx} ${sy-r-3} L${sx} 40 L${sx+14} 40"/><text class="foil-label" x="${sx+18}" y="44">Holm · Kohlerohr Ø 8 mm</text>
-    <path class="foil-leader" d="M${uw[0].toFixed(1)} ${uw[1].toFixed(1)} L${uw[0]-20} 82 L${uw[0]-34} 82"/><text class="foil-label" x="${uw[0]-38}" y="86" text-anchor="end">Außenwand · 1 Linie</text>
-    <path class="foil-leader" d="M${X0+.6*C} ${Y0+18} L${X0+.6*C+18} 198 L${X0+.6*C+32} 198"/><text class="foil-label dim" x="${X0+.6*C+36}" y="202">Hilfsholm</text>
-    <g class="foil-leader"><line x1="${X0}" y1="228" x2="${X0+C}" y2="228"/><line x1="${X0}" y1="218" x2="${X0}" y2="238"/><line x1="${X0+C}" y1="218" x2="${X0+C}" y2="238"/><line x1="${X0}" y1="${Y0+10}" x2="${X0}" y2="214" stroke-dasharray="3 3"/><line x1="${X0+C}" y1="${Y0+4}" x2="${X0+C}" y2="214" stroke-dasharray="3 3"/></g>
-    <text class="foil-label" x="${X0+C/2}" y="254" text-anchor="middle">Profiltiefe 220 mm</text>
-    <text class="foil-label dim" x="${X0+C}" y="278" text-anchor="end">NACA 2412 · 12 % Dicke</text>`;
+    <path class="foil-leader" d="M${sx} ${sy-r-3} L${sx} 46 L${sx+14} 46"/><text class="foil-label" x="${sx+18}" y="50">Holm aus Kohlerohr, Ø 8 mm</text>
+    <path class="foil-leader" d="M${uw[0].toFixed(1)} ${uw[1].toFixed(1)} L${uw[0]-20} 86 L${uw[0]-34} 86"/><text class="foil-label" x="${uw[0]-38}" y="90" text-anchor="end">Außenwand, eine Linie</text>
+    <path class="foil-leader" d="M${X0+.6*C} ${Y0+18} L${X0+.6*C+18} 200 L${X0+.6*C+32} 200"/><text class="foil-label dim" x="${X0+.6*C+36}" y="204">Hilfsholm</text>
+    <g class="foil-leader"><line x1="${X0}" y1="232" x2="${X0+C}" y2="232"/><line x1="${X0}" y1="224" x2="${X0}" y2="240"/><line x1="${X0+C}" y1="224" x2="${X0+C}" y2="240"/></g>
+    <text class="foil-label" x="${X0+C/2}" y="260" text-anchor="middle">Profiltiefe 220 mm, NACA 2412</text>`;
   const path=$('#foil-outline'), L=path.getTotalLength(), dot=$('#nozzle');
   const place=len=>{const q=path.getPointAtLength(len);dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y)};
-  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if(reduce){place(L*.5);return}
-  /* Druckmoment: Schicht für Schicht von unten nach oben, danach Konturfahrt */
+  if(reduceMotion()){place(L*.5);return}
   const rect=$('#build-rect');
   const top=Math.min(...up.map(q=>q[1])), bottom=Math.max(...lo.map(q=>q[1]));
   const layerH=2.6, layers=Math.ceil((bottom-top)/layerH), perLayer=70;
   const span=y=>{let a=Infinity,b=-Infinity;for(let i=0;i<up.length;i++){if(y>=up[i][1]&&y<=lo[i][1]){a=Math.min(a,up[i][0],lo[i][0]);b=Math.max(b,up[i][0],lo[i][0])}}return a<b?[a,b]:null};
   rect.setAttribute('y',bottom);rect.setAttribute('height',290-bottom);
   let start=null, phase='build', traceStart=0, offset=0, lastX=X0, lastY=bottom;
-  const nearest=(x,y)=>{let best=0,bd=Infinity;for(let s=0;s<=200;s++){const q=path.getPointAtLength(L*s/200),d=(q.x-x)**2+(q.y-y)**2;if(d<bd){bd=d;best=L*s/200}}return best};
+  const nearest=(x,y)=>{let best=0,bd=Infinity;for(let s=0;s<=200;s++){const q=path.getPointAtLength(L*s/200),dd=(q.x-x)**2+(q.y-y)**2;if(dd<bd){bd=dd;best=L*s/200}}return best};
   const tick=ts=>{
     if(start===null)start=ts;
     if(phase==='build'){
