@@ -961,7 +961,7 @@ function drawFoil(){
   const uw=up[52];
   $('#foil-anno').innerHTML=`
     <path class="foil-leader" d="M${sx} ${sy-r-3} L${sx} 40 L${sx+14} 40"/><text class="foil-label" x="${sx+18}" y="44">Holm · Kohlerohr Ø 8 mm</text>
-    <path class="foil-leader" d="M${uw[0].toFixed(1)} ${uw[1].toFixed(1)} L${uw[0]+26} 74 L${uw[0]+40} 74"/><text class="foil-label" x="${uw[0]+44}" y="78">Außenwand · 1 Linie</text>
+    <path class="foil-leader" d="M${uw[0].toFixed(1)} ${uw[1].toFixed(1)} L${uw[0]-20} 80 L${uw[0]-34} 80"/><text class="foil-label" x="${uw[0]-38}" y="84" text-anchor="end">Außenwand · 1 Linie</text>
     <path class="foil-leader" d="M${X0+.6*C} ${Y0+18} L${X0+.6*C+18} 196 L${X0+.6*C+32} 196"/><text class="foil-label dim" x="${X0+.6*C+36}" y="200">Hilfsholm</text>
     <g class="foil-leader"><line x1="${X0}" y1="226" x2="${X0+C}" y2="226"/><line x1="${X0}" y1="216" x2="${X0}" y2="236"/><line x1="${X0+C}" y1="216" x2="${X0+C}" y2="236"/><line x1="${X0}" y1="${Y0+10}" x2="${X0}" y2="212" stroke-dasharray="3 3"/><line x1="${X0+C}" y1="${Y0+4}" x2="${X0+C}" y2="212" stroke-dasharray="3 3"/></g>
     <text class="foil-label" x="${X0+C/2}" y="252" text-anchor="middle">Profiltiefe 220 mm</text>
