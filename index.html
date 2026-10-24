@@ -273,6 +273,23 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .back-link{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:var(--t14);padding:0;align-self:flex-start}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:2px;font-size:var(--t14);font-weight:500;max-width:calc(100% - 32px)}
 
+/* Bewegung: ein Druckmoment beim Laden, sonst nur als Antwort auf Klicks */
+@media (prefers-reduced-motion: no-preference){
+  .overlay{animation:lw-fade .2s ease-out}
+  .modal-panel{animation:lw-panel .24s cubic-bezier(.2,.8,.2,1)}
+  .drawer{animation:lw-drawer .28s cubic-bezier(.2,.8,.2,1)}
+  .toast{animation:lw-toast .22s ease-out}
+  .cart-count.bump{animation:lw-bump .42s ease-out}
+  .types.refresh .type{animation:lw-type .32s ease-out both;animation-delay:calc(var(--i,0) * 40ms)}
+  .btn,.tab,.drawing{transition:background .15s,border-color .15s,color .15s}
+}
+@keyframes lw-fade{from{opacity:0}}
+@keyframes lw-panel{from{opacity:0;transform:translateY(10px) scale(.985)}}
+@keyframes lw-drawer{from{transform:translateX(100%)}}
+@keyframes lw-toast{from{opacity:0;transform:translate(-50%,8px)}}
+@keyframes lw-bump{30%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes lw-type{from{opacity:0;transform:translateY(8px)}}
+
 /* Rechtstexte */
 .legal-wrap{padding-block:var(--s48) 0}
 .legal{max-width:74ch}
@@ -347,9 +364,9 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
     <figure class="foil-band" style="margin-inline:0;margin-bottom:0">
       <div class="wrap">
         <svg id="foil" viewBox="0 0 640 290" role="img" aria-label="Querschnitt durch ein Flügelsegment mit Kohlefaserholm, Hilfsholm und diagonalen Innenrippen">
-          <defs><clipPath id="foil-clip"><path id="foil-clip-path"/></clipPath></defs>
+          <defs><clipPath id="foil-clip"><path id="foil-clip-path"/></clipPath><clipPath id="build-clip"><rect id="build-rect" x="0" y="0" width="640" height="290"/></clipPath></defs>
           <path class="foil-outline" id="foil-outline"/>
-          <g clip-path="url(#foil-clip)" id="foil-ribs"></g>
+          <g clip-path="url(#foil-clip)"><g clip-path="url(#build-clip)" id="foil-ribs"></g></g>
           <path class="foil-outline" id="foil-outline-top" style="fill:none"/>
           <g id="foil-spar"></g>
           <g id="foil-anno"></g>
@@ -757,7 +774,13 @@ function planeSVG(p,opt){
 let cart=[];
 try{cart=JSON.parse(localStorage.getItem('lw-cart')||'[]').filter(byId)}catch(e){cart=[]}
 const save=()=>{try{localStorage.setItem('lw-cart',JSON.stringify(cart))}catch(e){}};
-function addToCart(id){if(!cart.includes(id)){cart.push(id);save();toast(byId(id).name+' liegt im Warenkorb')}syncCart()}
+function addToCart(id){
+  if(!cart.includes(id)){
+    cart.push(id);save();toast(byId(id).name+' liegt im Warenkorb');
+    const c=$('#cart-count');c.classList.remove('bump');void c.offsetWidth;c.classList.add('bump');
+  }
+  syncCart();
+}
 function removeFromCart(id){cart=cart.filter(x=>x!==id);save();syncCart()}
 
 /* Typenliste */
@@ -765,15 +788,18 @@ const state={cat:'Alle',printer:'alle'};
 function renderFilters(){
   $('#cat-filter').insertAdjacentHTML('beforeend',CATS.map(c=>`<button class="tab" data-cat="${c}" aria-pressed="${c===state.cat}">${c}</button>`).join(''));
   $('#printer-filter').insertAdjacentHTML('beforeend',PFILTER.map(f=>`<button class="tab" data-printer="${f.k}" aria-pressed="${f.k===state.printer}">${f.n}</button>`).join(''));
-  $('#cat-filter').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;state.cat=b.dataset.cat;document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid()});
-  $('#printer-filter').addEventListener('click',e=>{const b=e.target.closest('[data-printer]');if(!b)return;state.printer=b.dataset.printer;document.querySelectorAll('[data-printer]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid()});
+  $('#cat-filter').addEventListener('click',e=>{const b=e.target.closest('[data-cat]');if(!b)return;state.cat=b.dataset.cat;document.querySelectorAll('[data-cat]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid(true)});
+  $('#printer-filter').addEventListener('click',e=>{const b=e.target.closest('[data-printer]');if(!b)return;state.printer=b.dataset.printer;document.querySelectorAll('[data-printer]').forEach(x=>x.setAttribute('aria-pressed',x===b));renderGrid(true)});
 }
 function cartBtn(p){const inC=cart.includes(p.id);return `<button class="btn ${inC?'in-cart':'btn-primary'}" data-add="${p.id}">${inC?'Liegt im Warenkorb':'In den Warenkorb'}</button>`}
-function renderGrid(){
+function renderGrid(animate){
+  const g=$('#grid');
+  g.classList.remove('refresh');
+  if(animate){void g.offsetWidth;g.classList.add('refresh')}
   const list=PRODUCTS.filter(p=>(state.cat==='Alle'||p.cat===state.cat)&&(state.printer==='alle'||p.printers.includes(state.printer)));
   $('#result-count').textContent=list.length+(list.length===1?' Modell':' Modelle');
-  $('#grid').innerHTML=list.length?list.map(p=>`
-    <article class="type">
+  $('#grid').innerHTML=list.length?list.map((p,i)=>`
+    <article class="type" style="--i:${i}">
       <div class="type-meta"><span class="type-no">${p.no} · ${p.cat}</span>${p.tag?`<span class="tag">${p.tag}</span>`:''}</div>
       <button class="drawing" data-open="${p.id}" aria-label="Details zu ${p.name}">${planeSVG(p,{dim:true})}</button>
       <div class="type-title"><h3>${p.name}</h3><span class="price">${eur(p.price)}</span></div>
@@ -958,8 +984,31 @@ function drawFoil(){
   const place=len=>{const q=path.getPointAtLength(len);dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y)};
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduce){place(L*.5);return}
-  let start=null;
-  const tick=ts=>{if(start===null)start=ts;place(((ts-start)*.1)%L);requestAnimationFrame(tick)};
+  /* Druckmoment: Schicht für Schicht von unten nach oben, danach Konturfahrt */
+  const rect=$('#build-rect');
+  const top=Math.min(...up.map(q=>q[1])), bottom=Math.max(...lo.map(q=>q[1]));
+  const layerH=2.6, layers=Math.ceil((bottom-top)/layerH), perLayer=70;
+  const span=y=>{let a=Infinity,b=-Infinity;for(let i=0;i<up.length;i++){if(y>=up[i][1]&&y<=lo[i][1]){a=Math.min(a,up[i][0],lo[i][0]);b=Math.max(b,up[i][0],lo[i][0])}}return a<b?[a,b]:null};
+  rect.setAttribute('y',bottom);rect.setAttribute('height',290-bottom);
+  let start=null, phase='build', traceStart=0, offset=0, lastX=X0, lastY=bottom;
+  const nearest=(x,y)=>{let best=0,bd=Infinity;for(let s=0;s<=200;s++){const q=path.getPointAtLength(L*s/200),d=(q.x-x)**2+(q.y-y)**2;if(d<bd){bd=d;best=L*s/200}}return best};
+  const tick=ts=>{
+    if(start===null)start=ts;
+    if(phase==='build'){
+      const k=(ts-start)/perLayer, li=Math.floor(k);
+      if(li>=layers){
+        phase='trace';traceStart=ts;offset=nearest(lastX,lastY);
+        rect.setAttribute('y',0);rect.setAttribute('height',290);
+      } else {
+        const y=bottom-li*layerH;
+        rect.setAttribute('y',y);rect.setAttribute('height',290-y);
+        const sp=span(Math.min(bottom-.5,Math.max(top+.5,y)));
+        if(sp){const f=k-li, x=li%2?sp[1]-(sp[1]-sp[0])*f:sp[0]+(sp[1]-sp[0])*f;lastX=x;lastY=y;dot.setAttribute('cx',x);dot.setAttribute('cy',y)}
+      }
+    }
+    if(phase==='trace')place((offset+(ts-traceStart)*.1)%L);
+    requestAnimationFrame(tick);
+  };
   requestAnimationFrame(tick);
 }
 
