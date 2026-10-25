@@ -85,6 +85,20 @@ mark{background:linear-gradient(transparent 80%,var(--accent) 80%,var(--accent) 
 .titleblock td{font-weight:600}
 .titleblock tr:first-child td{font-family:var(--f-display);font-stretch:120%;font-weight:800;font-size:var(--t16)}
 @media (max-width:860px){.hero-top{grid-template-columns:1fr;gap:var(--s32)}}
+.hero-top{grid-template-columns:1fr}
+.hero{padding-top:var(--s32)}
+#schriftfeld .titleblock{max-width:560px}
+
+/* 3D-Bühne mit dem BF1 */
+.hero3d-stage{position:relative;height:clamp(340px,62vh,620px);overflow:hidden;border-bottom:1px solid var(--line);
+  background:radial-gradient(60% 75% at 50% 42%,#1D2B3B 0%,var(--paper) 72%)}
+#hero3d-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
+.hero3d-meta{position:absolute;left:0;right:0;bottom:20px;max-width:1200px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;pointer-events:none}
+.hero3d-meta .btn{pointer-events:auto}
+.h3d-name{margin:0;font-family:var(--f-display);font-stretch:125%;font-weight:800;font-size:clamp(2rem,4.5vw,3.25rem);line-height:1;letter-spacing:-.01em}
+.h3d-sub{margin:6px 0 0;color:var(--muted);font-size:var(--t14)}
+.hero3d-fallback{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:24px 16px 96px}
 
 .foil-band{margin-top:var(--s48);border-top:1px solid var(--line);border-bottom:1px solid var(--line);overflow:hidden;
   background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px}
@@ -362,26 +376,25 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 </header>
 
 <main id="top">
+  <section class="hero3d" aria-label="Der BF1 im Flug: 3D-Animation mit drehendem Propeller, Querrudern und V-Leitwerk">
+    <div class="hero3d-stage" id="hero3d">
+      <canvas id="hero3d-canvas" aria-hidden="true"></canvas>
+      <div class="hero3d-meta">
+        <div><p class="h3d-name">BF1</p><p class="h3d-sub">Hochdecker mit V-Leitwerk, 748 mm Spannweite</p></div>
+        <button class="btn btn-primary" data-open="bf1">Datenblatt BF1</button>
+      </div>
+    </div>
+  </section>
   <section class="hero">
     <div class="wrap hero-top">
       <div>
         <p class="label">Druckdateien für RC-Flugzeuge</p>
         <h1>Flugmodelle zum Selbstdrucken, mit <mark>fertigen Profilen</mark> für deinen Bambu.</h1>
-        <p class="lead">Du kaufst die Datei, kein gedrucktes Modell. Jedes Flugzeug kommt als Bambu-Studio-Projekt mit allen Platten, Temperaturen und Flow-Werten für LW-PLA, PETG und PLA. Öffnen, Platte wählen, drucken.</p>
         <div class="ctas">
           <a class="btn btn-primary" href="#modelle">Modelle ansehen</a>
           <a class="btn" href="#datei">Was in der Datei steckt</a>
         </div>
       </div>
-      <table class="titleblock">
-        <caption>Schriftfeld</caption>
-        <tr><th scope="row">Projekt</th><td>LayerWing</td></tr>
-        <tr><th scope="row">Inhalt</th><td>7 Flugmodelle</td></tr>
-        <tr><th scope="row">Format</th><td>.3mf, .stl, PDF</td></tr>
-        <tr><th scope="row">Drucker</th><td>Bambu Lab A1 mini bis H2D</td></tr>
-        <tr><th scope="row">Düse</th><td>0,4 mm</td></tr>
-        <tr><th scope="row">Preise</th><td>ab 9,90 €, Download</td></tr>
-      </table>
     </div>
     <figure class="foil-band" style="margin-inline:0;margin-bottom:0">
       <div class="wrap">
@@ -403,7 +416,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
     <div class="wrap">
       <div class="sec-head">
         <div><p class="label">Typenliste</p><h2>Modelle</h2></div>
-        <p class="intro">Jede Datei gilt als private Drucklizenz. Verbesserte Profile und überarbeitete Teile bekommst du kostenlos nachgeliefert.</p>
+        <p class="intro">Du kaufst die Datei, kein gedrucktes Modell. Jedes Flugzeug kommt als Bambu-Studio-Projekt mit allen Platten und fertigen Druckprofilen. Jede Datei ist eine private Drucklizenz, Updates bekommst du kostenlos.</p>
       </div>
       <div class="tabs">
         <div class="tab-group" id="cat-filter" role="group" aria-label="Typ"><span>Typ</span></div>
@@ -497,6 +510,20 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
         <details><summary>Brauche ich ein AMS?</summary><p>Nein. Mit AMS wechselt der Drucker zwischen LW-PLA und PETG automatisch. Ohne AMS druckst du die Platten einfach nach Material sortiert.</p></details>
         <details><summary>Bekomme ich Updates?</summary><p>Ja. Wenn ein Profil verbessert oder ein Teil überarbeitet wird, lädst du die neue Version kostenlos herunter.</p></details>
       </div>
+    </div>
+  </section>
+
+  <section class="section" id="schriftfeld">
+    <div class="wrap">
+      <table class="titleblock">
+        <caption>Schriftfeld</caption>
+        <tr><th scope="row">Projekt</th><td>LayerWing</td></tr>
+        <tr><th scope="row">Inhalt</th><td>7 Flugmodelle</td></tr>
+        <tr><th scope="row">Format</th><td>.3mf, .stl, PDF</td></tr>
+        <tr><th scope="row">Drucker</th><td>Bambu Lab A1 mini bis H2D</td></tr>
+        <tr><th scope="row">Düse</th><td>0,4 mm</td></tr>
+        <tr><th scope="row">Preise</th><td>ab 9,90 €, Download</td></tr>
+      </table>
     </div>
   </section>
 </main>
@@ -678,6 +705,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 
 <div class="toast" id="toast" hidden role="status"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
 const PRINTERS=[
@@ -1105,6 +1133,152 @@ if(window.matchMedia&&window.matchMedia('(hover: hover)').matches&&!window.match
   });
 }
 
+/* 3D-Bühne: der BF1 nach seinen echten Maßen, fliegend, mit drehendem Propeller und beweglichen Rudern */
+function initHero3D(){
+  const stage=$('#hero3d'), canvas=$('#hero3d-canvas'); if(!stage||!canvas)return;
+  const fallback=()=>{canvas.remove();if(IMG)stage.insertAdjacentHTML('afterbegin',`<img class="hero3d-fallback" src="${IMG.gallery[0].src}" alt="BF1 flugfertig, Rendering aus Fusion 360">`)};
+  if(!window.THREE){fallback();return}
+  const T=window.THREE, S=.01, D=Math.PI/180;
+  let renderer;
+  try{renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true})}catch(e){fallback();return}
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.outputEncoding=T.sRGBEncoding;
+  const scene=new T.Scene();
+  scene.fog=new T.Fog(0x111A24,13,36);
+  const camera=new T.PerspectiveCamera(30,1,.1,120);
+  scene.add(new T.HemisphereLight(0xE4ECF4,0x182230,.95));
+  const sun=new T.DirectionalLight(0xFFFFFF,1.2);sun.position.set(4,9,7);scene.add(sun);
+  const rim=new T.DirectionalLight(0xF4C61F,.45);rim.position.set(-7,2,-6);scene.add(rim);
+
+  const M=(c,r,m,extra)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:r,metalness:m||0,side:T.DoubleSide},extra||{}));
+  const matBody=M(0xE6E9EC,.62), matCanopy=M(0xC9D0D8,.4), matCtl=M(0xF4C61F,.5), matDark=M(0x262B32,.5,.2), matMetal=M(0xB9C0C8,.32,.85);
+  const mesh=(g,m)=>new T.Mesh(g,m);
+  const X=s=>(250-s)*S;  /* Abstand von der Nase in mm -> Szene */
+
+  const plane=new T.Group();plane.rotation.order='YXZ';scene.add(plane);
+  const body=new T.Group();body.position.set(-X(157),-.22,0);plane.add(body);  /* Drehpunkt im Schwerpunkt, 44 mm hinter der Nasenleiste */
+
+  /* Rumpf: 60 mm breit, 50 mm hoch, 505 mm lang */
+  const prof=[[0,0],[0,15],[4,21],[14,24],[40,25],[250,25],[300,20],[400,12],[480,8],[505,5],[505,0]];
+  const fus=new T.LatheGeometry(prof.map(([s,r])=>new T.Vector2(r*S,X(s))),40);
+  fus.rotateZ(-Math.PI/2);fus.scale(1,1,1.2);body.add(mesh(fus,matBody));
+  const can=new T.SphereGeometry(1,28,16);can.scale(.42,.13,.135);const canM=mesh(can,matCanopy);canM.position.set(X(70),.2,0);body.add(canM);
+
+  /* Motor A2212, Spinner, Luftschraube 6x4 */
+  const mot=new T.CylinderGeometry(.14,.14,.22,28);mot.rotateZ(Math.PI/2);const motM=mesh(mot,matMetal);motM.position.x=X(0)+.11;body.add(motM);
+  const prop=new T.Group();prop.position.x=X(0)+.26;body.add(prop);
+  const spin=new T.ConeGeometry(.085,.2,28);spin.rotateZ(-Math.PI/2);const spinM=mesh(spin,matDark);spinM.position.x=.1;prop.add(spinM);
+  for(const sgn of [1,-1]){
+    const bl=new T.BoxGeometry(.018,.68,.085);bl.translate(0,.38,0);
+    const b=mesh(bl,matDark);b.rotation.x=sgn>0?0:Math.PI;
+    const tw=new T.Group();tw.rotation.y=.32;tw.add(b);
+    const holder=new T.Group();holder.rotation.x=sgn>0?0:Math.PI;b.rotation.x=0;holder.add(tw);prop.add(holder);
+  }
+  const disc=mesh(new T.CircleGeometry(.76,48),new T.MeshBasicMaterial({color:0xE1E6EA,transparent:true,opacity:.07,depthWrite:false,side:T.DoubleSide}));
+  disc.rotation.y=Math.PI/2;prop.add(disc);
+
+  /* Flügel: Clark Y, Tiefe 150 mm, Mittelteil 250 mm, Außenflügel je 249 mm mit 5° V-Form */
+  const CY=[[0,3.5,3.5],[1.25,5.45,1.93],[2.5,6.5,1.47],[5,7.9,.93],[7.5,8.85,.63],[10,9.6,.42],[15,10.68,.15],[20,11.36,.03],[30,11.7,0],[40,11.4,0],[50,10.52,0],[60,9.15,0],[70,7.35,0],[80,5.22,0],[90,2.8,0],[95,1.49,0],[100,.12,0]];
+  const CH=150;
+  const yAt=(xc,i)=>{const p=Math.max(0,Math.min(100,xc/CH*100));for(let k=1;k<CY.length;k++){if(p<=CY[k][0]){const a=CY[k-1],b=CY[k],f=(p-a[0])/(b[0]-a[0]);return (a[i]+(b[i]-a[i])*f)*CH/100}}return CY[CY.length-1][i]*CH/100};
+  const foil=(a,b,ox,oy)=>{
+    const sh=new T.Shape(), n=18, up=[], lo=[];
+    for(let i=0;i<=n;i++){const xc=a+(b-a)*(1-Math.cos(Math.PI*i/n))/2;up.push([xc,yAt(xc,1)]);lo.push([xc,yAt(xc,2)])}
+    const P=([xc,y])=>[-(xc-ox)*S,(y-oy)*S];
+    sh.moveTo(...P(up[0]));up.slice(1).forEach(v=>sh.lineTo(...P(v)));lo.slice().reverse().forEach(v=>sh.lineTo(...P(v)));
+    return sh;
+  };
+  const ext=(sh,depth,side)=>{const g=new T.ExtrudeGeometry(sh,{depth,bevelEnabled:false,curveSegments:4});if(side<0)g.translate(0,0,-depth);return g};
+  const wing=new T.Group();wing.position.set(X(113),.25,0);body.add(wing);
+  const mid=ext(foil(0,CH,0,0),2.5,1);mid.translate(0,0,-1.25);wing.add(mesh(mid,matBody));
+  const hingeY=yAt(108,1)*.45, ail={};
+  for(const side of [1,-1]){
+    const panel=new T.Group();panel.position.z=side*1.25;panel.rotation.x=-side*5*D;wing.add(panel);
+    panel.add(mesh(ext(foil(0,108,0,0),2.49,side),matBody));
+    const ag=new T.Group();ag.position.set(-1.08,hingeY*S,side*.1);panel.add(ag);
+    ag.add(mesh(ext(foil(108,CH,108,hingeY),2.33,side),matCtl));
+    ail[side]=ag;
+  }
+
+  /* V-Leitwerk: 35° je Seite, Ruder ab 478 mm */
+  const rud={};
+  for(const side of [1,-1]){
+    const vg=new T.Group();vg.position.set(0,.05,side*.06);vg.rotation.x=-side*35*D;body.add(vg);
+    const fs=new T.Shape();fs.moveTo(X(420),0);fs.lineTo(X(478),0);fs.lineTo(X(478),1.73);fs.lineTo(X(470),1.73);fs.lineTo(X(420),0);
+    const fg=new T.ExtrudeGeometry(fs,{depth:.03,bevelEnabled:false});fg.translate(0,0,-.015);fg.rotateX(Math.PI/2);fg.scale(1,1,side);
+    vg.add(mesh(fg,matBody));
+    const rs=new T.Shape();rs.moveTo(0,.02);rs.lineTo(-.27,.02);rs.lineTo(-.27,1.71);rs.lineTo(0,1.71);rs.lineTo(0,.02);
+    const rg=new T.ExtrudeGeometry(rs,{depth:.026,bevelEnabled:false});rg.translate(0,0,-.013);rg.rotateX(Math.PI/2);rg.scale(1,1,side);
+    const rgp=new T.Group();rgp.position.x=X(478);rgp.add(mesh(rg,matCtl));vg.add(rgp);
+    rud[side]=rgp;
+  }
+
+  /* Boden als Raster, das unter dem Flieger durchläuft */
+  const grid=new T.GridHelper(90,90,0x2C3847,0x1C2734);grid.position.y=-3.2;scene.add(grid);
+  const gridOff={x:0,z:0};
+
+  /* Flugbahn: ruhige Kurven, Querlage folgt der Kurve, Ruder folgen den Bewegungen */
+  const base=t=>{const w=.26;return{
+    yaw:-.5+.62*Math.sin(w*t), roll:-.44*Math.cos(w*t), pitch:.06*Math.sin(.55*t),
+    x:.45*Math.sin(w*t*.8), y:.18*Math.sin(.55*t-.8), z:.35*Math.cos(w*t)}};
+  const clamp=(v,m)=>Math.max(-m,Math.min(m,v));
+  let orbit=0, orbitTarget=0, tilt=0, tiltTarget=0, px=0, py=0;
+  function frame(t,dt){
+    const p=base(t), q=base(t+.08);
+    const intro=Math.min(1,t/2.6), e=1-Math.pow(1-intro,3);
+    plane.position.set(p.x+(1-e)*7,p.y+(1-e)*1.2,p.z-(1-e)*9);
+    plane.rotation.set(p.roll*e,p.yaw+(1-e)*.4,p.pitch);
+    const dRoll=(q.roll-p.roll)/.08, dPitch=(q.pitch-p.pitch)/.08, dYaw=(q.yaw-p.yaw)/.08;
+    const da=clamp(dRoll*3.2,.38), de=clamp(dPitch*7.5,.3), dr=clamp(dYaw*1.7,.28);
+    ail[1].rotation.z=-da; ail[-1].rotation.z=da;
+    rud[1].rotation.z=-(de+dr); rud[-1].rotation.z=-(de-dr);
+    prop.rotation.x+=dt*34;
+    const fw=new T.Vector3(Math.cos(plane.rotation.y),0,-Math.sin(plane.rotation.y));
+    gridOff.x+=fw.x*dt*2.2;gridOff.z+=fw.z*dt*2.2;
+    grid.position.x=-(((gridOff.x%1)+1)%1);grid.position.z=-(((gridOff.z%1)+1)%1);
+    orbit+=(orbitTarget-orbit)*.08;tilt+=(tiltTarget-tilt)*.08;
+    const dist=camera.userData.dist||11, a=orbit+px*.25, el=.12+tilt+py*.08;
+    camera.position.set(Math.sin(a)*dist*Math.cos(el),Math.sin(el)*dist+.4,Math.cos(a)*dist*Math.cos(el));
+    camera.lookAt(0,-.1,0);
+    renderer.render(scene,camera);
+  }
+
+  const size=()=>{
+    const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;
+    renderer.setSize(w,h,false);camera.aspect=w/h;
+    camera.userData.dist=Math.max(10.5,9.6/(2*Math.tan(15*D)*camera.aspect));
+    camera.updateProjectionMatrix();
+  };
+  size();
+  if(window.ResizeObserver)new ResizeObserver(size).observe(stage);else window.addEventListener('resize',size);
+
+  /* Ziehen dreht die Ansicht, die Maus verschiebt sie leicht */
+  let drag=null;
+  canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,o:orbitTarget,t:tiltTarget};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
+  canvas.addEventListener('pointermove',e=>{
+    const r=stage.getBoundingClientRect();px=(e.clientX-r.left)/r.width-.5;py=(e.clientY-r.top)/r.height-.5;
+    if(drag){orbitTarget=drag.o+(e.clientX-drag.x)*.008;tiltTarget=clamp(drag.t+(e.clientY-drag.y)*.004,.5)}
+  });
+  const endDrag=()=>{drag=null;canvas.style.cursor=''};
+  canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
+  canvas.addEventListener('pointerleave',()=>{px=0;py=0});
+
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(reduce){frame(30,0);canvas.style.cursor='default';return}
+  let start=null,last=null,raf=0,onScreen=true;
+  const loop=ts=>{
+    if(start===null){start=ts;last=ts}
+    const dt=Math.min(.05,(ts-last)/1000);last=ts;
+    frame((ts-start)/1000,dt);
+    raf=requestAnimationFrame(loop);
+  };
+  const play=()=>{if(!raf&&onScreen&&!document.hidden){last=null;raf=requestAnimationFrame(ts=>{if(start!==null){const gap=ts-(last||ts);start+=gap}last=ts;loop(ts)})}};
+  const pause=()=>{if(raf){cancelAnimationFrame(raf);raf=0;last=performance.now()}};
+  if(window.IntersectionObserver)new IntersectionObserver(es=>{onScreen=es[0].isIntersecting;onScreen?play():pause()}).observe(stage);
+  document.addEventListener('visibilitychange',()=>document.hidden?pause():play());
+  play();
+}
+
 /* Rechtstexte als eigene Ansichten */
 const LEGAL=['impressum','datenschutz','agb','widerruf','widerrufen'];
 function route(){
@@ -1116,7 +1290,7 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 
-renderFilters(); renderGrid(); renderTables(); syncCart(); drawFoil(); route();
+renderFilters(); renderGrid(); renderTables(); syncCart(); drawFoil(); route(); initHero3D();
 })();
 </script>
 
