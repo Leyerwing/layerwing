@@ -1246,7 +1246,7 @@ function initHero3D(){
   const size=()=>{
     const w=stage.clientWidth,h=stage.clientHeight;if(!w||!h)return;
     renderer.setSize(w,h,false);camera.aspect=w/h;
-    camera.userData.dist=Math.max(10.5,9.6/(2*Math.tan(15*D)*camera.aspect));
+    camera.userData.dist=Math.max(9.4,8.6/(2*Math.tan(15*D)*camera.aspect));
     camera.updateProjectionMatrix();
   };
   size();
