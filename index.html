@@ -1219,7 +1219,7 @@ function initHero3D(){
 
   /* Flugbahn: ruhige Kurven, Querlage folgt der Kurve, Ruder folgen den Bewegungen */
   const base=t=>{const w=.26;return{
-    yaw:-.5+.62*Math.sin(w*t), roll:-.44*Math.cos(w*t), pitch:.06*Math.sin(.55*t),
+    yaw:-.8+.5*Math.sin(w*t), roll:-.3*Math.cos(w*t), pitch:.06*Math.sin(.55*t),
     x:.45*Math.sin(w*t*.8), y:.18*Math.sin(.55*t-.8), z:.35*Math.cos(w*t)}};
   const clamp=(v,m)=>Math.max(-m,Math.min(m,v));
   let orbit=0, orbitTarget=0, tilt=0, tiltTarget=0, px=0, py=0;
@@ -1229,7 +1229,7 @@ function initHero3D(){
     plane.position.set(p.x+(1-e)*7,p.y+(1-e)*1.2,p.z-(1-e)*9);
     plane.rotation.set(p.roll*e,p.yaw+(1-e)*.4,p.pitch);
     const dRoll=(q.roll-p.roll)/.08, dPitch=(q.pitch-p.pitch)/.08, dYaw=(q.yaw-p.yaw)/.08;
-    const da=clamp(dRoll*3.2,.38), de=clamp(dPitch*7.5,.3), dr=clamp(dYaw*1.7,.28);
+    const da=clamp(dRoll*4.6,.38), de=clamp(dPitch*7.5,.3), dr=clamp(dYaw*2.2,.28);
     ail[1].rotation.z=-da; ail[-1].rotation.z=da;
     rud[1].rotation.z=-(de+dr); rud[-1].rotation.z=-(de-dr);
     prop.rotation.x+=dt*34;
@@ -1237,7 +1237,7 @@ function initHero3D(){
     gridOff.x+=fw.x*dt*2.2;gridOff.z+=fw.z*dt*2.2;
     grid.position.x=-(((gridOff.x%1)+1)%1);grid.position.z=-(((gridOff.z%1)+1)%1);
     orbit+=(orbitTarget-orbit)*.08;tilt+=(tiltTarget-tilt)*.08;
-    const dist=camera.userData.dist||11, a=orbit+px*.25, el=.12+tilt+py*.08;
+    const dist=camera.userData.dist||11, a=orbit+px*.25, el=.42+tilt+py*.08;
     camera.position.set(Math.sin(a)*dist*Math.cos(el),Math.sin(el)*dist+.4,Math.cos(a)*dist*Math.cos(el));
     camera.lookAt(0,-.1,0);
     renderer.render(scene,camera);
