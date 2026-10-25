@@ -449,7 +449,7 @@ h1,h2,h3,.logo,.h3d-name{letter-spacing:-.025em}
           <li><span class="ext">.3mf</span><div><strong>Bambu-Studio-Projekt</strong><span class="d">Alle Teile auf Platten verteilt, mit Temperatur, Flow, Wandlinien, Naht und Kühlung pro Teil.</span></div></li>
           <li><span class="ext">.3mf</span><div><strong>Variante A1 mini</strong><span class="d">Eigene Aufteilung für die 180-mm-Platte, wo das Modell es zulässt.</span></div></li>
           <li><span class="ext">.stl</span><div><strong>Einzelteile als STL</strong><span class="d">Für andere Slicer oder eigene Anpassungen, plus ein Testwürfel zum Einstellen des Flows.</span></div></li>
-          <li><span class="ext">.pdf</span><div><strong>Bauplan und Bauanleitung</strong><span class="d">Klebereihenfolge, Schwerpunkt, Ruderausschläge und Fotos jedes Schritts.</span></div></li>
+          <li><span class="ext">.pdf</span><div><strong>Bauplan und Bauanleitung</strong><span class="d">Jeder Schritt mit Bild und Pfeilen, dazu Schwerpunkt und Ruderausschläge. <a href="https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf" target="_blank" rel="noopener">Bauanleitung des BF1 ansehen</a></span></div></li>
           <li><span class="ext">.pdf</span><div><strong>Stückliste</strong><span class="d">Motor, Regler, Servos, Akku, Kohlerohre und Schrauben mit Maßen.</span></div></li>
           <li><span class="ext">.step</span><div><strong>Servo- und Motorhalter</strong><span class="d">Zum Anpassen an andere Komponenten in deinem CAD-Programm.</span></div></li>
         </ul>
@@ -762,7 +762,7 @@ const PRODUCTS=[
    span:748,weight:735,pw:520,time:'21 h',plates:5,parts:18,printers:['a1','p1','x1','h2d'],
    motor:'A2212 · 2450 KV',esc:'40 A mit BEC',akku:'3S 1300 mAh',servos:'3 × SG90 (9 g)',prop:'6 × 4"',cg:'44 mm hinter Nasenleiste (42–46 mm)',profile:'Clark Y, Tiefe 150 mm',
    desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Flügel, Außenflügel und Haube rasten ohne Werkzeug ein, an der Zelle gibt es keine Schrauben. Für Handstart und Bauchlandung.',
-   files:['.3mf für Bambu Studio, 5 Platten','18 Teile als .stl','Bauanleitung .pdf, 17 Seiten'],
+   files:['.3mf für Bambu Studio, 5 Platten','18 Teile als .stl','Bauanleitung .pdf, 18 Seiten'],manual:'https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf',
    note:'Alle Teile in Bambu PLA Tough+ mit dem Profil 0,20 mm Standard auf der Smooth-PEI-Platte (55 °C). Stützen sind pro Teil schon eingestellt; der vordere Rumpf steht beim Druck auf der Nase, der Motorspant ist die erste Schicht.',
    presets:['bf_rv','bf_rh','bf_fl','bf_haube','bf_zunge','bf_ruder','bf_qr','bf_mech']},
   {id:'moewe',no:'LW-01',name:'Möwe 1500',cat:'Segler',kind:'Thermiksegler',price:24.90,color:'#ECEAE2',shape:'glider',
@@ -945,7 +945,7 @@ function openModal(id){
           <div><b>${p.load} g/dm²</b><span>Flächenlast</span></div>
         </div>
         <div class="file-chips">${(p.files||['.3mf Bambu Studio','.stl','Bauplan .pdf','Bauanleitung .pdf']).map(f=>`<span class="tag">${f}</span>`).join('')}</div>
-        <div class="modal-buy"><span class="price">${eur(p.price)}</span>${cartBtn(p)}</div>
+        <div class="modal-buy"><span class="price">${eur(p.price)}</span>${cartBtn(p)}${p.manual?`<a class="btn" href="${p.manual}" target="_blank" rel="noopener">Bauanleitung als PDF</a>`:''}</div>
       </div>
     </div>
     <div class="modal-sec">
