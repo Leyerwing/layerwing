@@ -787,7 +787,7 @@ const PRODUCTS=[
    span:748,weight:780,pw:485,time:'21,5 h',plates:5,parts:12,printers:['a1','p1','x1','h2d'],
    motor:'A2212 · 2450 KV',esc:'40 A mit BEC',akku:'3S 1300 mAh',servos:'4 × Micro-Servo 9 g (z. B. PTK 7455MG-D)',prop:'6 × 4"',cg:'42 mm hinter Nasenleiste (40–44 mm)',profile:'Clark Y, Tiefe 150 mm',
    desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Flügel, Außenflügel und Haube rasten ohne Werkzeug ein, jedes Querruder hat sein eigenes Servo im Außenflügel. Seitliche Lufthutzen kühlen Regler und Akku, Griffmulden am Rumpf erleichtern den Handstart. Für Bauchlandung ausgelegt.',
-   files:['.3mf für Bambu Studio, 5 Platten','12 Teile als .stl','Bauanleitung .pdf, __PAGES__ Seiten'],manual:'https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf',
+   files:['.3mf für Bambu Studio, 5 Platten','12 Teile als .stl','Bauanleitung .pdf, 19 Seiten'],manual:'https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf',
    note:'Alle Teile in Bambu PLA Tough+ mit 0,20 mm auf der Smooth-PEI-Platte (55 °C). Flügel und Querruder drucken mit einer Wand und 2D-Lattice-Füllung, leicht und trotzdem steif. Scharnierlöcher haben Lochkompensation, damit der Stift ohne Nacharbeit passt. Stützen sind pro Teil eingestellt; der vordere Rumpf steht beim Druck auf der Nase.',
    presets:['bf_rv','bf_rh','bf_fl','bf_haube','bf_zunge','bf_ruder','bf_qr']},
   {id:'moewe',no:'LW-01',name:'Möwe 1500',cat:'Segler',kind:'Thermiksegler',price:24.90,color:'#ECEAE2',shape:'glider',
@@ -1419,10 +1419,22 @@ function initExplode(){
   function labelsUpdate(){
     const w=canvas.clientWidth,h=canvas.clientHeight, show=Math.max(0,(t-.55)/.45);
     labelsEl.style.opacity=show.toFixed(3);
+    if(show<=0)return;
+    const L=[];
     for(const p of parts){
       const s=labs[p.name];if(!s)continue;
       v.copy(p.center);p.obj.localToWorld(v);v.project(camera);
-      s.style.transform=`translate(${((v.x+1)/2*w).toFixed(1)}px,${((1-v.y)/2*h).toFixed(1)}px) translate(-50%,-50%)`;
+      L.push({s,x:(v.x+1)/2*w,y:(1-v.y)/2*h,w:s.offsetWidth+8,h:s.offsetHeight+6});
+    }
+    /* Schilder, die sich überdecken, auseinanderschieben */
+    L.sort((a,b)=>a.y-b.y);
+    for(let it=0;it<4;it++)for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){
+      const a=L[i],b=L[j],ox=(a.w+b.w)/2-Math.abs(a.x-b.x),oy=(a.h+b.h)/2-Math.abs(a.y-b.y);
+      if(ox>0&&oy>0){a.y-=oy/2;b.y+=oy/2}
+    }
+    for(const l of L){
+      const x=Math.max(l.w/2,Math.min(w-l.w/2,l.x)), y=Math.max(l.h/2,Math.min(h-l.h/2-48,l.y));
+      l.s.style.transform=`translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(-50%,-50%)`;
     }
   }
   function draw(){
