@@ -3,11 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#111A24">
 <meta name="robots" content="noindex, nofollow">
 <meta name="description" content="LayerWing: druckfertige RC-Flugzeuge als 3D-Druckdateien mit fertigen Bambu-Studio-Profilen.">
 <style>
-:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-body{margin:0}img{max-width:100%}[hidden]{display:none!important}
+:root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;background:#111A24}img{max-width:100%}[hidden]{display:none!important}
 </style>
 <title>LayerWing</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,25 +18,15 @@ body{margin:0}img{max-width:100%}[hidden]{display:none!important}
 /* Layout: Bauplan-Bogen. Papier mit Raster, Tuschelinien, Schriftfeld oben rechts, der Profilschnitt läuft über den rechten Rand hinaus.
    Modelle stehen als Draufsichten mit Maßlinie in einer Typenliste aus Haarlinien. Farbig ist nur das Filament und Signalgelb. */
 :root{
-  --paper:#F1F3F0; --surface:#FAFBF9; --ink:#1A2330; --muted:#58626E; --line:#C6CDD2; --grid:#E2E6E2;
-  --accent:#F2C100; --accent-ink:#1A2330; --ok:#2B7A4B; --overlay:rgba(20,28,38,.45);
+  color-scheme:dark;
+  --paper:#111A24; --surface:#17222E; --ink:#E1E6EA; --muted:#97A3AF; --line:#2C3847; --grid:#18232F;
+  --accent:#F4C61F; --accent-ink:#111A24; --ok:#62C08A; --overlay:rgba(0,0,0,.6);
+  --lift-shadow:0 22px 44px rgba(0,0,0,.55),0 4px 12px rgba(0,0,0,.4);
   --f-display:"Archivo","Arial Narrow",system-ui,sans-serif;
   --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   --t12:.75rem; --t14:.875rem; --t16:1rem; --t20:1.25rem; --t28:1.75rem; --t40:2.5rem; --t56:3.5rem;
   --s8:8px; --s16:16px; --s24:24px; --s32:32px; --s48:48px; --s72:72px;
-}
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --paper:#111A24; --surface:#17222E; --ink:#E1E6EA; --muted:#97A3AF; --line:#2C3847; --grid:#18232F;
-    --accent:#F4C61F; --accent-ink:#111A24; --ok:#62C08A; --overlay:rgba(0,0,0,.6);
-    color-scheme:dark;
-  }
-}
-:root[data-theme="dark"]{
-  --paper:#111A24; --surface:#17222E; --ink:#E1E6EA; --muted:#97A3AF; --line:#2C3847; --grid:#18232F;
-  --accent:#F4C61F; --accent-ink:#111A24; --ok:#62C08A; --overlay:rgba(0,0,0,.6);
-  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -120,7 +112,14 @@ mark{background:linear-gradient(transparent 80%,var(--accent) 80%,var(--accent) 
 
 /* Typenliste */
 .types{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));column-gap:var(--s48)}
-.type{display:flex;flex-direction:column;gap:12px;padding-block:var(--s24) var(--s32);border-bottom:1px solid var(--line);min-width:0}
+.type{position:relative;display:flex;flex-direction:column;gap:12px;padding:var(--s24) 12px var(--s32);margin-inline:-12px;border:1px solid transparent;border-bottom-color:var(--line);border-radius:4px;min-width:0}
+@media (hover:hover) and (prefers-reduced-motion: no-preference){
+  .type{transition:transform .45s cubic-bezier(.22,1,.36,1),box-shadow .45s cubic-bezier(.22,1,.36,1),background-color .3s,border-color .3s}
+  .type .drawing svg{transition:transform .55s cubic-bezier(.22,1,.36,1),filter .55s cubic-bezier(.22,1,.36,1)}
+  .type:hover{z-index:2;transform:translateY(-10px);background:var(--surface);border-color:var(--line);box-shadow:var(--lift-shadow)}
+  .type:hover .drawing{border-color:var(--accent)}
+  .type:hover .drawing svg{transform:translateY(-6px) scale(1.05) rotate(-3deg);filter:drop-shadow(0 16px 12px rgba(0,0,0,.55))}
+}
 .type-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:24px}
 .type-no{font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);letter-spacing:.04em}
 .tag{font-family:var(--f-mono);font-size:11px;border:1px solid var(--ink);padding:2px 7px;border-radius:2px;white-space:nowrap}
@@ -280,7 +279,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
   .drawer{animation:lw-drawer .28s cubic-bezier(.2,.8,.2,1)}
   .toast{animation:lw-toast .22s ease-out}
   .cart-count.bump{animation:lw-bump .42s ease-out}
-  .types.refresh .type{animation:lw-type .32s ease-out both;animation-delay:calc(var(--i,0) * 40ms)}
+  .types.refresh .type{animation:lw-type .32s ease-out backwards;animation-delay:calc(var(--i,0) * 40ms)}
   .btn,.tab,.drawing{transition:background .15s,border-color .15s,color .15s}
 }
 @keyframes lw-fade{from{opacity:0}}
