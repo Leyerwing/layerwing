@@ -769,11 +769,11 @@ const dez=n=>String(n).replace('.',',');
 PRODUCTS.forEach(p=>{const x=EXTRA[p.id];Object.assign(p,x);p.load=dez((p.weight/x.area).toFixed(1));p.ar=dez(((p.span/100)**2/x.area).toFixed(1))});
 /* Echte Werte aus dem BF1-Projekt: Druckzeit in Minuten, Filament in Gramm */
 const PLATES=[
-  ['1','Rumpf vorne mit Motorspant','PLA Tough+',238,98],
-  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',219,84],
-  ['3','Flügel Mitte, links und rechts','PLA Tough+',419,226],
-  ['4','Haube, Steckzungen, Ruder','PLA Tough+',187,80],
-  ['5','Querruder, Wellen, Hebel, Schubstangen','PLA Tough+',186,33]
+  ['1','Rumpf vorne mit Motorspant','PLA Tough+',238,98.15],
+  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',219,83.78],
+  ['3','Flügel Mitte, links und rechts','PLA Tough+',419,225.6],
+  ['4','Haube, Steckzungen, Ruder','PLA Tough+',187,79.87],
+  ['5','Querruder, Wellen, Hebel, Schubstangen','PLA Tough+',186,32.85]
 ];
 const CATS=['Alle','Hochdecker','Segler','Trainer','Nurflügel','Warbird','Jet'];
 const PFILTER=[{k:'alle',n:'Alle'},{k:'a1m',n:'A1 mini'},{k:'a1',n:'A1 · P1 · X1'},{k:'h2d',n:'H2D'}];
@@ -873,9 +873,9 @@ function renderGrid(animate){
 function renderTables(){
   let tot=0;
   let grams=0;
-  $('#plates-body').innerHTML=PLATES.map((r,i)=>{tot+=r[3];grams+=r[4];return `<tr><td class="mono">${IMG?`<img class="pthumb" src="${IMG.plates[i]}" alt="">`:''}${r[0]}</td><td>${r[1]}</td><td class="mat">${r[2]}</td><td class="num">${hm(r[3])}</td><td class="num">${r[4]} g</td></tr>`}).join('');
+  $('#plates-body').innerHTML=PLATES.map((r,i)=>{tot+=r[3];grams+=r[4];return `<tr><td class="mono">${IMG?`<img class="pthumb" src="${IMG.plates[i]}" alt="">`:''}${r[0]}</td><td>${r[1]}</td><td class="mat">${r[2]}</td><td class="num">${hm(r[3])}</td><td class="num">${Math.round(r[4])} g</td></tr>`}).join('');
   $('#plates-total').textContent=hm(tot);
-  $('#plates-grams').textContent=grams+' g';
+  $('#plates-grams').textContent=Math.round(grams)+' g';
   $('#matrix').innerHTML=`<thead><tr><th>Modell</th>${PRINTERS.map(p=>`<th>${p.n}<br><span style="text-transform:none;letter-spacing:0">${p.bed}</span></th>`).join('')}</tr></thead>
   <tbody>${PRODUCTS.map(p=>`<tr><td>${p.name}</td>${PRINTERS.map(pr=>p.printers.includes(pr.k)?'<td class="yes" aria-label="passt">✓</td>':'<td class="no" aria-label="passt nicht">–</td>').join('')}</tr>`).join('')}</tbody>`;
 }
