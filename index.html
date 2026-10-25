@@ -1250,6 +1250,7 @@ function initHero3D(){
     camera.updateProjectionMatrix();
   };
   size();
+  frame(2.6,0);  /* sofort ein fertiges Standbild, bevor die Animation startet */
   if(window.ResizeObserver)new ResizeObserver(size).observe(stage);else window.addEventListener('resize',size);
 
   /* Ziehen dreht die Ansicht, die Maus verschiebt sie leicht */
