@@ -1361,8 +1361,8 @@ function initExplode(){
     Rumpf_hinten_VLeitwerk:[105,0,0,.08],Ruder_rechts:[165,38,32,.16],Ruder_links:[165,-38,32,.16],
     Fluegel_Mitte:[0,0,135,.06],Steckzunge_rechts:[0,44,158,.14],Steckzunge_links:[0,-44,158,.14],
     Fluegel_rechts:[0,135,135,.1],Fluegel_links:[0,-135,135,.1],Querruder_rechts:[58,135,135,.18],Querruder_links:[58,-135,135,.18]};
-  const LABEL={Haube:'Haube',Fluegel_Mitte:'Flügel Mitte',Fluegel_links:'Außenflügel',Querruder_links:'Querruder',
-    Steckzunge_links:'Steckzunge',Rumpf_vorne:'Rumpf vorne',Rumpf_hinten_VLeitwerk:'Rumpf hinten mit V-Leitwerk',Ruder_links:'Ruder',Motor_A2212:'Motor A2212',Prop:'Luftschraube 6 × 4"'};
+  const LABEL={Haube:'Haube',Fluegel_Mitte:'Flügel Mitte',Fluegel_rechts:'Außenflügel',Querruder_links:'Querruder',
+    Rumpf_vorne:'Rumpf vorne',Rumpf_hinten_VLeitwerk:'Rumpf hinten mit V-Leitwerk',Ruder_rechts:'Ruder',Prop:'Motor A2212 mit Luftschraube'};
   const parts=[];
   const add=(name,obj,center)=>{const o=OFF[name]||[0,0,0,0];parts.push({name,obj,center,off:o});root.add(obj)};
 
@@ -1409,9 +1409,9 @@ function initExplode(){
     }
   }
   function aim(){
-    const a=-2.25+sway*.06+px*.22, el=.36-py*.12;
+    const a=2.3+Math.sin(sway)*.08+px*.25, el=.5-py*.12;
     const d=camera.userData.dist||1500;
-    const ctr=new T.Vector3(235,0,40+48*t);       /* Modellmitte, wandert beim Zerlegen etwas nach oben */
+    const ctr=new T.Vector3(225,0,30+60*ease(t));       /* Modellmitte, wandert beim Zerlegen etwas nach oben */
     const c=new T.Vector3(ctr.x,ctr.z,-ctr.y);
     camera.position.set(c.x+Math.cos(a)*Math.cos(el)*d,c.y+Math.sin(el)*d,c.z+Math.sin(a)*Math.cos(el)*d);
     camera.lookAt(c);
@@ -1435,7 +1435,7 @@ function initExplode(){
     renderer.setSize(w,h,false);camera.aspect=w/h;
     /* Abstand so, dass auch die zerlegte Ansicht (ca. 1060 × 600 mm) ins Bild passt */
     const half=Math.tan(13*Math.PI/180);
-    camera.userData.dist=Math.max(560/half,(560/camera.aspect)/half)*1.02;
+    camera.userData.dist=Math.max(600/(half*camera.aspect),360/half);
     camera.updateProjectionMatrix();draw();
   };
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
