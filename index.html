@@ -51,7 +51,7 @@ h3{font-size:var(--t20);font-stretch:112%;line-height:1.2}
 @media (max-width:820px){.sec-head{grid-template-columns:1fr}}
 
 /* Buttons */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 16px;border:1.5px solid var(--ink);border-radius:2px;background:transparent;color:var(--ink);font-weight:600;font-size:var(--t14);text-decoration:none;line-height:1.2;transition:background .15s}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;border:1.5px solid var(--ink);border-radius:999px;background:transparent;color:var(--ink);font-weight:600;font-size:var(--t14);text-decoration:none;line-height:1.2;transition:background .15s}
 .btn:hover{background:var(--grid)}
 .btn-primary{background:var(--accent);color:var(--accent-ink)}
 .btn-primary:hover{background:var(--accent);filter:brightness(.94)}
@@ -66,8 +66,8 @@ h3{font-size:var(--t20);font-stretch:112%;line-height:1.2}
 .nav{display:flex;gap:var(--s24);margin-left:auto}
 .nav a{text-decoration:none;font-size:var(--t14);font-weight:500;color:var(--muted);padding-block:4px;border-bottom:2px solid transparent}
 .nav a:hover{color:var(--ink);border-bottom-color:var(--accent)}
-.cart-btn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:transparent;border-radius:2px;padding:7px 12px;font-weight:600;font-size:var(--t14)}
-.cart-count{font-family:var(--f-mono);font-size:var(--t12);min-width:22px;height:22px;display:inline-grid;place-items:center;padding:0 6px;background:var(--accent);color:var(--accent-ink);border-radius:2px;font-variant-numeric:tabular-nums}
+.cart-btn{display:flex;align-items:center;gap:8px;border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:7px 14px;font-weight:600;font-size:var(--t14)}
+.cart-count{font-family:var(--f-mono);font-size:var(--t12);min-width:22px;height:22px;display:inline-grid;place-items:center;padding:0 6px;background:var(--accent);color:var(--accent-ink);border-radius:999px;font-variant-numeric:tabular-nums}
 .cart-count[data-zero="1"]{background:transparent;color:var(--muted);border:1px solid var(--line)}
 @media (max-width:1000px){.nav{display:none}.cart-btn{margin-left:auto}}
 
@@ -88,6 +88,10 @@ mark{background:linear-gradient(transparent 80%,var(--accent) 80%,var(--accent) 
 .hero-top{grid-template-columns:1fr}
 .hero{padding-top:var(--s32)}
 #schriftfeld .titleblock{max-width:560px}
+.hero-text{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding-bottom:var(--s8)}
+.hero-text h1{font-size:clamp(2rem,4.6vw,3.25rem);margin:0}
+.hero-sub{margin:0;color:var(--muted);font-size:1.0625rem;max-width:46ch}
+.hero-text .ctas{justify-content:center;margin-top:10px}
 
 /* 3D-Bühne mit dem BF1 */
 .hero3d-stage{position:relative;height:clamp(340px,62vh,620px);overflow:hidden;border-bottom:1px solid var(--line);
@@ -145,7 +149,7 @@ mark{background:linear-gradient(transparent 80%,var(--accent) 80%,var(--accent) 
 }
 .type-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;min-height:24px}
 .type-no{font-family:var(--f-mono);font-size:var(--t12);color:var(--muted);letter-spacing:.04em}
-.tag{font-family:var(--f-mono);font-size:11px;border:1px solid var(--ink);padding:2px 7px;border-radius:2px;white-space:nowrap}
+.tag{font-family:var(--f-mono);font-size:11px;border:1px solid var(--ink);padding:2px 9px;border-radius:999px;white-space:nowrap}
 .drawing{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:5/4;border:1px solid var(--line);padding:0;color:var(--ink);
   background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:16px 16px}
 .drawing{overflow:hidden}
@@ -221,13 +225,13 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .foot-links{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
 .foot-links a{text-decoration:none}
 .foot-links a:hover{color:var(--ink);text-decoration:underline}
-.foot-wd{border:1.5px solid var(--ink);color:var(--ink);border-radius:2px;padding:6px 12px;font-weight:600}
+.foot-wd{border:1.5px solid var(--ink);color:var(--ink);border-radius:999px;padding:6px 14px;font-weight:600}
 .foot-wd:hover{background:var(--accent);color:var(--accent-ink);text-decoration:none!important}
 
 /* Overlay, Modal, Warenkorb */
 .overlay{position:fixed;inset:0;background:var(--overlay);z-index:40}
 .modal{position:fixed;z-index:50;inset:0;display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));pointer-events:none}
-.modal-panel{pointer-events:auto;position:relative;background:var(--surface);border:1.5px solid var(--ink);border-radius:3px;width:min(940px,100%);max-height:100%;overflow:auto}
+.modal-panel{pointer-events:auto;position:relative;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;width:min(940px,100%);max-height:100%;overflow:auto}
 .modal-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-bottom:1px solid var(--line)}
 .modal-top .drawing{aspect-ratio:auto;min-height:300px;height:100%;border:0;border-right:1px solid var(--line);cursor:default}
 .modal-info{padding:var(--s24);display:flex;flex-direction:column;gap:14px}
@@ -261,7 +265,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .shop-list ul.plain{columns:2 220px;column-gap:24px}
 .shop-list ul.plain li{display:list-item;list-style:"– ";margin-left:14px;border:0;break-inside:avoid}
 .fine{font-size:12.5px;color:var(--muted);margin:0}
-.close-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:2px;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);font-size:18px;line-height:1;display:grid;place-items:center;z-index:2}
+.close-x{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);background:var(--paper);color:var(--ink);font-size:18px;line-height:1;display:grid;place-items:center;z-index:2}
 .close-x:hover{background:var(--accent);color:var(--accent-ink)}
 @media (max-width:720px){.modal-top{grid-template-columns:1fr}.modal-top .drawing{min-height:240px;aspect-ratio:5/4;border-right:0;border-bottom:1px solid var(--line)}}
 .gallery{display:flex;flex-direction:column;min-width:0;background:#2E3440;border-right:1px solid var(--line)}
@@ -282,7 +286,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .drawer{position:fixed;z-index:50;top:0;right:0;bottom:0;width:min(420px,100%);background:var(--surface);border-left:1.5px solid var(--ink);display:flex;flex-direction:column;
   padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);padding-right:env(safe-area-inset-right,0px)}
 .drawer-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1.5px solid var(--ink)}
-.icon-btn{width:34px;height:34px;border-radius:2px;border:1.5px solid var(--ink);background:transparent;font-size:18px;display:grid;place-items:center}
+.icon-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--ink);background:transparent;font-size:18px;display:grid;place-items:center}
 .icon-btn:hover{background:var(--accent);color:var(--accent-ink)}
 .drawer-body{flex:1;overflow:auto;padding:8px 20px}
 .cart-item{display:grid;grid-template-columns:72px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
@@ -299,7 +303,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .cart-empty{padding:40px 0;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:flex-start}
 .form{display:flex;flex-direction:column;gap:14px;padding:12px 0}
 .form label.t{font-weight:600;font-size:var(--t14);display:flex;flex-direction:column;gap:6px}
-.form input[type=email]{font:inherit;padding:10px 12px;border-radius:2px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
+.form input[type=email]{font:inherit;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink)}
 .form input[type=email]:focus{outline:none;border-color:var(--ink)}
 .check{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;font-size:13.5px;color:var(--muted);align-items:start}
 .check input{margin-top:3px;accent-color:var(--ink);width:16px;height:16px}
@@ -307,7 +311,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .notice{border:1.5px solid var(--ink);background:var(--paper);border-left:6px solid var(--accent);padding:12px 14px;font-size:var(--t14)}
 .notice strong{display:block;margin-bottom:4px}
 .back-link{border:0;background:none;color:var(--muted);text-decoration:underline;font-size:var(--t14);padding:0;align-self:flex-start}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:2px;font-size:var(--t14);font-weight:500;max-width:calc(100% - 32px)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--paper);padding:10px 18px;border-radius:999px;font-size:var(--t14);font-weight:500;max-width:calc(100% - 32px)}
 
 /* Bewegung: ein Druckmoment beim Laden, sonst nur als Antwort auf Klicks */
 @media (prefers-reduced-motion: no-preference){
@@ -344,7 +348,7 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
 .todo::before{content:"Hinweis für dich, vor Veröffentlichung löschen: ";font-weight:700}
 .wd-form{display:flex;flex-direction:column;gap:14px;max-width:440px;margin-top:8px}
 .wd-form label{font-weight:600;font-size:var(--t14);display:flex;flex-direction:column;gap:6px}
-.wd-form input{font:inherit;padding:10px 12px;border-radius:2px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
+.wd-form input{font:inherit;padding:10px 14px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink)}
 .wd-form input:focus{outline:none;border-color:var(--ink)}
 .wd-form .btn{align-self:flex-start}
 </style>
@@ -387,29 +391,15 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
   </section>
   <section class="hero">
     <div class="wrap hero-top">
-      <div>
-        <p class="label">Druckdateien für RC-Flugzeuge</p>
-        <h1>Flugmodelle zum Selbstdrucken, mit <mark>fertigen Profilen</mark> für deinen Bambu.</h1>
+      <div class="hero-text">
+        <h1><mark>RC-Modelle zum Selbstdrucken</mark></h1>
+        <p class="hero-sub">Mit fertigen Druckprofilen für deinen Bambu-Lab-Drucker.</p>
         <div class="ctas">
           <a class="btn btn-primary" href="#modelle">Modelle ansehen</a>
           <a class="btn" href="#datei">Was in der Datei steckt</a>
         </div>
       </div>
     </div>
-    <figure class="foil-band" style="margin-inline:0;margin-bottom:0">
-      <div class="wrap">
-        <svg id="foil" viewBox="0 0 640 290" role="img" aria-label="Querschnitt durch ein Flügelsegment mit Kohlefaserholm, Hilfsholm und diagonalen Innenrippen">
-          <defs><clipPath id="foil-clip"><path id="foil-clip-path"/></clipPath><clipPath id="build-clip"><rect id="build-rect" x="0" y="0" width="640" height="290"/></clipPath></defs>
-          <path class="foil-outline" id="foil-outline"/>
-          <g clip-path="url(#foil-clip)"><g clip-path="url(#build-clip)" id="foil-ribs"></g></g>
-          <path class="foil-outline" id="foil-outline-top" style="fill:none"/>
-          <g id="foil-spar"></g>
-          <g id="foil-anno"></g>
-          <circle class="foil-nozzle" id="nozzle" r="4" cx="-20" cy="-20"/>
-        </svg>
-        <figcaption class="foil-cap"><span>Schnitt F2, Flügel Möwe 1500, Maßstab ca. 1:2</span><span>Schicht 0,25 mm · LW-PLA · 240 °C · 1 Wandlinie</span></figcaption>
-      </div>
-    </figure>
   </section>
 
   <section class="section" id="modelle">
@@ -469,6 +459,23 @@ table.data tfoot td{font-weight:700;border-bottom:1.5px solid var(--ink)}
       </div>
     </div>
   </section>
+
+  <div class="foil-wrap">
+    <figure class="foil-band" style="margin-inline:0;margin-bottom:0">
+      <div class="wrap">
+        <svg id="foil" viewBox="0 0 640 290" role="img" aria-label="Querschnitt durch ein Flügelsegment mit Kohlefaserholm, Hilfsholm und diagonalen Innenrippen">
+          <defs><clipPath id="foil-clip"><path id="foil-clip-path"/></clipPath><clipPath id="build-clip"><rect id="build-rect" x="0" y="0" width="640" height="290"/></clipPath></defs>
+          <path class="foil-outline" id="foil-outline"/>
+          <g clip-path="url(#foil-clip)"><g clip-path="url(#build-clip)" id="foil-ribs"></g></g>
+          <path class="foil-outline" id="foil-outline-top" style="fill:none"/>
+          <g id="foil-spar"></g>
+          <g id="foil-anno"></g>
+          <circle class="foil-nozzle" id="nozzle" r="4" cx="-20" cy="-20"/>
+        </svg>
+        <figcaption class="foil-cap"><span>Schnitt F2, Flügel Möwe 1500, Maßstab ca. 1:2</span><span>Schicht 0,25 mm · LW-PLA · 240 °C · 1 Wandlinie</span></figcaption>
+      </div>
+    </figure>
+  </div>
 
   <section class="section" id="erster-druck">
     <div class="wrap">
@@ -1151,7 +1158,7 @@ function initHero3D(){
   const rim=new T.DirectionalLight(0xF4C61F,.45);rim.position.set(-7,2,-6);scene.add(rim);
 
   const M=(c,r,m,extra)=>new T.MeshStandardMaterial(Object.assign({color:c,roughness:r,metalness:m||0,side:T.DoubleSide},extra||{}));
-  const matBody=M(0xE6E9EC,.62), matCanopy=M(0xC9D0D8,.4), matCtl=M(0xF4C61F,.5), matDark=M(0x262B32,.5,.2), matMetal=M(0xB9C0C8,.32,.85);
+  const matBody=M(0xE6E9EC,.62), matCanopy=M(0xD9DEE4,.55), matCtl=M(0xF4C61F,.5), matDark=M(0x262B32,.5,.2), matMetal=M(0xB9C0C8,.32,.85);
   const mesh=(g,m)=>new T.Mesh(g,m);
   const X=s=>(250-s)*S;  /* Abstand von der Nase in mm -> Szene */
 
@@ -1159,10 +1166,23 @@ function initHero3D(){
   const body=new T.Group();body.position.set(-X(157),-.22,0);plane.add(body);  /* Drehpunkt im Schwerpunkt, 44 mm hinter der Nasenleiste */
 
   /* Rumpf: 60 mm breit, 50 mm hoch, 505 mm lang */
-  const prof=[[0,0],[0,15],[4,21],[14,24],[40,25],[250,25],[300,20],[400,12],[480,8],[505,5],[505,0]];
-  const fus=new T.LatheGeometry(prof.map(([s,r])=>new T.Vector2(r*S,X(s))),40);
-  fus.rotateZ(-Math.PI/2);fus.scale(1,1,1.2);body.add(mesh(fus,matBody));
-  const can=new T.SphereGeometry(1,28,16);can.scale(.42,.13,.135);const canM=mesh(can,matCanopy);canM.position.set(X(70),.2,0);body.add(canM);
+  /* Rumpf als Loft aus abgerundeten Kastenquerschnitten [Abstand von der Nase, halbe Breite, halbe Höhe, Rundung] */
+  const loft=(secs,a0,a1,seg,off)=>{
+    const pos=[],idx=[];
+    secs.forEach(([s,hw,hh,n])=>{for(let j=0;j<=seg;j++){
+      const a=a0+(a1-a0)*j/seg,c=Math.cos(a),si=Math.sin(a);
+      pos.push(X(s),Math.sign(si)*Math.pow(Math.abs(si),2/n)*(hh+off)*S,Math.sign(c)*Math.pow(Math.abs(c),2/n)*(hw+off)*S)}});
+    for(let i=0;i<secs.length-1;i++)for(let j=0;j<seg;j++){const a=i*(seg+1)+j,b=a+seg+1;idx.push(a,b,a+1,b,b+1,a+1)}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();return g;
+  };
+  const FUS=[[-.01,.1,.1,3],[0,17,14,3],[2,24,20,3],[7,28.5,23.5,3.2],[15,30,25,3.2],[250,30,25,3.2],[300,22,19,2.6],[400,13,11,2.2],[480,9,8,2],[505,6,5.5,2],[505.01,.1,.1,2]];
+  body.add(mesh(loft(FUS,0,Math.PI*2,48,0),matBody));
+  /* Haube: Abdeckung über Oberseite und obere Seitenwände, bündig mit dem Rumpf, vom Bug bis zur Flügelvorderkante */
+  const HB=(a,b)=>[[a,30,25,3.2],[b,30,25,3.2]];
+  body.add(mesh(loft(HB(17,60),-.22,Math.PI+.22,40,.9),matCanopy));
+  body.add(mesh(loft(HB(61,111),-.22,Math.PI+.22,40,.9),matCanopy));
+  /* Flügelauflage: flacher Sattel hinter der Haube */
+  const sad=new T.BoxGeometry(X(111)-X(268),.04,.5);const sadM=mesh(sad,matBody);sadM.position.set((X(111)+X(268))/2,.24,0);body.add(sadM);
 
   /* Motor A2212, Spinner, Luftschraube 6x4 */
   const mot=new T.CylinderGeometry(.14,.14,.22,28);mot.rotateZ(Math.PI/2);const motM=mesh(mot,matMetal);motM.position.x=X(0)+.11;body.add(motM);
