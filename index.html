@@ -382,6 +382,41 @@ h1,h2,h3,.logo,.h3d-name{letter-spacing:-.025em}
 .hero-text h1{letter-spacing:-.035em}
 .label,.tab-group > span,.specs dt,.stat-row span,.kv dt,.titleblock th,.titleblock caption,.modal-sec h4,.type-no,.foil-cap,.g-cap{font-size:13px;font-weight:500}
 .label{color:var(--muted)}
+
+/* Aufgeräumt: Inhalte in umrandeten Flächen */
+:root{--panel:rgba(255,255,255,.028);--panel-line:rgba(255,255,255,.1);--panel-r:14px}
+.sec-head{border-bottom:1px solid var(--panel-line);padding-bottom:var(--s20,20px);margin-bottom:var(--s24)}
+/* Modellkarten */
+.types{gap:20px;column-gap:20px}
+.type{margin:0;padding:18px 18px 20px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--panel-r)}
+.type .drawing{border-radius:10px}
+/* Ablauf */
+.sequence{border:0;gap:20px}
+.sequence li{padding:52px 22px 22px;background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--panel-r)}
+.sequence li::before{top:22px;left:22px}
+@media (max-width:820px){.sequence{border-left:0;padding-left:0;gap:12px}.sequence li{padding:52px 20px 20px}.sequence li::before{top:22px;left:20px}}
+/* Lieferumfang */
+.file-grid{gap:20px}
+.file-list{border:1px solid var(--panel-line);border-radius:var(--panel-r);background:var(--panel);padding:4px 20px}
+.file-list li:last-child{border-bottom:0}
+.file-grid>*{min-width:0}
+@media (max-width:860px){.file-grid{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:560px){.file-list{padding:4px 16px}.file-list li{grid-template-columns:44px minmax(0,1fr);gap:12px}.table-wrap{padding:6px 14px 10px}.checklist{padding:4px 16px}.type{padding:16px}}
+.table-wrap{border:1px solid var(--panel-line);border-radius:var(--panel-r);background:var(--panel);padding:6px 20px 12px}
+table.data tfoot td{border-bottom:0}
+/* Checkliste */
+.checklist{border:1px solid var(--panel-line);border-radius:var(--panel-r);background:var(--panel);padding:4px 24px;max-width:none}
+.checklist li:last-child{border-bottom:0}
+/* FAQ */
+.faq{border:0;gap:12px 20px}
+.faq details{background:var(--panel);border:1px solid var(--panel-line);border-radius:12px;padding:16px 20px;transition:border-color .2s}
+.faq details:hover,.faq details[open]{border-color:var(--accent-line)}
+/* Schriftfeld */
+.titleblock{border-collapse:separate;border-spacing:0;border:1px solid var(--panel-line);border-radius:var(--panel-r);overflow:hidden;background:var(--panel);max-width:560px}
+.titleblock th,.titleblock td{border:0;border-bottom:1px solid var(--panel-line)}
+.titleblock th{border-right:1px solid var(--panel-line)}
+.titleblock tr:last-child th,.titleblock tr:last-child td{border-bottom:0}
+.titleblock caption{padding-bottom:10px}
 </style>
 
 </head>
@@ -556,11 +591,11 @@ h1,h2,h3,.logo,.h3d-name{letter-spacing:-.025em}
       <table class="titleblock">
         <caption>Schriftfeld</caption>
         <tr><th scope="row">Projekt</th><td>LayerWing</td></tr>
-        <tr><th scope="row">Inhalt</th><td>7 Flugmodelle</td></tr>
+        <tr><th scope="row">Inhalt</th><td>3 Flugmodelle</td></tr>
         <tr><th scope="row">Format</th><td>.3mf, .stl, PDF</td></tr>
-        <tr><th scope="row">Drucker</th><td>Bambu Lab A1 mini bis H2D</td></tr>
+        <tr><th scope="row">Drucker</th><td>Bambu Lab A1, P1, X1 und H2D</td></tr>
         <tr><th scope="row">Düse</th><td>0,4 mm</td></tr>
-        <tr><th scope="row">Preise</th><td>ab 9,90 €, Download</td></tr>
+        <tr><th scope="row">Preise</th><td>ab 14,90 €, Download</td></tr>
       </table>
     </div>
   </section>
