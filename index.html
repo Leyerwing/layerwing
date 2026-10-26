@@ -505,7 +505,7 @@ table.data tfoot td{border-bottom:0}
     <div class="wrap">
       <div class="sec-head">
         <div><p class="label">Lieferumfang</p><h2>Was in einer Datei steckt</h2></div>
-        <p class="intro">Am Beispiel des BF1: fünf Druckplatten, rund 20 Stunden Druckzeit und 489 g Filament auf einem P1S.</p>
+        <p class="intro">Am Beispiel des BF1: fünf Druckplatten, rund 20 Stunden Druckzeit und 488 g Filament auf einem P1S.</p>
       </div>
       <div class="file-grid">
         <ul class="file-list">
@@ -850,7 +850,7 @@ const PRODUCTS=[
    presets:['rumpf','fluegel','leit','spant','klein']}
 ];
 const EXTRA={
-  bf1:{area:11.2,len:505,ch:4,bed:'256 × 256 mm, 250 mm Höhe',fil:{'Bambu PLA Tough+':489},carbon:[],
+  bf1:{area:11.2,len:505,ch:4,bed:'256 × 256 mm, 250 mm Höhe',fil:{'Bambu PLA Tough+':488},carbon:[],
     smallParts:['4× Schraube M3×10 für den Motor, Schraubensicherung mittelfest','Federstahldraht Ø 1 mm: 2× ca. 380 mm fürs Leitwerk, 2× ca. 80 mm für die Querruder','Scharnierstifte: Draht Ø 1,5 mm (Messing oder Federstahl) oder gerades Filament 1,75 mm, 2× 150 mm und 2× 170 mm','Y-Kabel oder 2 Servoverlängerungen für die Querruder','Sekundenkleber dünn mit Aktivator oder 5-Minuten-Epoxid','Klettband 20 mm und ein Klett-Akkuriemen','4-Kanal-Empfänger, Sender mit V-Leitwerk-Mischer']},
   moewe:{area:28,len:1080,stall:18,ch:4,bed:'256 × 256 mm',fil:{'LW-PLA':360,'PETG':40,'PLA':10},carbon:['Kohlerohr Ø 8 mm × 750 mm (2×)','Kohlestab Ø 3 mm × 500 mm (2×)']},
   falke:{area:24,len:880,stall:24,ch:4,bed:'256 × 256 mm',fil:{'LW-PLA':460,'PETG':45,'PLA':15},carbon:['Kohlerohr Ø 6 mm × 500 mm (2×)','Fahrwerksdraht Ø 3 mm Federstahl']}
@@ -861,7 +861,7 @@ PRODUCTS.forEach(p=>{const x=EXTRA[p.id];Object.assign(p,x);p.load=dez((p.weight
 /* Echte Werte aus dem BF1-Projekt: Druckzeit in Minuten, Filament in Gramm */
 const PLATES=[
   ['1','Rumpf vorne mit Motorspant','PLA Tough+',271,110.6],
-  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',219,77.4],
+  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',218,77.1],
   ['3','Flügel Mitte, links und rechts','PLA Tough+',424,186.8],
   ['4','Haube, Steckzungen, Ruder','PLA Tough+',178,84.7],
   ['5','Querruder links und rechts','PLA Tough+',131,29.0]
