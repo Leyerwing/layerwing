@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#141414">
-<meta name="robots" content="noindex, nofollow">
-<meta name="description" content="LayerWing: druckfertige RC-Flugzeuge als 3D-Druckdateien mit fertigen Bambu-Studio-Profilen.">
+<meta name="description" content="LayerWing: RC-Flugzeuge zum 3D-Drucken. Druckdateien mit fertigen Bambu-Studio-Profilen und Bauanleitung, z. B. der BF1 Hochdecker mit V-Leitwerk.">
+<meta property="og:title" content="LayerWing – RC-Flugzeuge zum 3D-Drucken">
+<meta property="og:description" content="Druckdateien für RC-Flugzeuge mit fertigen Profilen für Bambu-Lab-Drucker.">
+<meta property="og:type" content="website">
 <style>
 :root{color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body{margin:0;background:#141414}img{max-width:100%}[hidden]{display:none!important}
 </style>
-<title>LayerWing</title>
+<title>LayerWing – RC-Flugzeuge zum 3D-Drucken</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..800;1,9..40,400..800&display=swap">
 <style>
@@ -507,7 +509,7 @@ table.data tfoot td{border-bottom:0}
         <ul class="file-list">
           <li><span class="ext">.3mf</span><div><strong>Bambu-Studio-Projekt</strong><span class="d">Alle Teile auf fünf Platten verteilt, mit Wänden, Füllung, Stützen, Brim und Lochkompensation pro Teil. Öffnen, Platte wählen, drucken.</span></div></li>
           <li><span class="ext">.stl</span><div><strong>Einzelteile als STL</strong><span class="d">Alle zwölf Teile, schon in Druckausrichtung. Für andere Slicer oder eigene Anpassungen.</span></div></li>
-          <li><span class="ext">.pdf</span><div><strong>Bauanleitung</strong><span class="d">19 Seiten: jeder Schritt mit Bild und Pfeilen, Einkaufsliste für Elektronik und Kleinteile, Schwerpunkt und Ruderausschläge. <a href="https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf" target="_blank" rel="noopener">Bauanleitung des BF1 ansehen</a></span></div></li>
+          <li><span class="ext">.pdf</span><div><strong>Bauanleitung</strong><span class="d">19 Seiten: jeder Schritt mit Bild und Pfeilen, Einkaufsliste für Elektronik und Kleinteile, Schwerpunkt und Ruderausschläge. <a href="downloads/BF1-Bauanleitung.pdf" target="_blank" rel="noopener">Bauanleitung des BF1 ansehen</a></span></div></li>
         </ul>
         <div>
           <div class="table-wrap">
@@ -828,7 +830,7 @@ const PRODUCTS=[
    span:748,weight:780,pw:489,time:'20,5 h',plates:5,parts:12,printers:['a1','p1','x1','h2d'],
    motor:'A2212 · 2450 KV',esc:'40 A mit BEC',akku:'3S 1300 mAh',servos:'4 × Micro-Servo 9 g (z. B. PTK 7455MG-D)',prop:'6 × 4"',cg:'40 mm hinter Nasenleiste (38–42 mm)',profile:'Clark Y, Tiefe 150 mm',
    desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Flügel, Außenflügel und Haube rasten ohne Werkzeug ein, jedes Querruder hat sein eigenes Servo im Außenflügel. Seitliche Lufthutzen kühlen Regler und Akku, Griffmulden am Rumpf erleichtern den Handstart. Für Bauchlandung ausgelegt.',
-   files:['.3mf für Bambu Studio, 5 Platten','12 Teile als .stl','Bauanleitung .pdf, 19 Seiten'],manual:'https://leyerwing.github.io/layerwing/downloads/BF1-Bauanleitung.pdf',
+   files:['.3mf für Bambu Studio, 5 Platten','12 Teile als .stl','Bauanleitung .pdf, 19 Seiten'],manual:'downloads/BF1-Bauanleitung.pdf',
    note:'Alle Teile in Bambu PLA Tough+ mit 0,20 mm auf der Smooth-PEI-Platte (55 °C). Flügel und Querruder drucken mit einer Wand und 2D-Lattice-Füllung, leicht und trotzdem steif. Scharnierlöcher haben Lochkompensation, damit der Stift ohne Nacharbeit passt. Stützen sind pro Teil eingestellt; der vordere Rumpf steht beim Druck auf der Nase.',
    presets:['bf_rv','bf_rh','bf_fl','bf_haube','bf_zunge','bf_ruder','bf_qr']},
   {id:'moewe',no:'LW-01',name:'Möwe 1500',cat:'Segler',kind:'Thermiksegler',price:24.90,color:'#ECEAE2',shape:'glider',
