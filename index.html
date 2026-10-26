@@ -1335,7 +1335,8 @@ function initHero3D(){
     const dRoll=(q.roll-p.roll)/.08, dPitch=(q.pitch-p.pitch)/.08, dYaw=(q.yaw-p.yaw)/.08;
     const da=clamp(dRoll*3.2,.26)*(1-k), de=clamp(dPitch*7.5,.3)*(1-k), dr=clamp(dYaw*2.2,.28)*(1-k);
     const set=(n,ang)=>{const c=ctl[n];if(c){qa.setFromAxisAngle(c.axis,ang);c.piv.quaternion.copy(qa)}};
-    set('Querruder_rechts',da);set('Querruder_links',da);
+    /* Querlage rechts: rechtes Querruder hoch, linkes runter */
+    set('Querruder_rechts',-da);set('Querruder_links',-da);
     set('Ruder_rechts',de+dr);set('Ruder_links',-(de-dr));
     /* Teile auseinanderschieben */
     for(const pt of parts){
