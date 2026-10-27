@@ -834,7 +834,7 @@ const PRODUCTS=[
   {id:'bf1',no:'LW-07',name:'BF1',cat:'Hochdecker',kind:'Hochdecker mit V-Leitwerk',price:14.90,color:'#E4E7EA',shape:'bf1',tag:'Neu',real:true,buy:'https://layerwing.lemonsqueezy.com/checkout/buy/dc2457a5-1717-4a66-9e2c-89964944921e?checkout%5Bbilling_address%5D%5Bcountry%5D=DE',
    span:748,weight:729,pw:438,time:'20,2 h',plates:5,parts:12,printers:['a1','p1','x1','h2d'],
    motor:'A2212 · 2450 KV',esc:'40 A mit BEC',akku:'3S 1300 mAh',servos:'4 × Micro-Servo 9 g (z. B. PTK 7455MG-D)',prop:'6 × 4"',cg:'40 mm hinter Nasenleiste (38–42 mm)',profile:'Clark Y, Tiefe 150 mm',
-   desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Flügel, Außenflügel und Haube rasten ohne Werkzeug ein, jedes Querruder hat sein eigenes Servo im Außenflügel. Seitliche Lufthutzen kühlen Regler und Akku, Griffmulden am Rumpf erleichtern den Handstart. Für Bauchlandung ausgelegt.',
+   desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Flügel, Außenflügel und Haube rasten ohne Werkzeug ein, jedes Querruder hat sein eigenes Servo im Außenflügel. Griffmulden am Rumpf erleichtern den Handstart, der glatte Rumpf ist für Bauchlandung ausgelegt.',
    files:['.3mf für Bambu Studio, 5 Platten','12 Teile als .stl','Bauanleitung .pdf, 19 Seiten'],manual:'downloads/BF1-Bauanleitung.pdf',
    note:'Alle Teile in Bambu PLA Tough+ mit 0,20 mm auf der Smooth-PEI-Platte (55 °C). Alle Teile drucken mit Gitter-Füllung (2D-Lattice), Flügel, Querruder und Leitwerk mit nur einer Wand: leicht und trotzdem steif. Die Scharnieraugen sind unten 45° angeschrägt und werden über einen Modifier voll gefüllt und langsamer gedruckt, damit die Löcher sauber und rund bleiben; Lochkompensation sorgt dafür, dass der Stift ohne Nacharbeit passt. Die Ruderhörner haben ein Loch und seitliche Verstärkungen. Stützen sind pro Teil eingestellt; der vordere Rumpf steht beim Druck auf der Nase.',
    presets:['bf_rv','bf_rh','bf_fl','bf_haube','bf_zunge','bf_ruder','bf_qr']},
@@ -879,43 +879,98 @@ const pname=k=>PRINTERS.find(p=>p.k===k).n;
 /* Draufsicht im Bauplan-Stil: Tuschekontur, Filamentfarbe, Mittellinie, Maßlinie für die Spannweite */
 function planeSVG(p,opt){
   opt=opt||{};
-  const s=SHAPES[p.shape], cx=100, out=[];
-  let lines='';
-  const wingPoly=(y,root,tip,hs,sw)=>`<polygon points="${cx},${y} ${cx+hs},${y+sw} ${cx+hs},${y+sw+tip} ${cx},${y+root} ${cx-hs},${y+sw+tip} ${cx-hs},${y+sw}"/>`;
-  if(!s.custom)out.push(wingPoly(s.wy,s.root,s.tip,s.span/2,s.sw));
+  const s=SHAPES[p.shape], cx=100, uid='pl'+p.id+(++planeSVG.n);
+  /* Farben aus der Grundfarbe ableiten: f>0 heller, f<0 dunkler */
+  const tone=(f)=>{const n=parseInt(p.color.slice(1),16),c=[n>>16,n>>8&255,n&255],t=f<0?0:255,a=Math.abs(f);return 'rgb('+c.map(v=>Math.round(v+(t-v)*a)).join(',')+')'};
+  const defs=`<defs>
+    <linearGradient id="${uid}w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone(.55)}"/><stop offset=".07" stop-color="${tone(.22)}"/><stop offset=".4" stop-color="${tone(0)}"/><stop offset="1" stop-color="${tone(-.2)}"/></linearGradient>
+    <linearGradient id="${uid}c" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${tone(-.1)}"/><stop offset="1" stop-color="${tone(-.28)}"/></linearGradient>
+    <linearGradient id="${uid}f" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="${tone(-.38)}"/><stop offset=".3" stop-color="${tone(.3)}"/><stop offset=".5" stop-color="${tone(.08)}"/><stop offset="1" stop-color="${tone(-.42)}"/></linearGradient>
+    <linearGradient id="${uid}g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9FB4C8"/><stop offset=".35" stop-color="#3A4A5C"/><stop offset="1" stop-color="#121820"/></linearGradient>
+    <radialGradient id="${uid}m" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#F4F4F4"/><stop offset=".5" stop-color="#A9A9A9"/><stop offset="1" stop-color="#4A4A4A"/></radialGradient>
+    <linearGradient id="${uid}p" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1A1A1A" stop-opacity="0"/><stop offset=".25" stop-color="#1A1A1A" stop-opacity=".35"/><stop offset=".75" stop-color="#1A1A1A" stop-opacity=".35"/><stop offset="1" stop-color="#1A1A1A" stop-opacity="0"/></linearGradient>
+    <filter id="${uid}s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4"/></filter>
+  </defs>`;
+  const E='stroke="rgba(0,0,0,.5)" stroke-width=".45" stroke-linejoin="round"';
+  const parts=[], sil=[], lines=[];
+  const add=(d,fill,sh=true)=>{parts.push(`<path d="${d}" fill="${fill}" ${E}/>`);if(sh)sil.push(d)};
+  const ell=(x,y,rx,ry)=>`M${x-rx},${y}a${rx},${ry} 0 1,0 ${2*rx},0a${rx},${ry} 0 1,0 ${-2*rx},0Z`;
+  /* glatte geschlossene Kurve durch Punkte (Catmull-Rom) */
+  const smooth=pts=>{const n=pts.length,P=i=>pts[(i+n)%n];let d=`M${P(0)[0].toFixed(2)},${P(0)[1].toFixed(2)}`;
+    for(let i=0;i<n;i++){const a=P(i-1),b=P(i),c=P(i+1),e=P(i+2);
+      d+=`C${(b[0]+(c[0]-a[0])/6).toFixed(2)},${(b[1]+(c[1]-a[1])/6).toFixed(2)} ${(c[0]-(e[0]-b[0])/6).toFixed(2)},${(c[1]-(e[1]-b[1])/6).toFixed(2)} ${c[0].toFixed(2)},${c[1].toFixed(2)}`}
+    return d+'Z'};
+  /* Tragfläche mit runden Randbögen: hs halbe Spannweite, y Vorderkante innen, root/tip Tiefe, sw Pfeilung bis zur Spitze */
+  const wing=(y,root,tip,hs,sw,round)=>{const r=Math.min(tip*round,hs*.08),pts=[];
+    const le=u=>y+sw*u, te=u=>y+sw*u+root+(tip-root)*u;
+    for(const g of [1,-1]){const seq=[[0,le(0)],[g*(hs-r*1.4),le(1-r*1.4/hs)],[g*(hs-r*.25),le(1)+tip*.12],[g*hs,le(1)+tip*.5],[g*(hs-r*.35),te(1)-tip*.05],[g*(hs-r*1.6),te(1-r*1.6/hs)],[0,te(0)]];
+      (g>0?seq:seq.reverse()).forEach(q=>pts.push([cx+q[0],q[1]]))}
+    /* doppelte Mittelpunkte entfernen */
+    const out=[];pts.forEach(q=>{const l=out[out.length-1];if(!l||Math.hypot(l[0]-q[0],l[1]-q[1])>.3)out.push(q)});
+    return {d:smooth(out),le,te,hs}};
+  const surf=(W,u0,u1,frac,fill)=>{for(const g of [1,-1]){const c=u=>W.te(u)-(W.te(u)-W.le(u))*frac;
+    const d=`M${cx+g*W.hs*u0},${c(u0).toFixed(2)}L${cx+g*W.hs*u1},${c(u1).toFixed(2)}L${cx+g*W.hs*u1},${(W.te(u1)-.2).toFixed(2)}L${cx+g*W.hs*u0},${(W.te(u0)-.2).toFixed(2)}Z`;
+    parts.push(`<path d="${d}" fill="${fill}" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`)}};
+  const prop=(y,dia,w)=>{parts.push(`<rect x="${cx-dia/2}" y="${y-1.1}" width="${dia}" height="2.2" fill="url(#${uid}p)"/>`,
+      `<path d="M${cx},${y}C${cx+dia*.18},${y-1.6} ${cx+dia*.42},${y-1} ${cx+dia*.48},${y}C${cx+dia*.42},${y+.6} ${cx+dia*.18},${y+.9} ${cx},${y}Z" fill="#2A2A2A" opacity=".85"/>`,
+      `<path d="M${cx},${y}C${cx-dia*.18},${y+1.6} ${cx-dia*.42},${y+1} ${cx-dia*.48},${y}C${cx-dia*.42},${y-.6} ${cx-dia*.18},${y-.9} ${cx},${y}Z" fill="#2A2A2A" opacity=".85"/>`,
+      `<path d="M${cx-w},${y+2.2}Q${cx-w},${y-4.5} ${cx},${y-5.2}Q${cx+w},${y-4.5} ${cx+w},${y+2.2}Z" fill="url(#${uid}m)" ${E}/>`)};
   if(s.custom){
-    /* BF1 nach den echten Maßen: 748 mm Spannweite, 150 mm Tiefe, 505 mm Länge, V-Leitwerk */
-    const k=.25, X=v=>(cx+v*k).toFixed(2), Y=v=>(36+v*k).toFixed(2);
-    for(const g of [1,-1])out.push(`<polygon points="${X(g*8)},${Y(420)} ${X(g*150)},${Y(472)} ${X(g*150)},${Y(505)} ${X(g*8)},${Y(505)}"/>`);
-    out.push(`<path d="M${X(-30)},${Y(16)} Q${X(-30)},${Y(0)} ${X(-15)},${Y(0)} L${X(15)},${Y(0)} Q${X(30)},${Y(0)} ${X(30)},${Y(16)} L${X(30)},${Y(250)} L${X(10)},${Y(470)} L${X(8)},${Y(505)} L${X(-8)},${Y(505)} L${X(-10)},${Y(470)} L${X(-30)},${Y(250)} Z"/>`);
-    out.push(`<rect x="${X(-14)}" y="${Y(-22)}" width="${28*k}" height="${22*k}" rx="1"/>`);
-    out.push(`<rect x="${X(-125)}" y="${Y(113)}" width="${250*k}" height="${150*k}"/>`);
-    for(const g of [1,-1])out.push(`<polygon points="${X(g*125)},${Y(113)} ${X(g*370)},${Y(116)} ${X(g*374)},${Y(124)} ${X(g*374)},${Y(263)} ${X(g*125)},${Y(263)}"/>`);
-    lines=`<g fill="none" stroke="currentColor" stroke-width=".45" opacity=".6">`
-      +[1,-1].map(g=>`<line x1="${X(g*135)}" y1="${Y(221)}" x2="${X(g*366)}" y2="${Y(221)}"/><line x1="${X(g*10)}" y1="${Y(478)}" x2="${X(g*150)}" y2="${Y(478)}"/>`).join('')
-      +`<rect x="${X(-12)}" y="${Y(30)}" width="${24*k}" height="${80*k}" rx="2.5"/><line x1="${X(-76)}" y1="${Y(-24)}" x2="${X(76)}" y2="${Y(-24)}" stroke-width=".8" opacity=".7"/></g>`;
+    /* BF1: Umrisse aus dem echten Fusion-Modell (Draufsicht), Maßstab 0,25 Einheiten pro mm */
+    const B=BF1TOP, k=.25, X=v=>cx+v*k, Y=v=>36+v*k;
+    add(B.tail,`url(#${uid}w)`);
+    parts.push(`<path d="${B.rud_r}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.rud_l}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
+    add(B.tube,`url(#${uid}f)`,false);
+    add(B.fus_f,`url(#${uid}f)`);add(B.motor,`url(#${uid}m)`);
+    add(B.haube,`url(#${uid}f)`);
+    add(B.wing_m,`url(#${uid}w)`);add(B.wing_r,`url(#${uid}w)`);add(B.wing_l,`url(#${uid}w)`);
+    parts.push(`<path d="${B.ail_r}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.ail_l}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
+    prop(Y(-44),152*k,3.4);
+    lines.push(`<line x1="${X(-125)}" y1="${Y(114)}" x2="${X(-125)}" y2="${Y(262)}"/><line x1="${X(125)}" y1="${Y(114)}" x2="${X(125)}" y2="${Y(262)}"/>`);
   } else if(s.flying){
-    const hs=s.span/2, y=s.wy+s.sw;
-    out.push(`<rect x="${cx+hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="1"/>`,`<rect x="${cx-hs-3}" y="${y-6}" width="6" height="${s.tip+8}" rx="1"/>`);
-    const y0=s.wy-12;
-    out.push(`<path d="M${cx},${y0} Q${cx+s.fw/2},${y0} ${cx+s.fw/2},${y0+18} L${cx+s.fw/2},${y0+s.fl} L${cx-s.fw/2},${y0+s.fl} L${cx-s.fw/2},${y0+18} Q${cx-s.fw/2},${y0} ${cx},${y0} Z"/>`);
+    const W=wing(s.wy,s.root,s.tip,s.span/2,s.sw,.4);
+    const y0=s.wy-12,h=s.fw/2,f=s.fl;
+    add(smooth([[cx,y0],[cx+h*.8,y0+f*.08],[cx+h,y0+f*.4],[cx+h*.7,y0+f],[cx-h*.7,y0+f],[cx-h,y0+f*.4],[cx-h*.8,y0+f*.08]]),`url(#${uid}f)`);
+    add(W.d,`url(#${uid}w)`);
+    surf(W,.45,.92,.22,`url(#${uid}c)`);
+    for(const g of [1,-1])add(`M${cx+g*W.hs-3},${W.le(1)-6}h6v${s.tip+8}h-6Z`,`url(#${uid}f)`);
+    add(ell(cx,y0+f*.3,h*.55,f*.16),`url(#${uid}g)`,false);
   } else {
-    out.push(wingPoly(s.ty,s.tr,s.tt,s.ts/2,s.tsw));
-    const y0=100-s.fl/2-8, h=s.fw/2, t=s.fw*s.te, f=s.fl;
-    out.push(`<path d="M${cx},${y0} Q${cx+h},${y0} ${cx+h},${y0+f*.17} L${cx+h},${y0+f*.55} L${cx+t},${y0+f} L${cx-t},${y0+f} L${cx-h},${y0+f*.55} L${cx-h},${y0+f*.17} Q${cx-h},${y0} ${cx},${y0} Z"/>`);
-    out.push(`<rect x="${cx-1.2}" y="${s.ty-4}" width="2.4" height="${s.tr+8}"/>`);
+    const glider=p.shape==='glider';
+    const y0=100-s.fl/2-8,h=s.fw/2,f=s.fl,t=Math.max(s.fw*s.te,1.4);
+    /* Rumpf: Breitenverlauf von der Nase bis zum Leitwerk */
+    const prof=glider?[[0,.55],[.04,.85],[.12,1],[.3,1],[.42,.7],[.6,.42],[.85,.32],[1,.28]]:[[0,.6],[.05,.9],[.15,1],[.5,1],[.75,.62],[1,t/h]];
+    const right=prof.map(([u,w])=>[cx+h*w,y0+f*u]), left=prof.slice().reverse().map(([u,w])=>[cx-h*w,y0+f*u]);
+    const fus=smooth([...right,...left]);
+    const T=wing(s.ty,s.tr,s.tt,s.ts/2,s.tsw,.45);
+    add(T.d,`url(#${uid}w)`);
+    surf(T,.06,.9,.38,`url(#${uid}c)`);
+    add(fus,`url(#${uid}f)`);
+    add(`M${cx-1.1},${s.ty-3}h2.2v${s.tr+7}h-2.2Z`,`url(#${uid}c)`);
+    const W=wing(s.wy,s.root,s.tip,s.span/2,s.sw,glider?.6:.45);
+    add(W.d,`url(#${uid}w)`);
+    if(glider){surf(W,.58,.94,.2,`url(#${uid}c)`);surf(W,.08,.56,.18,`url(#${uid}c)`);
+      lines.push(`<line x1="${cx+W.hs*.5}" y1="${W.le(.5)}" x2="${cx+W.hs*.5}" y2="${W.te(.5)}"/><line x1="${cx-W.hs*.5}" y1="${W.le(.5)}" x2="${cx-W.hs*.5}" y2="${W.te(.5)}"/>`)}
+    else surf(W,.55,.93,.24,`url(#${uid}c)`);
+    add(ell(cx,s.wy-(glider?f*.07:f*.05),h*(glider?.62:.58),f*(glider?.11:.08)),`url(#${uid}g)`,false);
+    if(glider){parts.push(`<path d="M${cx-h*.45},${y0+2}L${cx-h*1.1},${y0+16}" stroke="#2A2A2A" stroke-width="1.1" stroke-linecap="round"/><path d="M${cx+h*.45},${y0+2}L${cx+h*1.1},${y0+16}" stroke="#2A2A2A" stroke-width="1.1" stroke-linecap="round"/>`,
+      `<path d="M${cx-h*.5},${y0+2.5}Q${cx},${y0-4.5} ${cx+h*.5},${y0+2.5}Z" fill="url(#${uid}m)" ${E}/>`)}
+    else prop(y0-1,s.span*.17,h*.52);
   }
-  const shapes=out.join('');
   let extra='';
   if(opt.dim){
     const hs=s.span/2, y=190;
-    extra=`<line x1="${cx}" y1="4" x2="${cx}" y2="182" stroke="currentColor" stroke-width=".6" stroke-dasharray="8 2.5 1.5 2.5" opacity=".55"/>
+    extra=`<line x1="${cx}" y1="4" x2="${cx}" y2="182" stroke="currentColor" stroke-width=".6" stroke-dasharray="8 2.5 1.5 2.5" opacity=".35"/>
       <g stroke="currentColor" stroke-width=".7" opacity=".8"><line x1="${cx-hs}" y1="${y}" x2="${cx+hs}" y2="${y}"/><line x1="${cx-hs}" y1="${y-5}" x2="${cx-hs}" y2="${y+3}"/><line x1="${cx+hs}" y1="${y-5}" x2="${cx+hs}" y2="${y+3}"/></g>
       <rect x="${cx-17}" y="${y-5}" width="34" height="10" fill="var(--paper)"/>
       <text x="${cx}" y="${y+3}" text-anchor="middle" font-family="DM Sans, system-ui, sans-serif" font-size="8" fill="currentColor">${p.span.toLocaleString('de-DE')}</text>`;
   }
-  return `<svg viewBox="0 0 200 200" aria-hidden="true">${opt.dim?extra:''}<g class="plane"><g fill="${p.color}" stroke="currentColor" stroke-width=".9" stroke-linejoin="round">${shapes}</g><g fill="url(#layers)">${shapes}</g>${lines}</g></svg>`;
+  const shadow=`<g transform="translate(3.5,5.5)" filter="url(#${uid}s)" fill="#000" opacity=".55">${sil.map(d=>`<path d="${d}"/>`).join('')}</g>`;
+  const ln=lines.length?`<g fill="none" stroke="rgba(0,0,0,.35)" stroke-width=".4">${lines.join('')}</g>`:'';
+  return `<svg viewBox="0 0 200 200" aria-hidden="true">${defs}${opt.dim?extra:''}<g class="plane">${shadow}${parts.join('')}${ln}<g opacity=".22" fill="url(#layers)">${sil.map(d=>`<path d="${d}"/>`).join('')}</g></g></svg>`;
 }
+planeSVG.n=0;
+const BF1TOP={"tail": "M94.0,94.8 94.0,98.5 93.8,98.5 95.0,117.4 95.0,117.9 94.7,119.2 94.4,124.4 94.8,125.8 95.5,125.9 95.6,127.4 68.6,138.1 68.5,155.2 68.8,155.3 68.7,156.1 68.9,156.5 68.9,156.7 68.8,156.8 68.8,162.2 97.5,162.2 97.5,158.0 97.2,157.0 97.2,156.6 102.8,156.7 102.8,157.0 102.5,158.1 102.5,162.2 131.2,162.2 131.2,156.8 131.1,156.7 131.3,156.1 131.2,155.3 131.5,155.2 131.4,138.1 104.4,127.4 104.5,125.9 105.2,125.8 105.6,124.3 105.3,119.2 105.0,117.9 106.2,98.8 106.2,98.5 106.0,98.5 106.0,94.8Z", "tube": "M96.7,94.8 96.9,118.4 96.8,126.8 96.9,129.9 96.9,134.6 96.7,134.6 96.9,139.6 96.6,141.4 97.3,153.6 97.0,155.2 96.9,156.2 97.2,156.6 102.8,156.6 103.1,156.2 103.0,155.2 102.7,153.6 103.4,142.3 103.2,141.3 103.4,127.1 102.9,127.0 103.3,117.8 103.2,117.4 102.8,117.4 103.3,100.5 103.1,94.8Z", "rud_r": "M131.2,156.8 131.2,162.2 102.5,162.2 102.5,158.1 102.8,156.8 106.8,155.4 126.9,155.4Z", "rud_l": "M97.5,158.0 97.5,162.2 68.8,162.2 68.8,156.8 73.1,155.4 93.2,155.4 97.2,156.8Z", "fus_f": "M94.8,36.0 93.9,44.5 93.8,50.2 93.8,98.5 106.2,98.5 106.2,50.2 106.1,44.5 105.2,36.0Z", "haube": "M97.0,38.2 97.0,39.8 94.3,39.8 94.2,42.1 93.9,42.6 93.8,45.7 93.9,45.7 93.8,54.5 93.6,54.6 93.6,57.9 93.8,58.0 93.8,59.7 106.2,59.7 106.2,58.0 106.4,57.9 106.4,54.6 106.2,54.5 106.1,45.7 106.2,45.7 106.1,42.6 106.0,42.3 105.8,42.2 105.7,39.8 103.0,39.8 103.0,38.2Z", "motor": "M99.6,25.5 99.6,29.1 96.5,29.1 96.5,36.0 103.5,36.0 103.5,29.1 100.4,29.1 100.4,25.5Z", "wing_m": "M68.8,64.2 68.8,101.8 131.2,101.8 131.2,64.2Z", "wing_r": "M131.2,64.2 131.2,101.8 193.5,101.8 193.5,89.7 193.6,88.1 193.6,68.0 189.8,64.2Z", "wing_l": "M6.4,68.0 6.4,88.1 6.4,89.5 6.5,89.7 6.5,101.8 68.8,101.8 68.8,64.2 10.2,64.2Z", "ail_r": "M193.5,89.8 193.5,101.8 153.9,101.8 153.7,89.8 155.2,88.4 186.8,88.4Z", "ail_l": "M46.3,89.8 46.1,101.8 6.5,101.8 6.5,89.8 13.2,88.4 44.8,88.4Z"};
 
 /* Warenkorb */
 let cart=[];
