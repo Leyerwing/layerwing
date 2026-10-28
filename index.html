@@ -128,10 +128,14 @@ mark{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 .h3d-prev{left:max(16px,env(safe-area-inset-left,0px))}
 .h3d-next{right:max(16px,env(safe-area-inset-right,0px))}
 .h3d-arrow:hover{border-color:var(--accent);background:var(--accent-soft-strong);color:var(--accent)}
+.h3d-next{width:60px;height:60px;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 10px 26px rgba(0,0,0,.45),0 0 0 6px rgba(244,198,31,.16)}
+.h3d-next svg{width:26px;height:26px;stroke-width:2.6}
+.h3d-next:hover{background:var(--accent);color:var(--accent-ink);filter:brightness(1.06)}
 .h3d-prev:hover{transform:translateX(-3px)}.h3d-next:hover{transform:translateX(3px)}
 .h3d-arrow:active{transform:scale(.94)}
 .is-fallback .h3d-arrow,.is-fallback .h3d-dots{display:none}
 @media (max-width:640px){.h3d-arrow{width:40px;height:40px;top:38%}.h3d-arrow svg{width:18px;height:18px}}
+@media (max-width:640px){.h3d-ex{display:none}}
 @media (prefers-reduced-motion: reduce){.h3d-arrow{transition:none}.h3d-arrow:hover,.h3d-arrow:active{transform:none}}
 #hero3d-canvas{touch-action:pan-y}
 .h3d-text{transition:opacity .22s ease,transform .22s ease}
@@ -738,14 +742,14 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
 </header>
 
 <main id="top">
-  <section class="hero3d" aria-label="BF1, Buschflugzeug und F2 im Flug als 3D-Modelle aus der Fusion-Konstruktion. Die Pfeile wechseln das Modell, mit der Maus darauf zerlegt es sich in seine Druckteile.">
+  <section class="hero3d" aria-label="BF1, Buschflugzeug und F2 im Flug als 3D-Modelle aus der Fusion-Konstruktion. Die Pfeile wechseln das Modell, ein Klick zerlegt es in seine Druckteile.">
     <div class="hero3d-stage" id="hero3d">
       <canvas id="hero3d-canvas" aria-hidden="true"></canvas>
       <button type="button" class="h3d-arrow h3d-prev" id="h3d-prev" aria-label="Vorheriges Modell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
       <button type="button" class="h3d-arrow h3d-next" id="h3d-next" aria-label="Nächstes Modell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
       <div class="hero3d-meta">
         <div class="h3d-text" id="h3d-text" aria-live="polite"><p class="h3d-name" id="h3d-name">BF1<span class="h3d-new">Neu</span></p><p class="h3d-sub" id="h3d-sub">Hochdecker mit V-Leitwerk, 748 mm Spannweite</p></div>
-        <div class="h3d-side"><div class="h3d-dots" id="h3d-dots" role="group" aria-label="Modell wählen"></div><button class="btn btn-primary" id="h3d-open" data-open="bf1">Datenblatt BF1</button></div>
+        <div class="h3d-side"><div class="h3d-dots" id="h3d-dots" role="group" aria-label="Modell wählen"></div><button type="button" class="btn h3d-ex" id="h3d-ex" aria-pressed="false">In Teile zerlegen</button><button class="btn btn-primary" id="h3d-open" data-open="bf1">Datenblatt BF1</button></div>
       </div>
     </div>
   </section>
@@ -1670,7 +1674,7 @@ if(window.matchMedia&&window.matchMedia('(hover: hover)').matches&&!window.match
 }
 
 /* 3D-Bühne: BF1, Buschflugzeug und F2 aus den echten Fusion-Netzen fliegen Kurven. Pfeile (oder Wischen) wechseln das Modell.
-   Mit der Maus darauf hält das Modell an und zerlegt sich in seine Druckteile. */
+   Ein Klick (oder Tippen) zerlegt das Modell in seine Druckteile. */
 function initHero3D(){
   const stage=$('#hero3d'), canvas=$('#hero3d-canvas');
   if(!stage||!canvas)return;
@@ -1938,7 +1942,7 @@ function initHero3D(){
     gridOff.x+=fw.x*dt*2.2*(1-k);gridOff.z+=fw.z*dt*2.2*(1-k);
     grid.position.x=-(((gridOff.x%1)+1)%1);grid.position.z=-(((gridOff.z%1)+1)%1);
     orbit+=(orbitTarget-orbit)*.08;tilt+=(tiltTarget-tilt)*.08;camW+=(M.camW-camW)*.05;
-    const dist=Math.max(9.4,camW/(2*Math.tan(15*Math.PI/180)*camera.aspect))*(1+.42*k), a=orbit+px*.25, el=.42+tilt+py*.08+.08*k;
+    const dist=Math.max(9.4,camW/(2*Math.tan(15*Math.PI/180)*camera.aspect))*(1+.42*k), a=orbit, el=.42+tilt+.08*k;   /* Kamera hängt nicht an der Mausposition: kein Zucken beim Rein- und Rausfahren */
     camera.position.set(Math.sin(a)*dist*Math.cos(el),Math.sin(el)*dist+.4,Math.cos(a)*dist*Math.cos(el));
     camera.lookAt(0,-.1-.05*k,0);
     scene.fog.near=dist+2;scene.fog.far=dist+27;
@@ -1954,7 +1958,9 @@ function initHero3D(){
 
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hoverable=!window.matchMedia||window.matchMedia('(hover: hover)').matches;
-  const setEx=on=>{exTarget=on?1:0;stage.classList.toggle('is-open',on);if(reduce){MODELS[cur].ex=exTarget;frame(0)}};
+  const exBtn=$('#h3d-ex');
+  const setEx=on=>{exTarget=on?1:0;stage.classList.toggle('is-open',on);if(exBtn){exBtn.textContent=on?'Zusammenbauen':'In Teile zerlegen';exBtn.setAttribute('aria-pressed',on?'true':'false')}if(reduce){MODELS[cur].ex=exTarget;frame(0)}};
+  if(exBtn)exBtn.addEventListener('click',()=>setEx(exTarget<.5));
 
   /* Text, Punkte und Datenblatt-Knopf zum aktiven Modell */
   if(dotsEl)dotsEl.innerHTML=MODELS.map((M,i)=>`<button type="button" class="h3d-dot" data-i="${i}" aria-label="${M.name} zeigen"></button>`).join('');
@@ -1974,7 +1980,7 @@ function initHero3D(){
     i=(i+MODELS.length)%MODELS.length;if(i===cur)return;
     const old=MODELS[cur], M=MODELS[i];
     if(!M.plane)return;
-    cur=i;syncMeta(true);
+    cur=i;syncMeta(true);setEx(false);
     if(outgoing&&outgoing!==M)outgoing.plane.visible=false;
     old.exitT=0;outgoing=reduce?null:old;if(reduce)old.plane.visible=false;
     M.exitT=-1;M.ex=0;M.introT=reduce?99:0;M.ft=old.ft;
@@ -1989,11 +1995,10 @@ function initHero3D(){
   stage.addEventListener('keydown',e=>{if(e.key==='ArrowRight'){show(cur+1);e.preventDefault()}else if(e.key==='ArrowLeft'){show(cur-1);e.preventDefault()}});
   syncMeta(false);
 
-  /* Maus auf dem Flieger: zerlegen. Ziehen dreht die Ansicht. Auf dem Handy: Tippen zerlegt, seitlich wischen wechselt das Modell. */
+  /* Klick oder Tippen auf den Flieger: zerlegen. Ziehen dreht die Ansicht. Auf dem Handy wechselt seitliches Wischen das Modell. */
   let drag=null, downType='mouse', moved=0;
   canvas.addEventListener('pointerdown',e=>{downType=e.pointerType;moved=0;drag={x:e.clientX,y:e.clientY,o:orbitTarget,t:tiltTarget,ts:performance.now()};canvas.setPointerCapture(e.pointerId);canvas.style.cursor='grabbing'});
   canvas.addEventListener('pointermove',e=>{
-    const r=stage.getBoundingClientRect();px=(e.clientX-r.left)/r.width-.5;py=(e.clientY-r.top)/r.height-.5;
     if(drag){moved=Math.max(moved,Math.abs(e.clientX-drag.x)+Math.abs(e.clientY-drag.y));
       if(downType==='mouse'){orbitTarget=drag.o+(e.clientX-drag.x)*.008;tiltTarget=clamp(drag.t+(e.clientY-drag.y)*.004,.5)}}
   });
@@ -2005,9 +2010,8 @@ function initHero3D(){
     drag=null;canvas.style.cursor='';
   };
   canvas.addEventListener('pointerup',endDrag);canvas.addEventListener('pointercancel',endDrag);
-  canvas.addEventListener('pointerenter',e=>{if(e.pointerType==='mouse')setEx(true)});
-  canvas.addEventListener('pointerleave',e=>{px=0;py=0;if(e.pointerType==='mouse')setEx(false)});
-  canvas.addEventListener('click',()=>{if(downType!=='mouse'&&moved<8)setEx(exTarget<.5)});
+  /* Zerlegen nur auf Klick oder Tippen, nicht beim Überfahren: die Ansicht bleibt ruhig, egal wo die Maus ist */
+  canvas.addEventListener('click',()=>{if(moved<8)setEx(exTarget<.5)});
   if(!hoverable)stage.classList.add('is-touch');
 
   let raf=0,last=null,onScreen=true;
