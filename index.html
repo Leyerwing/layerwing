@@ -339,6 +339,29 @@ html.lb-open{overflow:hidden}
 .g-thumb:hover{border-color:var(--accent-line);transform:translateY(-2px)}
 .g-thumb[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 2px rgba(244,198,31,.3)}
 .g-cap{margin:0;padding:8px 16px 14px;font-family:var(--f-mono);font-size:var(--t12);color:#ADADAD}
+/* Größenvergleich */
+.sizes{margin-top:var(--s32,32px);border:1px solid var(--panel-line);border-radius:var(--panel-r,14px);background:var(--panel);padding:18px 20px 16px}
+.sizes-head{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.sizes-note{margin:0;font-size:var(--t12);color:var(--muted)}
+.sizes-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sizes-row{position:relative;display:flex;align-items:flex-start;gap:0;min-width:620px;padding-bottom:34px}
+.size-it{flex:0 0 calc(var(--w) / var(--tot) * 100%);display:flex;flex-direction:column;align-items:center;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;font:inherit;transition:opacity .25s}
+.size-pic{display:block;width:100%;aspect-ratio:1}
+.size-pic svg{display:block;width:100%;height:100%;overflow:visible;transition:transform .35s cubic-bezier(.22,1,.36,1)}
+.size-cap{display:flex;flex-direction:column;align-items:center;gap:1px;margin-top:-4%;font-size:var(--t12);color:var(--muted);white-space:nowrap}
+.size-cap b{color:var(--ink);font-weight:600;font-size:var(--t14)}
+.size-cap .mono{font-family:var(--f-mono)}
+.sizes-row:hover .size-it,.sizes-row:focus-within .size-it{opacity:.35}
+.sizes-row .size-it:hover,.sizes-row .size-it:focus-visible{opacity:1}
+.size-it:hover .size-pic svg,.size-it:focus-visible .size-pic svg{transform:translateY(-4px)}
+.size-it:focus-visible{outline:2px solid var(--accent);outline-offset:4px;border-radius:8px}
+.size-scale{position:absolute;left:0;bottom:4px;width:calc(var(--w) / var(--tot) * 100% * .99);display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.size-scale i{display:block;height:8px;border:1.5px solid var(--muted);border-top:0;background:linear-gradient(90deg,var(--accent) 0 50%,transparent 50%) bottom/100% 3px no-repeat}
+.size-scale span{font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+/* Filamentkosten im Datenblatt */
+.fil-calc{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:var(--t12);color:var(--muted)}
+.fil-calc input{width:64px;padding:4px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);font-family:var(--f-mono);font-size:var(--t12)}
+.fil-calc output{font-family:var(--f-mono);color:var(--ink);font-weight:600}
 .pthumb{width:34px;height:34px;max-width:none;flex:none;border-radius:3px;background:#262626}
 .plate-id{display:inline-flex;align-items:center;gap:10px;line-height:1;vertical-align:middle}
 .plate-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
@@ -627,15 +650,6 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
 @keyframes fx-layers{from{clip-path:inset(100% -12px -4px -12px)}to{clip-path:inset(-12px -12px -4px -12px)}}
 @keyframes fx-nozzle{from{bottom:0;opacity:1}92%{opacity:1}to{bottom:100%;opacity:0}}
 
-/* Windsack: zeigt, wie schnell du scrollst */
-.fx-sock{position:absolute;z-index:3;top:14px;right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;align-items:flex-end;gap:2px;pointer-events:none}
-.fx-sock svg{width:92px;height:92px;overflow:visible}
-.fx-sock .pole{stroke:var(--muted);stroke-width:2;stroke-linecap:round}
-.fx-sock .seg{stroke:rgba(0,0,0,.35);stroke-width:.6}
-.fx-sock .seg.a{fill:var(--accent)}
-.fx-sock .seg.b{fill:#E6E6E6}
-@media (max-width:640px){.fx-sock{top:8px}.fx-sock svg{width:64px;height:64px}}
-.fx-sock span{font-family:var(--f-mono);font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* Fliegende Teile */
 .fx-fly{position:fixed;left:0;top:0;z-index:150;pointer-events:none;will-change:transform,opacity}
@@ -755,6 +769,10 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
         <div class="count" id="result-count"></div>
       </div>
       <div class="types" id="grid"></div>
+      <div class="sizes" id="sizes">
+        <div class="sizes-head"><p class="label">Größenvergleich</p><p class="sizes-note">Alle Modelle im selben Maßstab von oben. Klick öffnet das Datenblatt.</p></div>
+        <div class="sizes-scroll"><div class="sizes-row" id="sizes-row"></div></div>
+      </div>
     </div>
   </section>
 
@@ -1354,6 +1372,27 @@ function renderGrid(animate){
     </article>`).join(''):`<div class="empty">Für diese Kombination gibt es noch kein Modell. Wähle einen anderen Typ oder Drucker.</div>`;
 }
 
+/* Filamentkosten: Preis pro kg merkt sich der Browser */
+let filPrice=25; try{const v=parseFloat(localStorage.getItem('lw-filprice'));if(v>0)filPrice=v}catch(e){}
+const filCost=g=>g/1000*filPrice;
+document.addEventListener('input',e=>{
+  const i=e.target.closest&&e.target.closest('.fil-calc input'); if(!i)return;
+  const v=parseFloat(String(i.value).replace(',','.')); if(!(v>0))return;
+  filPrice=v; try{localStorage.setItem('lw-filprice',String(v))}catch(err){}
+  i.closest('.fil-calc').querySelector('output').textContent=eur(filCost(+i.dataset.fil));
+});
+
+/* Größenvergleich: echte Spannweiten im gemeinsamen Maßstab, dazu ein 50-cm-Maßstab */
+function renderSizes(){
+  const row=$('#sizes-row'); if(!row)return;
+  const L=PRODUCTS.map(p=>({p,w:200*p.span/SHAPES[p.shape].span})), tot=L.reduce((a,x)=>a+x.w,0);
+  row.style.setProperty('--tot',tot);
+  row.innerHTML=L.map(({p,w})=>`<button class="size-it" data-open="${p.id}" style="--w:${w.toFixed(1)}" aria-label="${p.name}, ${mm(p.span)} Spannweite, Datenblatt öffnen">
+      <span class="size-pic">${planeSVG(p)}</span>
+      <span class="size-cap"><b>${p.name}</b><span class="mono">${mm(p.span)}</span></span></button>`).join('')+
+    `<div class="size-scale" style="--w:500" aria-hidden="true"><i></i><span>50 cm</span></div>`;
+}
+
 function renderTables(){
   let tot=0;
   let grams=0;
@@ -1422,7 +1461,8 @@ function openModal(id){
       <h4>Einkaufsliste</h4>
       <div class="shop-list">
         <div><h5>3D-Drucker</h5><p>Bauraum ab ${p.bed}, 0,4-mm-Düse</p><p class="small">${p.printers.map(pname).join(' · ')}</p></div>
-        <div><h5>Filament</h5><ul>${Object.entries(p.fil).map(([k,v])=>`<li><span>${k}</span><span class="mono">${v} g</span></li>`).join('')}</ul></div>
+        <div><h5>Filament</h5><ul>${Object.entries(p.fil).map(([k,v])=>`<li><span>${k}</span><span class="mono">${v} g</span></li>`).join('')}</ul>
+          <label class="fil-calc">Deine Rolle kostet <input type="number" min="5" max="200" step="0.5" value="${filPrice}" data-fil="${Object.values(p.fil).reduce((a,b)=>a+b,0)}" aria-label="Preis pro Kilogramm in Euro"> €/kg, Material für das Modell: <output>${eur(filCost(Object.values(p.fil).reduce((a,b)=>a+b,0)))}</output></label></div>
         <div><h5>Antrieb</h5><ul><li><span>Motor</span><span>${p.motor}</span></li><li><span>Regler</span><span>${p.esc}</span></li><li><span>Luftschraube</span><span>${p.prop}</span></li><li><span>Servos</span><span>${p.servos}</span></li></ul></div>
         <div><h5>Akku und Sender</h5><ul><li><span>Akku</span><span>${p.akku}</span></li><li><span>Sender</span><span>ab ${p.ch} Kanäle</span></li></ul></div>
         <div class="wide"><h5>Kleinteile</h5><ul class="plain">${(p.smallParts||[...p.carbon,...COMMON_PARTS]).map(x=>`<li>${x}</li>`).join('')}</ul></div>
@@ -2069,7 +2109,7 @@ function route(){
 }
 window.addEventListener('hashchange',route);
 
-renderFilters(); renderGrid(); renderTables(); syncCart(); drawFoil(); route(); initHero3D();
+renderFilters(); renderGrid(); renderSizes(); renderTables(); syncCart(); drawFoil(); route(); initHero3D();
 })();
 </script>
 <script>
@@ -2248,7 +2288,7 @@ renderFilters(); renderGrid(); renderTables(); syncCart(); drawFoil(); route(); 
 })();
 </script>
 <script>
-/* Spielereien, Teil 2: Windsack, Kippen, Magnetknöpfe, Druck-Überschriften, Abflug beim Klick, Konfetti, Tiefflug */
+/* Spielereien, Teil 2: Kippen, Magnetknöpfe, Druck-Überschriften, Abflug beim Klick, Konfetti, Tiefflug */
 (function(){
   const q=s=>document.querySelector(s), qa=s=>Array.from(document.querySelectorAll(s));
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2258,46 +2298,6 @@ renderFilters(); renderGrid(); renderTables(); syncCart(); drawFoil(); route(); 
   const PROP='<svg viewBox="0 0 100 100" width="100%" height="100%"><use href="#fx-prop"/></svg>';
   const PLANE='<svg viewBox="0 0 20 16" width="100%" height="100%"><use href="#fx-plane"/></svg>';
 
-  /* Windsack auf der 3D-Bühne: Scrolltempo wird zu Wind */
-  const stage=q('#hero3d');
-  if(stage){
-    const N=5, L=15;
-    let inner='', open='';
-    for(let i=0;i<N;i++){
-      const h0=7-i*.75, h1=7-(i+1)*.75;
-      open+=`<g class="sk" ${i?`transform="translate(${-L},0)"`:''}><path class="seg ${i%2?'b':'a'}" d="M0,${-h0} L${-L-.6},${-h1} L${-L-.6},${h1} L0,${h0}Z"/>`;
-    }
-    for(let i=0;i<N;i++)open+='</g>';
-    stage.insertAdjacentHTML('beforeend',`<div class="fx-sock" aria-hidden="true"><svg viewBox="0 0 92 92"><line class="pole" x1="86" y1="3" x2="86" y2="92"/><g transform="translate(86,9)">${open}</g></svg><span>Wind <b>0</b> kn</span></div>`);
-    const segs=[...stage.querySelectorAll('.fx-sock .sk')], kn=stage.querySelector('.fx-sock b');
-    let v=0, lastY=window.scrollY, lastT=performance.now(), wind=.08, raf=0, vis=true, shown=-1;
-    const pose=(t)=>{
-      segs.forEach((g,i)=>{
-        const base=i===0?-(1-wind)*66-4:-(1-wind)*6;
-        const flap=Math.sin(t*(.004+.012*wind)+i*1.15)*(1.5+9*wind)*(i?1:.35);
-        const tr=i?`translate(${-L},0) `:'';
-        g.setAttribute('transform',`${tr}rotate(${(base+flap).toFixed(2)})`);
-      });
-      const k=Math.round(wind*28);if(k!==shown){shown=k;kn.textContent=k}
-    };
-    const tick=t=>{
-      raf=0;
-      const now=performance.now(), y=window.scrollY, dt=Math.max(16,now-lastT);
-      const inst=Math.abs(y-lastY)/dt*1000; lastY=y;lastT=now;
-      v=v*.9+inst*.1;
-      const target=Math.min(1,.08+.04*Math.sin(now/1900)+(1-Math.exp(-v/1400)));
-      wind+=(target-wind)*(target>wind?.12:.025);
-      pose(now);
-      if(vis&&!document.hidden)raf=requestAnimationFrame(tick);
-    };
-    if(reduce){wind=.35;pose(0)}
-    else{
-      const start=()=>{if(!raf&&vis&&!document.hidden){lastT=performance.now();lastY=window.scrollY;raf=requestAnimationFrame(tick)}};
-      if(window.IntersectionObserver)new IntersectionObserver(es=>{vis=es[0].isIntersecting;start()}).observe(stage);
-      document.addEventListener('visibilitychange',start);
-      start();
-    }
-  }
 
   if(!reduce&&mouse){
     /* Datenblatt-Kacheln kippen zur Maus */
