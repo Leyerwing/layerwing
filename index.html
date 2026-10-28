@@ -1286,12 +1286,12 @@ function planeSVG(p,opt){
     /* BF1: Umrisse aus dem echten Fusion-Modell (Draufsicht), Maßstab 0,25 Einheiten pro mm */
     const B=BF1TOP, k=.25, X=v=>cx+v*k, Y=v=>36+v*k;
     add(B.tail,`url(#${uid}w)`);
-    parts.push(`<path d="${B.rud_r}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.rud_l}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
+    parts.push(`<path d="${B.rud_r}" fill="url(#${uid}y)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.rud_l}" fill="url(#${uid}y)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
     add(B.tube,`url(#${uid}f)`,false);
     add(B.fus_f,`url(#${uid}f)`);add(B.motor,`url(#${uid}m)`);
     add(B.haube,`url(#${uid}f)`);
     add(B.wing_m,`url(#${uid}w)`);add(B.wing_r,`url(#${uid}w)`);add(B.wing_l,`url(#${uid}w)`);
-    parts.push(`<path d="${B.ail_r}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.ail_l}" fill="url(#${uid}c)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
+    parts.push(`<path d="${B.ail_r}" fill="url(#${uid}y)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/><path d="${B.ail_l}" fill="url(#${uid}y)" stroke="rgba(0,0,0,.55)" stroke-width=".4"/>`);
     prop(Y(-44),152*k,3.4);
     lines.push(`<line x1="${X(-125)}" y1="${Y(114)}" x2="${X(-125)}" y2="${Y(262)}"/><line x1="${X(125)}" y1="${Y(114)}" x2="${X(125)}" y2="${Y(262)}"/>`);
   } else if(s.flying){
