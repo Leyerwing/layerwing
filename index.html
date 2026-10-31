@@ -1138,7 +1138,7 @@ const PS={
   winglet:['Winglets','PLA','0,16 mm','2','15 % Gyroid','220 °C','100 %'],
   haube:['Cockpithaube','PETG','0,16 mm','2','0 %','245 °C','100 %'],
   bf_rv:['Rumpf vorne mit Motorspant','PLA Tough+','0,20 mm','2','15 % 2D-Lattice (Gitter), 30 Bodenschichten, Baumstützen','245 °C','98 %'],
-  bf_rh:['Rumpf hinten mit V-Leitwerk (6 mm)','PLA Tough+','0,20 mm','1','3 % 2D-Lattice (Gitter), 8-mm-Brim, Baumstützen nur vom Druckbett, innen stützenfrei, Scharnieraugen 100 %','245 °C','98 %'],
+  bf_rh:['Rumpf hinten mit V-Leitwerk (6 mm)','PLA Tough+','0,20 mm','1 (Arachne, Außenwand 120 mm/s)','3 % 2D-Lattice (Gitter), 8-mm-Brim, Baumstützen nur vom Druckbett, innen stützenfrei, Scharnieraugen 100 %','245 °C','98 %'],
   bf_fl:['Flügel Mitte, links, rechts','PLA Tough+','0,20 mm','1','2 % 2D-Lattice (Gitter), 8-mm-Brim, Scharnieraugen 100 %','245 °C','98 %'],
   bf_haube:['Haube','PLA Tough+','0,20 mm','2','15 % 2D-Lattice (Gitter)','245 °C','98 %'],
   bf_zunge:['Holmverbinder und Raststifte','PLA Tough+','0,20 mm','4','40 % 2D-Lattice (Gitter)','245 °C','98 %'],
@@ -1177,7 +1177,7 @@ const BUSCHPLATES=[["images/buschflugzeug/platte-1.webp", "Rumpf Kabine und Nase
 const JETPLATES=[["images/f2/platte-1.webp", "Rumpf Nase, Akku, Mitte, Heck", 549, 155.4], ["images/f2/platte-2.webp", "Rumpf Einlauf, Leitwerk mit Seitenleitwerk", 620, 181.2], ["images/f2/platte-3.webp", "Haube vorne und hinten, Motorhalter, Startschienen", 321, 80.9], ["images/f2/platte-4.webp", "Flügel rechts innen, Ruder", 372, 133.8], ["images/f2/platte-5.webp", "Flügel links innen, Ruder", 361, 130.6], ["images/f2/platte-6.webp", "Flügel außen, Höhenleitwerk, Glas", 590, 191.2]];
 const PRODUCTS=[
   {id:'bf1',no:'LW-07',name:'BF1',cat:'Hochdecker',kind:'Hochdecker mit V-Leitwerk',price:14.90,color:'#E4E7EA',shape:'bf1',tag:'Neu',real:true,buy:'https://layerwing.lemonsqueezy.com/checkout/buy/dc2457a5-1717-4a66-9e2c-89964944921e?checkout%5Bbilling_address%5D%5Bcountry%5D=DE',
-   span:748,weight:703,pw:412,time:'19,4 h',plates:5,parts:14,printers:['a1','p1','x1','h2d'],
+   span:748,weight:703,pw:404,time:'20,1 h',plates:5,parts:14,printers:['a1','p1','x1','h2d'],
    motor:'A2212 · 2450 KV',esc:'40 A mit BEC',akku:'3S 1300 mAh',servos:'4 × Micro-Servo 9 g (z. B. PTK 7455MG-D)',prop:'6 × 4"',cg:'40 mm hinter Nasenleiste (38–42 mm)',profile:'Clark Y, Tiefe 150 mm',
    desc:'Steckbarer Elektro-Hochdecker mit V-Leitwerk, in Fusion 360 konstruiert. Die Außenflügel werden mit gedruckten Holmverbindern fest verklebt, Flügel und Haube rasten ohne Werkzeug ein, jedes Querruder hat sein eigenes Servo im Außenflügel. Griffmulden am Rumpf erleichtern den Handstart, der glatte Rumpf ist für Bauchlandung ausgelegt. Die Servokabel laufen samt Verlängerungsstecker durch einen 13 mm breiten Kanal im Flügel bis in den Rumpf.',
    files:['.3mf für Bambu Studio, 5 Platten','14 Teile als .stl','Bauanleitung .pdf, 19 Seiten'],manual:'downloads/BF1-Bauanleitung.pdf',
@@ -1214,10 +1214,10 @@ PRODUCTS.forEach(p=>{const x=EXTRA[p.id];Object.assign(p,x);p.load=dez((p.weight
 /* Echte Werte aus dem BF1-Projekt: Druckzeit in Minuten, Filament in Gramm */
 const PLATES=[
   ['1','Rumpf vorne mit Motorspant','PLA Tough+',249,96.4],
-  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',214,73.7],
-  ['3','Flügel Mitte, links und rechts','PLA Tough+',419,183.7],
+  ['2','Rumpf hinten mit V-Leitwerk','PLA Tough+',215,63.8],
+  ['3','Flügel Mitte, links und rechts','PLA Tough+',462,203.0],
   ['4','Haube, Holmverbinder, Stifte, Ruder','PLA Tough+',149,61.2],
-  ['5','Querruder links und rechts','PLA Tough+',133,30.0]
+  ['5','Querruder links und rechts','PLA Tough+',132,29.1]
 ];
 const CATS=['Alle','Hochdecker','Jet'];
 const PFILTER=[{k:'alle',n:'Alle'},{k:'a1',n:'A1 · P1 · X1'},{k:'h2d',n:'H2D'}];
