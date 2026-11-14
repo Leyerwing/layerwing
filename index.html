@@ -84,6 +84,9 @@ h3{font-size:var(--t20);font-stretch:112%;line-height:1.2}
 .cart-count{font-family:var(--f-mono);font-size:var(--t12);min-width:22px;height:22px;display:inline-grid;place-items:center;padding:0 6px;background:var(--accent);color:var(--accent-ink);border-radius:999px;font-variant-numeric:tabular-nums}
 .cart-count[data-zero="1"]{background:transparent;color:var(--muted);border:1px solid var(--line)}
 @media (max-width:1000px){.nav{display:none}.cart-btn{margin-left:auto}}
+/* auf dem Handy ist die Navigation ausgeblendet: das Flugspiel bekommt dort einen eigenen Knopf im Kopf */
+.fly-pill{display:none}
+@media (max-width:1000px){.fly-pill{display:inline-flex;align-items:center;gap:8px;margin-left:auto;min-height:40px;padding:7px 16px;border:1.5px solid var(--accent);border-radius:999px;color:var(--accent);font-size:var(--t14);font-weight:600;text-decoration:none}.fly-pill::before{content:"";width:16px;height:9px;background:currentColor;clip-path:polygon(0 60%,100% 0,62% 100%,48% 62%)}}
 
 /* Hero */
 .hero{padding-top:var(--s48)}
@@ -749,6 +752,7 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
       <a href="#faq">FAQ</a>
       <a href="/fliegen.html">Fliegen</a>
     </nav>
+    <a class="fly-pill" href="/fliegen.html">Fliegen</a>
     <button class="cart-btn" id="open-cart" aria-label="Warenkorb öffnen" hidden>Warenkorb <span class="cart-count" id="cart-count">0</span></button>
   </div>
 </header>

@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fliegen: die LayerWing-Modelle im Browser steuern | LayerWing</title>
 <meta name="description" content="Kleines Flugspiel: Starte mit BF1, Buschflugzeug, F2 oder C-160 vom Platz im Tal, flieg zwischen den Bergen und lande wieder. Läuft direkt im Browser.">
 <link rel="canonical" href="https://www.layerwing.de/fliegen.html">
@@ -80,27 +80,56 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 .loadline{margin-top:14px;font-size:14px;color:var(--muted);min-height:1.4em}
 
 /* Touch: Knüppel links, Gas rechts */
-.touch{display:none}
+/* Touch: zwei Knüppel wie am Sender (Mode 2). Links Gas und Seitenruder, rechts Höhen- und Querruder */
+.touch,.only-touch{display:none}
+.pad{position:fixed;bottom:max(22px,env(safe-area-inset-bottom));width:148px;height:148px;border-radius:26px;background:var(--panel);border:1px solid var(--panel-line);touch-action:none;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.pad-l{left:max(18px,env(safe-area-inset-left))}
+.pad-r{right:max(18px,env(safe-area-inset-right))}
+.pad::before,.pad::after{content:"";position:absolute;background:var(--panel-line)}
+.pad::before{left:50%;top:14px;bottom:14px;width:1px}
+.pad::after{top:50%;left:14px;right:14px;height:1px}
+.pad i{position:absolute;z-index:1;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.4);will-change:transform}
+.pad span{position:absolute;left:0;right:0;top:-24px;text-align:center;font-size:12px;font-weight:600;color:var(--ink);text-shadow:0 1px 4px rgba(0,0,0,.8)}
 @media (pointer:coarse){
-  .touch{display:block}
+  html,body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .card-in{touch-action:pan-y}
+  .touch,.only-touch{display:block}
+  .only-keys{display:none}
   .top{flex-wrap:wrap;gap:8px}
   .home span{display:none}
-  .models{width:100%;margin:0;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .models{width:100%;margin:0;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;touch-action:pan-x}
   .models .chip{padding:7px 13px;font-size:13px;white-space:nowrap}
   .inst{left:max(16px,env(safe-area-inset-left));bottom:auto;top:116px}
   .inst div{min-width:0;padding:7px 10px 8px}
   .inst dd{font-size:18px}
   .inst dd small{font-size:11px}
-  .acts{bottom:auto;top:174px;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));gap:5px;flex-wrap:wrap}
+  .acts{bottom:auto;top:196px;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));gap:5px;flex-wrap:wrap}
   .act{padding:7px 12px;font-size:13px;min-height:40px}
   .act kbd{display:none}
-  .note{top:268px;font-size:15px}
+  .note{top:292px;font-size:15px}
+  .keys div{grid-template-columns:128px 1fr}
 }
-.stick{position:fixed;left:max(22px,env(safe-area-inset-left));bottom:max(26px,env(safe-area-inset-bottom));width:150px;height:150px;border-radius:50%;background:var(--panel);border:1px solid var(--panel-line);touch-action:none}
-.stick i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px 0 0 -29px;border-radius:50%;background:var(--accent);opacity:.9}
-.thr{position:fixed;right:max(26px,env(safe-area-inset-right));bottom:max(26px,env(safe-area-inset-bottom));width:64px;height:170px;border-radius:32px;background:var(--panel);border:1px solid var(--panel-line);touch-action:none;overflow:hidden}
-.thr i{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--accent);opacity:.85}
-.thr span{position:absolute;left:0;right:0;top:8px;text-align:center;font-size:12px;color:var(--muted)}
+/* Handy quer: Modellwahl neben dem Logo, Instrumente links, Knöpfe rechts, Knüppel in den Ecken */
+@media (pointer:coarse) and (orientation:landscape){
+  .top{flex-wrap:nowrap;padding-top:8px}
+  .models{width:auto;margin-left:auto}
+  .inst{top:56px}
+  .acts{top:56px;left:auto;max-width:54vw;justify-content:flex-end}
+  .note{top:108px}
+  .pad{width:128px;height:128px;bottom:max(12px,env(safe-area-inset-bottom))}
+  .pad-l{left:max(22px,env(safe-area-inset-left))}
+  .pad-r{right:max(22px,env(safe-area-inset-right))}
+  /* Startkarte zweispaltig, damit der Knopf ohne Scrollen erreichbar ist */
+  .card{padding:8px}
+  .card-in{width:min(800px,100%);padding:16px 20px 14px;display:grid;grid-template-columns:1fr 1.2fr;column-gap:24px;align-content:start}
+  .card h1{font-size:1.5rem}
+  .card-in>*{grid-column:1}
+  .card-in>dl.only-touch{grid-column:2;grid-row:1/span 6;margin:0;border-top:0}
+  .card-in>p.only-touch{display:none}
+  .keys div{padding:7px 0;grid-template-columns:118px 1fr}
+  .go{margin-top:14px}
+  .check{margin-left:0}
+}
 @media (max-width:560px){.keys div{grid-template-columns:118px 1fr}.card-in{padding:22px 20px 20px}}
 </style>
 </head>
@@ -130,22 +159,28 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 <p class="note" id="note" role="status" aria-live="polite"></p>
 
 <div class="touch" aria-hidden="true">
-  <div class="stick" id="stick"><i id="stick-k"></i></div>
-  <div class="thr" id="thr"><span>Gas</span><i id="thr-f"></i></div>
+  <div class="pad pad-l" id="pad-l"><span>Gas und Seite</span><i id="pad-l-k"></i></div>
+  <div class="pad pad-r" id="pad-r"><span>Höhe und Quer</span><i id="pad-r-k"></i></div>
 </div>
 
 <div class="card" id="card">
   <div class="card-in" role="dialog" aria-modal="true" aria-labelledby="card-h">
     <h1 id="card-h">Flugplatz im Tal</h1>
-    <p>Starte auf Bahn 36, flieg durch das Tal und zwischen den Bergen und setz wieder auf. Rollen, Loopings und Rückenflug gehen auch. Oben rechts wechselst du das Modell.</p>
-    <dl class="keys">
+    <p>Starte auf Bahn 36, flieg durch das Tal und zwischen den Bergen und setz wieder auf. Rollen, Loopings und Rückenflug gehen auch. Oben wechselst du das Modell.</p>
+    <dl class="keys only-keys">
       <div><dt><kbd class="k">W</kbd><kbd class="k">S</kbd></dt><dd>Gas rauf und runter</dd></div>
       <div><dt><kbd class="k">←</kbd><kbd class="k">→</kbd></dt><dd>Querruder: rollen, bis zur ganzen Rolle</dd></div>
       <div><dt><kbd class="k">↓</kbd><kbd class="k">↑</kbd></dt><dd id="k-pitch">Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender</dd></div>
       <div><dt><kbd class="k">A</kbd><kbd class="k">D</kbd></dt><dd>Seitenruder, am Boden lenkst du damit</dd></div>
       <div><dt><kbd class="k">Leer</kbd><kbd class="k">C</kbd><kbd class="k">R</kbd></dt><dd>Rauch, Kamera wechseln, neu starten; M schaltet den Ton</dd></div>
     </dl>
-    <p>Starten: Vollgas, mit A und D geradeaus halten, bei genug Fahrt ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Wird das Modell zu langsam, reißt die Strömung ab. Am Handy steuerst du links mit dem Knüppel und rechts mit dem Gas.</p>
+    <p class="only-keys">Starten: Vollgas, mit A und D geradeaus halten, bei genug Fahrt ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Wird das Modell zu langsam, reißt die Strömung ab.</p>
+    <dl class="keys only-touch">
+      <div><dt>Linker Knüppel</dt><dd>Hoch und runter ist das Gas, es bleibt stehen. Links und rechts ist das Seitenruder, damit lenkst du am Boden.</dd></div>
+      <div><dt>Rechter Knüppel</dt><dd id="t-pitch">Runter ziehen hebt die Nase, wie am Sender. Links und rechts rollt das Modell.</dd></div>
+      <div><dt>Knöpfe</dt><dd>Rauch, Ton, Kamera, neu starten und diese Hilfe</dd></div>
+    </dl>
+    <p class="only-touch">Starten: Gas ganz hoch, geradeaus halten, bei genug Fahrt rechts leicht ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Quer gehalten siehst du mehr.</p>
     <div class="go">
       <button class="btn btn-primary" id="b-go" type="button">Losfliegen</button>
       <a class="btn" href="/" style="text-decoration:none;color:inherit;display:inline-flex;align-items:center">Zurück zum Shop</a>
@@ -211,7 +246,7 @@ const sun=new T.DirectionalLight(0xfff0d2,.95),SUN=new T.Vector3(-.55,.75,.35).n
 /* nur das Flugzeug wirft einen Schatten; die Schattenkamera wandert mit ihm mit */
 sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);sun.shadow.bias=-.0006;sun.shadow.normalBias=.04;
 function resize(){const w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
-window.addEventListener('resize',resize);resize();
+window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);resize();
 
 /* Himmel: Kuppel mit Verlauf vom Horizont zum Zenit */
 {const g=new T.SphereGeometry(9000,24,14),p=g.attributes.position,c=new Float32Array(p.count*3),a=new T.Color(HORIZON),b=new T.Color(ZENITH),m=new T.Color();
@@ -390,7 +425,7 @@ const S={pos:new T.Vector3(),vel:new T.Vector3(),Q:new T.Quaternion(),w:new T.Ve
   thr:0,ground:true,gs:0,psi:0,pitchG:0,crashed:0,landings:0,air:0,started:false,alpha:0,stalled:0,drop:1,va:0,bounces:0,warn:0};
 const START={x:0,z:RW.len/2-60};
 const camPos=new T.Vector3(0,8,400),camLook=new T.Vector3();let camMode=0,camYaw=Math.PI;
-const touch={x:0,y:0,on:false,thr:null};
+const touch={x:0,y:0,r:0,on:false,ron:false,thr:null,draw:()=>{}};
 function reset(msg){
   S.pos.set(START.x,P?P.gear:1,START.z);S.vel.set(0,0,0);S.w.set(0,0,0);S.Q.identity();
   Object.assign(S,{thr:0,ground:true,gs:0,psi:0,pitchG:0,crashed:0,air:0,stalled:0,va:0,bounces:0});
@@ -413,10 +448,10 @@ try{SND.on=localStorage.getItem('lw-fliegen-ton')!=='0'}catch(e){}
 const keys={};let invert=false;
 try{invert=localStorage.getItem('lw-fliegen-invert')==='1'}catch(e){}
 const inv=$('#c-inv');inv.checked=invert;
-const pitchText=()=>{$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
+const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Links und rechts rollt das Modell.':'Runter ziehen hebt die Nase, wie am Sender. Links und rechts rollt das Modell.';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
 inv.addEventListener('change',()=>{invert=inv.checked;pitchText();try{localStorage.setItem('lw-fliegen-invert',invert?'1':'0')}catch(e){}});pitchText();
 const card=$('#card');
-function start(){card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say('Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
+function start(){card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{card.hidden=false;$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
 $('#b-reset').addEventListener('click',()=>{reset('Zurück am Start');});
@@ -434,15 +469,20 @@ window.addEventListener('keydown',e=>{
 });
 window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false});
 window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
-/* Touch: Knüppel und Gas */
-{const st=$('#stick'),kn=$('#stick-k');
- const move=e=>{const r=st.getBoundingClientRect(),R=r.width/2;let dx=(e.clientX-r.left-R)/R,dy=(e.clientY-r.top-R)/R;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}touch.x=dx;touch.y=dy;kn.style.transform=`translate(${dx*46}px,${dy*46}px)`};
- st.addEventListener('pointerdown',e=>{st.setPointerCapture(e.pointerId);touch.on=true;move(e)});
- st.addEventListener('pointermove',e=>{if(touch.on)move(e)});
- const end=()=>{touch.on=false;touch.x=touch.y=0;kn.style.transform=''};st.addEventListener('pointerup',end);st.addEventListener('pointercancel',end);
- const th=$('#thr');let down=false;const setT=e=>{const r=th.getBoundingClientRect();touch.thr=clamp(1-(e.clientY-r.top-10)/(r.height-20),0,1)};
- th.addEventListener('pointerdown',e=>{th.setPointerCapture(e.pointerId);down=true;setT(e)});th.addEventListener('pointermove',e=>{if(down)setT(e)});
- const up=()=>{down=false};th.addEventListener('pointerup',up);th.addEventListener('pointercancel',up)}
+/* Touch: zwei Knüppel wie am Sender (Mode 2). Links Gas (bleibt stehen) und Seitenruder, rechts Höhen- und Querruder.
+   Jeder Knüppel folgt dem Finger ab dem Punkt, an dem er aufsetzt; man muss also nicht die Mitte treffen. */
+{const TR=46,dead=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),expo=v=>.4*v+.6*v*v*v,   /* um die Mitte feinfühlig, am Rand voller Ausschlag */
+ grab=(el,e)=>{try{el.setPointerCapture(e.pointerId)}catch(x){}};
+ const padL=$('#pad-l'),kL=$('#pad-l-k'),padR=$('#pad-r'),kR=$('#pad-r-k');let l0=null,r0=null;
+ touch.draw=()=>{const t=touch.thr===null?S.thr:touch.thr;kL.style.transform=`translate(${touch.r*TR}px,${(1-2*t)*TR}px)`};
+ padL.addEventListener('pointerdown',e=>{e.preventDefault();grab(padL,e);if(touch.thr===null)touch.thr=S.thr;l0={x:e.clientX,y:e.clientY,t:touch.thr};touch.ron=true});
+ padL.addEventListener('pointermove',e=>{if(!l0)return;touch.r=expo(dead(clamp((e.clientX-l0.x)/TR,-1,1),.2));touch.thr=clamp(l0.t-(e.clientY-l0.y)/(2*TR),0,1);touch.draw()});
+ const endL=()=>{l0=null;touch.r=0;touch.ron=false;touch.draw()};padL.addEventListener('pointerup',endL);padL.addEventListener('pointercancel',endL);
+ padR.addEventListener('pointerdown',e=>{e.preventDefault();grab(padR,e);r0={x:e.clientX,y:e.clientY};touch.on=true});
+ padR.addEventListener('pointermove',e=>{if(!r0)return;let dx=(e.clientX-r0.x)/TR,dy=(e.clientY-r0.y)/TR;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}
+   touch.x=expo(dead(dx,.07));touch.y=expo(dead(dy,.07));kR.style.transform=`translate(${dx*TR}px,${dy*TR}px)`});
+ const endR=()=>{r0=null;touch.on=false;touch.x=touch.y=0;kR.style.transform=''};padR.addEventListener('pointerup',endR);padR.addEventListener('pointercancel',endR);
+ touch.draw()}
 
 /* ---------- Flugmodell ----------
    Kräfte: Schub, Gewicht, Auftrieb und Widerstand aus Anstellwinkel und Staudruck, Seitenkraft aus dem Schiebewinkel.
@@ -472,8 +512,7 @@ function rolling(dt){
   if(S.thr<.03)a-=rw?3.4:2.4;                                      /* Gas ganz raus: bremsen */
   S.gs=Math.max(0,S.gs+a*dt);
   /* gelenkt wird mit dem Seitenruder; Seitenwind dreht die Nase etwas in den Wind */
-  const steer=touch.on?touch.x:inY;
-  S.psi+=(-steer*1.15*clamp(S.gs/3,0,1)/(1+S.gs/22)+.012*cw*clamp(S.gs/8,0,1))*dt;
+  S.psi+=(-inY*1.15*clamp(S.gs/3,0,1)/(1+S.gs/22)+.012*cw*clamp(S.gs/8,0,1))*dt;
   const h0=ground(S.pos.x,S.pos.z);S.pos.addScaledVector(fH,S.gs*dt);const h1=ground(S.pos.x,S.pos.z);S.pos.y=h1+P.gear;
   if((h1-h0)/Math.max(S.gs*dt,.01)>.3&&S.gs>6){crash('Das Gelände war zu steil.');return}
   S.Q.setFromEuler(eul.set(S.pitchG,S.psi,0,'YXZ'));
@@ -534,7 +573,7 @@ function flying(dt){
     S.gs=Math.max(0,S.vel.dot(fH));S.pitchG=clamp(nose,0,.25);S.w.set(0,0,0);
     if(S.air>4){
       if(onRunway(S.pos.x,S.pos.z)){S.landings++;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
-      else say('Außenlandung auf der Wiese. Zurück zur Bahn rollen oder R drücken',true);
+      else say(coarse?'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder neu starten':'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder R drücken',true);
     }
     return;
   }
@@ -545,11 +584,13 @@ function step(dt){
   const d=P.def;
   /* Eingaben glätten: Quer (Pfeile links/rechts), Höhe (Pfeile hoch/runter), Seite (A/D) */
   let r=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0),p=(keys.ArrowDown?1:0)-(keys.ArrowUp?1:0),y=(keys.d?1:0)-(keys.a?1:0);if(invert)p=-p;
-  if(touch.on){r=touch.x;p=invert?-touch.y:touch.y;y=touch.x*.4}
+  if(touch.on){r=touch.x;p=invert?-touch.y:touch.y}
+  if(touch.ron)y=touch.r;
   /* Tasten kennen nur an und aus: der Ausschlag wächst, solange die Taste gehalten wird, und geht beim Loslassen schnell zurück.
-     Kurz tippen gibt kleine Korrekturen, halten den vollen Ausschlag. Der Knüppel am Handy wirkt direkt. */
-  if(touch.on){const k=1-Math.exp(-14*dt);inR=lerp(inR,r,k);inP=lerp(inP,p,k);inY=lerp(inY,y,k)}
-  else{inR=ramp(inR,r,dt);inP=ramp(inP,p,dt);inY=ramp(inY,y,dt)}
+     Kurz tippen gibt kleine Korrekturen, halten den vollen Ausschlag. Die Knüppel am Handy wirken direkt. */
+  const kt=1-Math.exp(-14*dt);
+  if(touch.on){inR=lerp(inR,r,kt);inP=lerp(inP,p,kt)}else{inR=ramp(inR,r,dt);inP=ramp(inP,p,dt)}
+  inY=touch.ron?lerp(inY,y,kt):ramp(inY,y,dt);
   if(touch.thr!==null)S.thr=touch.thr;else S.thr=clamp(S.thr+((keys.w?1:0)-(keys.s?1:0))*.75*dt,0,1);
   if(S.crashed){S.crashed+=dt;
     const agl=S.pos.y-ground(S.pos.x,S.pos.z);
@@ -618,7 +659,7 @@ function boom(){
 function toggleSound(){SND.on=!SND.on;if(SND.on)audioInit();$('#b-snd').setAttribute('aria-pressed',SND.on);say(SND.on?'Ton an':'Ton aus');try{localStorage.setItem('lw-fliegen-ton',SND.on?'1':'0')}catch(e){}}
 
 /* ---------- Bild ---------- */
-const iv=$('#i-v'),ih=$('#i-h'),ig=$('#i-g'),igb=$('#i-gb'),iw=$('#i-w'),iwa=$('#i-wa'),thrF=$('#thr-f');let hudT=0,spin=0;
+const iv=$('#i-v'),ih=$('#i-h'),ig=$('#i-g'),igb=$('#i-gb'),iw=$('#i-w'),iwa=$('#i-wa');let hudT=0,spin=0;
 function frame(dt,still){
   updateWind(dt);
   if(!still&&P&&S.started&&card.hidden){const n=Math.max(1,Math.ceil(dt*120));for(let i=0;i<n;i++)step(dt/n)}
@@ -649,7 +690,7 @@ function frame(dt,still){
     /* der Pilot dreht sich mit dem Modell mit */
     const man=scene.userData.pilot;man.visible=camMode===0;man.rotation.y=Math.atan2(-(S.pos.x-FIELD.pilot.x),-(S.pos.z-FIELD.pilot.z));
     scene.userData.sky.position.copy(cam.position);
-    hudT+=dt;if(hudT>.1){hudT=0;iv.textContent=Math.round(S.va*3.6);ih.textContent=Math.round(agl<.3?0:Math.max(0,S.pos.y-P.gear));const g=Math.round(S.thr*100);ig.textContent=g;igb.style.width=g+'%';thrF.style.height=g+'%';
+    hudT+=dt;if(hudT>.1){hudT=0;iv.textContent=Math.round(S.va*3.6);ih.textContent=Math.round(agl<.3?0:Math.max(0,S.pos.y-P.gear));const g=Math.round(S.thr*100);ig.textContent=g;igb.style.width=g+'%';touch.draw();
       iw.textContent=Math.round(WIND.speed*3.6);iwa.style.transform='rotate('+(-(WIND.ang-Math.atan2(fwd.x,fwd.z))*180/Math.PI).toFixed(0)+'deg)'}
   }
   smoke(dt);audioUpdate(dt);
