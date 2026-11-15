@@ -222,22 +222,22 @@ const K=.01;                       /* Maßstab: eine Einheit in der Welt sind 10
 
 /* Modelle: Schwerpunkt (x, z in mm), Ruderachsen und Luftschrauben wie in der 3D-Ansicht der Startseite, dazu Flugwerte: Abreißgeschwindigkeit, Höchstfahrt, Schub zu Gewicht, Roll- und Gierrate, Drehmoment der Luftschraube, Eigenstabilität um die Längsachse */
 const PLANES=[
- {id:'bf1',name:'BF1',pivot:[153,35],vS:15,vMax:58,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,wash:1,belly:true,
+ {id:'bf1',name:'BF1',pivot:[153,35],vS:15,vMax:58,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.02,wash:1,belly:true,
   HINGE:{Querruder_rechts:[[212,125-3.5*S5,30+3.5*C5],[0,C5,S5]],Querruder_links:[[212,-(125-3.5*S5),30+3.5*C5],[0,-C5,S5]],Ruder_rechts:[[480,10.95,14.54],[0,.819,.574]],Ruder_links:[[480,-10.95,14.54],[0,-.819,.574]]},
   CTL:/^(Querruder|Ruder)_/,MAT:{Motor_A2212:'dark',Haube:'glass'},props:[[80,-37,0,0,2,true]],
   snd:{f0:56,f1:188,motors:1,detune:1,whine:4.02},
   controls:(set,r)=>{set('Querruder_rechts',-r.da);set('Querruder_links',-r.da);set('Ruder_rechts',-(r.de+r.dr));set('Ruder_links',r.de-r.dr)}},
- {id:'busch',name:'Buschflugzeug',pivot:[275,30],vS:12.5,vMax:48,twr:.8,roll:2.5,yaw:1.2,tq:.25,dih:.45,wash:1,tail:true,
+ {id:'busch',name:'Buschflugzeug',pivot:[275,30],vS:12.5,vMax:48,twr:.8,roll:2.5,yaw:1.2,tq:.25,dih:.45,ar:6.5,wo:.035,wash:1,tail:true,
   HINGE:{Querruder_R:[[373.5,0,108],[0,1,0]],Querruder_L:[[373.5,0,108],[0,1,0]],Hoehenruder_R:[[815,0,40],[0,1,0]],Hoehenruder_L:[[815,0,40],[0,1,0]],Seitenruder:[[815,0,0],[0,0,1]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Rad_R:'dark',Rad_L:'dark',Sporn:'dark'},wheels:/^(Rad|Felge)_/,props:[[152,-17,0,0,2,false]],
   snd:{f0:40,f1:132,motors:1,detune:1,whine:3.01},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
- {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:23,vMax:100,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,wash:0,belly:true,
+ {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:23,vMax:100,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,ar:2.4,wo:0,wash:0,belly:true,
   HINGE:{QR_R:[[765.13,160,-.83],[.1574,.9875,-.009]],QR_L:[[765.13,-160,-.83],[-.1574,.9875,.009]],HR_R:[[993.74,52,-6],[.4838,.8752,0]],HR_L:[[993.74,-52,-6],[-.4838,.8752,0]]},
   CTL:/^(QR|HR)_/,MAT:{Motor:'dark',Spinner:'dark',Schiene_R:'dark',Schiene_L:'dark',Haube_Glas_Druck:'glass'},props:[[101.6,1124,0,0,2,false]],
   snd:{f0:72,f1:262,motors:1,detune:1,whine:5.03},
   controls:(set,r)=>{set('QR_R',-r.da);set('QR_L',r.da);set('HR_R',-r.de);set('HR_L',-r.de)}},
- {id:'c160',name:'C-160',pivot:[461,35],vS:18.5,vMax:64,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,wash:.5,belly:true,
+ {id:'c160',name:'C-160',pivot:[461,35],vS:18.5,vMax:64,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,ar:9,wo:.03,wash:.5,belly:true,
   HINGE:{Heckklappe:[[706.67,0,-35.33],[0,1,0]],Hoehenruder_L:[[981.33,-60,42.67],[0,1,0]],Hoehenruder_R:[[981.33,60,42.67],[0,1,0]],Querruder_L:[[535,-488,81.3],[.0022,.99954,-.0303]],Querruder_R:[[535,488,81.3],[.0022,.99954,.0303]],Seitenruder:[[985.07,0,56.67],[.3098,0,.9508]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder|Riegel)/,MAT:{Motor_R:'dark',Motor_L:'dark',Regler_R:'dark',Servo_Quer_R:'dark',Regler_L:'dark',Servo_Quer_L:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Heckklappe:'dark',Empfaenger:'dark',Akku:'dark'},
   props:[[101.6,299.5,180,45,2,false],[101.6,299.5,-180,45,2,false]],
@@ -583,7 +583,12 @@ async function build(def){
   let aTail=.1;while(aTail<.3&&lowAt(aTail+.01)<=lowAt(0)+.1)aTail+=.01;      /* ab diesem Winkel setzt am Boden das Heck auf */
   /* Raketen hängen sichtbar an ihren Trägern und verschwinden dort, sobald sie abgefeuert sind */
   const mounts=(def.rockets||[]).map(([x,y,z])=>{const g=new T.Group(),rocket=makeRocket(),py=new T.Mesh(new T.BoxGeometry(56,3,9),matDark);g.position.set(x,y,z);py.position.set(8,0,8.5);py.castShadow=true;g.add(py);g.add(rocket);fit.add(g);return {g,rocket,p:[x,y,z]}});
-  const M={def,fit,parts,hinge,props,wheels,mounts,low:lowAt,aTail,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
+  /* Maße für das Flugmodell in Metern: vier Flächenstücke, Höhen- und Seitenleitwerk mit ihren Hebelarmen, dazu die Trägheit um die drei Achsen */
+  const bm=(box.max.y-box.min.y)*K*.1,lm=(box.max.x-box.min.x)*K*.1,cm=bm/def.ar;
+  const aero={b:bm,c:cm,h:.04*cm,y:[-.34*bm,-.12*bm,.12*bm,.34*bm],s:[.22,.28,.28,.22],lt:Math.max(.22,(box.max.x-def.pivot[0])*K*.08),hv:.05,
+    at:3.4,st:.2,av:2.8,sv:.15,kR2:(.17*bm)*(.17*bm),kP2:(.2*lm)*(.2*lm),da:def.roll*bm/(5.08*def.vS),dr:.11*def.yaw,dih:.2*def.dih,wo:def.wo||0};
+  aero.tv=aero.at*aero.st*aero.lt;aero.kY2=aero.kR2+aero.kP2;
+  const M={def,fit,parts,hinge,props,wheels,mounts,aero,low:lowAt,aTail,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
   return cache[def.id]=M;
 }
 
@@ -601,13 +606,13 @@ function updateWind(dt){
 
 /* ---------- Flugzustand ---------- */
 const S={pos:new T.Vector3(),vel:new T.Vector3(),Q:new T.Quaternion(),w:new T.Vector3(),   /* w: Rollrate, Nickrate, Gierrate im Flugzeug */
-  thr:0,ground:true,gs:0,psi:0,pitchG:0,crashed:0,landings:0,air:0,started:false,alpha:0,stalled:0,drop:1,va:0,bounces:0,warn:0,gates:0,px:0,pz:0,tw:-9,gt:9,next:0,lap0:null,clock:0,best:null,pw:0,bob:0,bobV:0,tc:0,rk:0};
+  thr:0,ground:true,gs:0,psi:0,pitchG:0,crashed:0,landings:0,air:0,started:false,alpha:0,stalled:0,drop:1,va:0,bounces:0,warn:0,gates:0,px:0,pz:0,tw:-9,gt:9,next:0,lap0:null,clock:0,best:null,pw:0,bob:0,bobV:0,tc:0,rk:0,st:[0,0,0,0],ti:0,upw:0};
 const START={x:0,z:RW.len/2-22};      /* an der Schwelle, die Bahnnummer liegt vor dem Modell */
 const camPos=new T.Vector3(0,8,400),camLook=new T.Vector3();let camMode=0,camYaw=Math.PI;
 const touch={x:0,y:0,r:0,on:false,ron:false,thr:null,draw:()=>{}};
 function reset(msg){
   S.pos.set(START.x,P?P.gear:1,START.z);S.vel.set(0,0,0);S.w.set(0,0,0);S.Q.identity();
-  Object.assign(S,{thr:0,pw:0,bob:0,bobV:0,tc:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
+  S.st.fill(0);Object.assign(S,{thr:0,pw:0,bob:0,bobV:0,tc:0,upw:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
   if(touch.thr!==null)touch.thr=0;
   if(P){S.Q.setFromEuler(eul.set(S.pitchG,0,0,'YXZ'));S.pos.y=ground(START.x,START.z)+P.low(S.pitchG)}      /* Spornradmodelle stehen von Anfang an mit dem Heck am Boden */
   if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0)});try{S.best=parseFloat(localStorage.getItem('lw-fliegen-runde-'+P.def.id))||null}catch(e){S.best=null}}
@@ -771,55 +776,78 @@ function rolling(dt){
   S.va=S.gs>.5?Math.max(0,ua):0;S.alpha=S.pitchG;S.stalled=0;
   if(qd*CL>G*1.03){S.ground=false;S.air=0;S.bounces=0;S.px=S.pos.x;S.pz=S.pos.z;S.vel.copy(fH).multiplyScalar(S.gs);S.vel.y=.4;S.w.set(0,0,0);if(S.gt>1)say('Abgehoben');S.gt=0;S.tc=0}
 }
+const CQ=6,CY=6;      /* zusätzliche Nick- und Gierdämpfung von Rumpf und Fläche */
 function flying(dt){
   const d=P.def;S.air+=dt;
   const agl=S.pos.y-P.gear-ground(S.pos.x,S.pos.z);
-  va.copy(S.vel).addScaledVector(WIND.v,-lerp(.55,1,clamp(agl/25,0,1)));
+  va.copy(S.vel).addScaledVector(WIND.v,-lerp(.35,1,clamp(agl/40,0,1)));      /* am Boden weht es deutlich schwächer als in der Höhe */
   /* Böen kommen auch von unten und oben: über dem Platz ruhig, in der Höhe und bei viel Wind unruhiger */
   va.y-=(Math.sin(WIND.t*1.3+2)+Math.sin(WIND.t*2.9+.7)+Math.sin(WIND.t*6.1))*.17*clamp(WIND.speed/4.2,0,1.6)*clamp(agl/18,0,1);
+  /* Hangwind: wo der Wind auf einen Hang trifft, steigt die Luft, im Lee fällt sie */
+  if((S.ti=(S.ti+1)%6)===0){const px=S.pos.x,pz=S.pos.z;
+    S.upw=WIND.speed>.3&&agl<500?clamp(WIND.v.x*(ground(px+20,pz)-ground(px-20,pz))/40+WIND.v.z*(ground(px,pz+20)-ground(px,pz-20))/40,-5,5)*Math.exp(-Math.max(agl,0)/110)*clamp(agl/10,0,1):0}
+  va.y-=S.upw;
   const V=va.length();
   fwd.set(0,0,-1).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);upv.set(0,1,0).applyQuaternion(S.Q);
   const uf=va.dot(fwd),ur=va.dot(rgt),uu=va.dot(upv);
   const alpha=V>1.5?Math.atan2(-uu,uf):0,beta=V>1.5?Math.asin(clamp(ur/V,-1,1)):0;
-  /* der Abriss kommt schlagartig, und die Strömung legt sich erst bei deutlich kleinerem Anstellwinkel wieder an */
-  const x=alpha+AZ,hy=S.stalled>.5?.055:0,st=V>1.5?sstep(XS-hy,XS-hy+.05,Math.abs(x)):1;
-  let CL=lerp(CLA*clamp(x,-XS,XS),Math.sin(2*alpha),st);
-  CL*=1+.12*clamp(1-agl/(P.span*.5),0,1);                                    /* Bodeneffekt */
-  /* Widerstand: Grundwiderstand, auftriebsabhängiger Anteil, beginnende Ablösung bei hohem Anstellwinkel, Schieben und die leer mitdrehende Luftschraube.
-     Beim Ausschweben mit hoher Nase baut das Modell deshalb zügig Fahrt ab. */
-  const sA=Math.sin(alpha),buf=sstep(.6*XS,XS,Math.abs(x));
-  const CD=.048+.085*CL*CL+(st*1.15+buf*2)*sA*sA+.25*Math.sin(beta)*Math.sin(beta)+(S.pw<.12?.05*(1-S.pw/.12):0);
-  const qd=G*V*V/(d.vS*d.vS)/CLMAX;
-  acc.set(0,-G,0);let aN=A0;
-  if(V>1.5){
-    lift.copy(rgt).cross(va).normalize();                                    /* senkrecht zur Anströmung, zur Oberseite hin */
-    /* Trimmung: bei neutralem Höhenruder hält das Modell seine Flugbahn weitgehend, statt auf und ab zu pendeln */
-    aN=lerp(A0,clamp(G*lift.y/qd/CLA-AZ,-.105,AS-.035),lift.y>0?lerp(.5,.92,clamp((V/d.vS-1.3)/.9,0,1)):.2);     /* schnell geflogen hebt das Modell die Nase nur noch wenig von selbst */
-    acc.addScaledVector(lift,clamp(qd*CL,-9*G,9*G)).addScaledVector(va,-Math.min(qd*CD,6*G)/V).addScaledVector(rgt,-clamp(qd*.9*beta,-3*G,3*G));
-  }
-  acc.addScaledVector(fwd,d.aT0*S.pw*Math.max(0,1-uf/d.vP));
+  /* ---------- Flugmodell aus Einzelflächen ----------
+     Wie in RC-Simulatoren vom Schlag eines RealFlight wird nicht das ganze Flugzeug über eine Formel gerechnet. Jedes Flächenstück,
+     das Höhen- und das Seitenleitwerk sehen ihre eigene Anströmung (Fahrt, Drehung des Modells, Propellerstrahl), bekommen daraus über die
+     Profilkurve Auftrieb und Widerstand, und die Summe der Kräfte und Hebel bewegt und dreht das Modell. Rollen, Gegengieren, Abkippen
+     über eine Fläche und Trudeln entstehen so von selbst.
+     Achsen im Modell: x nach rechts, y nach oben, z nach hinten; Längen in Metern. */
+  const ae=P.aero,A=G/(d.vS*d.vS*CLMAX),qd=A*V*V,ge=clamp(1-agl/(P.span*.5),0,1);
+  const ox=S.w.y,oy=S.w.z,oz=-S.w.x,Vs=Math.max(V,6);
+  /* Trimmung und Höhenruder: der Knüppel gibt einen Anstellwinkel vor, das Ruder stellt sich so, dass die Fläche ihn im Gleichgewicht erreicht */
+  let aN=A0;
+  if(V>1.5){lift.copy(rgt).cross(va).normalize();
+    /* im steilen Sturzflug fängt das Modell von selbst ab, wie es ein auf Reiseflug getrimmtes Flugzeug tut */
+    aN=lerp(A0,clamp(G*lift.y/qd/CLA-AZ,-.105,AS-.035),lift.y>0?lerp(.5,.92,clamp((V/d.vS-1.3)/.9,0,1))*(1-.6*clamp((-va.y/V-.25)/.5,0,1)):.2)}
+  const pull=lerp(AS+.07,AS-.04,clamp((V/d.vS-1)/.5,0,1))-aN,aT=aN+(inP>0?inP*pull:inP*.17);
+  const qc=V>4?clamp((qd*CLA*(aT+AZ)-G*upv.y)/V,-1.5,3):0;                    /* Nickrate, die zu diesem Anstellwinkel gehört */
+  /* im Propellerstrahl ist das Leitwerk wirksamer und flacher angeströmt; das Ruder rechnet das mit ein */
+  const wash=d.wash*S.pw*1.3*d.vS*d.vS,ft=uf>0?Math.sqrt(uf*uf+wash):uf,ftc=Math.max(ft,.6),tr=uf>1?clamp(uf/ft,.3,1):1;
+  const de=clamp(ae.h*CLA*(aT+AZ)/ae.tv*tr*tr-aT*tr+.35*(aT+AZ)-qc*(ae.lt/Vs*tr+CQ*ae.kP2/(Vs*ae.tv)*tr*tr),-.42,.42);
+  let Fx=0,Fy=0,Fz=0,Mx=0,My=0,Mz=0,stS=0,bufS=0;
+  /* Fläche: vier Stücke. Die äußeren tragen die Querruder und sind leicht geschränkt, Böen treffen links und rechts verschieden */
+  const gst=(Math.sin(WIND.t*1.7+1)+Math.sin(WIND.t*4.3))*.0013*clamp(WIND.speed/4.2,0,1.6);
+  for(let i=0;i<4;i++){const y=ae.y[i],sg=y>0?1:-1,out=i===0||i===3;
+    const lx=ur-oy*ae.h,ly=uu+oz*y+ox*ae.h,f=uf+oy*y,Vl2=f*f+ly*ly,Vl=Math.sqrt(Vl2)||1e-3;
+    let a=Math.atan2(-ly,Math.max(f,.6))+AZ+sg*ae.dih*clamp(lx/Math.max(f,3),-.5,.5)+sg*gst;
+    a+=out?-.56*ae.wo-sg*inR*ae.da:.44*ae.wo;                      /* Schränkung: außen flacher angestellt, damit die Fläche innen zuerst abreißt */
+    /* Profilkurve: linear bis zum kritischen Winkel, dann bricht der Auftrieb schlagartig ein; die Strömung legt sich erst verzögert wieder an */
+    const hy=S.st[i]>.5?.055:0,st=f>1?sstep(XS-hy,XS-hy+.05,Math.abs(a)):1;S.st[i]=st;
+    const CL=lerp(CLA*clamp(a,-XS,XS),1.05*Math.sin(2*a),st)*(1+.12*ge),sa=Math.sin(a-AZ),bf=sstep(.6*XS,XS,Math.abs(a)),CD=.085*CL*CL+(st*1.15+bf*2)*sa*sa;
+    const q=ae.s[i]*A*Vl2,fy=q*(CL*f-CD*ly)/Vl,fz=q*(CL*ly+CD*f)/Vl;
+    Fy+=fy;Fz+=fz;Mx+=ae.h*fy;My-=y*fz;Mz+=y*fy;stS+=st*ae.s[i];bufS+=bf*ae.s[i]}
+  /* Leitwerke: der Propellerstrahl erhöht dort die Anströmung, deshalb bleiben sie bei wenig Fahrt und viel Leistung wirksam */
+  {const ly=uu-ox*ae.lt,Vl2=ft*ft+ly*ly,Vl=Math.sqrt(Vl2)||1e-3;
+    const at=Math.atan2(-ly,ftc)-.35*clamp(alpha+AZ,-XS,XS)*(1-stS)+de,ts=sstep(.24,.32,Math.abs(at));     /* die Fläche lenkt die Luft vor dem Leitwerk nach unten ab */
+    const CL=lerp(ae.at*clamp(at,-.24,.24),.8*Math.sin(2*at),ts),CD=.015+.1*CL*CL+ts*Math.sin(at)*Math.sin(at);
+    const q=ae.st*A*Vl2,fy=q*(CL*ft-CD*ly)/Vl,fz=q*(CL*ly+CD*ft)/Vl;
+    Fy+=fy;Fz+=fz;Mx-=ae.lt*fy}
+  {const lx=ur+oy*ae.lt-oz*ae.hv,Vl2=ft*ft+lx*lx,Vl=Math.sqrt(Vl2)||1e-3;
+    const af=Math.atan2(-lx,ftc)-inY*ae.dr,fs=sstep(.3,.4,Math.abs(af));
+    const CL=lerp(ae.av*clamp(af,-.3,.3),.8*Math.sin(2*af),fs),CD=.012+.1*CL*CL+fs*Math.sin(af)*Math.sin(af);
+    const q=ae.sv*A*Vl2,fx=q*(CL*ft-CD*lx)/Vl,fz=q*(CL*lx+CD*ft)/Vl;
+    Fx+=fx;Fz+=fz;My+=ae.lt*fx;Mz-=ae.hv*fx}
+  /* Kräfte: Flächen und Leitwerke, Rumpf (Widerstand, Seitenkraft beim Schieben, leer mitdrehende Luftschraube), Schub, Schwerkraft */
+  const sb=Math.sin(beta),CDb=.043+.25*sb*sb+(S.pw<.12?.05*(1-S.pw/.12):0);
+  acc.set(0,0,0).addScaledVector(rgt,Fx).addScaledVector(upv,Fy).addScaledVector(fwd,-Fz);
+  if(V>1.5)acc.addScaledVector(va,-qd*CDb/V).addScaledVector(rgt,-qd*.9*beta);
+  {const m=acc.length();if(m>12*G)acc.multiplyScalar(12*G/m)}
+  acc.y-=G;acc.addScaledVector(fwd,d.aT0*S.pw*Math.max(0,1-uf/d.vP));
   S.vel.addScaledVector(acc,dt);S.pos.addScaledVector(S.vel,dt);
-  /* Drehraten: Ruderwirkung wächst mit dem Staudruck, das Leitwerk dreht die Nase in die Anströmung */
-  const eff=clamp(V*V/(2.89*d.vS*d.vS),0,1.5)*(uf>0?1:.3),effS=Math.max(eff,.12);
-  if(st>.5&&S.stalled<=.5)S.drop=(S.w.x+beta*2+(Math.random()-.5)*.2)>=0?1:-1;
-  S.stalled=st;S.alpha=alpha;S.va=V;
-  /* Drehmoment der Luftschraube zieht bei viel Gas und wenig Fahrt nach links; Böen rütteln an der Querachse */
-  /* Propellerstrahl: bei viel Leistung und wenig Fahrt bleiben Höhen- und Seitenruder wirksam, die Querruder nicht */
-  const slow=1-clamp(V/(2.2*d.vS),0,1),effT=Math.min(1.5,effS+.5*d.wash*S.pw*slow),shake=sstep(XS-.06,XS,Math.abs(x))*(1-.6*st)*clamp(eff,0,1);
-  const tq=d.tq*S.pw*slow,gust=(Math.sin(WIND.t*1.7+1)+Math.sin(WIND.t*4.3))*.1*clamp(WIND.speed/4.2,0,1.6)*clamp(eff,0,1);
-  const pT=inR*(1-.7*st)*d.roll*eff-1.6*beta*effS+sstep(.4,.85,st)*S.drop*2.3*clamp(V/d.vS,0,1.2)-tq*.3+gust+(upv.y>0?d.dih*rgt.y*effS*(1-st):0)+(Math.random()-.5)*shake*2.2;   /* V-Form richtet das Modell langsam wieder auf */
-  /* das Leitwerk führt die Nase der Flugbahn nach, solange die Strömung anliegt.
-     Voll gezogen reicht der Anstellwinkel bei wenig Fahrt über den kritischen Winkel hinaus: dann reißt die Strömung ab. */
-  const ffk=V>3?(1-.8*st)/V:0,qff=acc.dot(lift)*ffk,rff=-acc.dot(rgt)*ffk;
-  const pull=lerp(AS+.12,AS-.012,clamp((V/d.vS-1)/.8,0,1))-aN;
-  /* kurz vor dem Abriss schüttelt das Modell: die Warnung, bevor die Strömung abreißt */
-  const qT=clamp(qff+KA*(aN+(inP>0?inP*pull:inP*.17)-alpha)*effT-st*.9*Math.sign(alpha)+(Math.random()-.5)*shake*1.6,-3.6,3.6);
-  /* Querruder allein giert gegen die Kurve; saubere Kurven brauchen etwas Seitenruder */
-  /* Gieren: Seitenruder, Windfahnenwirkung, Querruder-Gegengieren; dazu zieht der Propeller nach links (Drall des Strahls, P-Faktor bei hoher Nase)
-     und reagiert wie ein Kreisel auf schnelles Nicken */
-  const rT=.55*rff-inY*d.yaw*Math.max(eff,effT*.8)-2.6*beta*effS-sstep(.4,.85,st)*S.drop*1.1+inR*.3*eff+tq*.6+d.tq*S.pw*clamp(alpha*4,-1,1)*.28*(1-clamp(V/(3*d.vS),0,1))-d.tq*.35*S.pw*S.w.y;
-  S.w.x=lerp(S.w.x,pT,1-Math.exp(-dt/.11));S.w.y=lerp(S.w.y,qT,1-Math.exp(-dt/.07));S.w.z=lerp(S.w.z,rT,1-Math.exp(-dt/.16));
+  /* Drehung: Hebel der Flächenkräfte, dazu Dämpfung von Rumpf und Fläche, das Nachkippen der abgerissenen Fläche,
+     und der Propeller: Gegendrehmoment, Drall des Strahls, P-Faktor bei hoher Nase und Kreiselwirkung */
+  const slow=1-clamp(V/(2.2*d.vS),0,1),tq=d.tq*S.pw,shake=bufS*(1-.6*stS)*clamp(qd/G,0,1);
+  const aP=Mx/ae.kP2-CQ*A*V*ox-stS*2.6*clamp(qd/G,0,1.5)*Math.sign(alpha)+(Math.random()-.5)*shake*18;
+  const aY=My/ae.kY2-CY*A*V*oy+tq*(2.2*slow+1.4*clamp(alpha*4,-1,1)*(1-clamp(V/(3*d.vS),0,1)))-tq*2*ox;
+  const aR=-Mz/ae.kR2-tq*1.3+(Math.random()-.5)*shake*26;
+  S.w.x=clamp(S.w.x+aR*dt,-14,14);S.w.y=clamp(S.w.y+aP*dt,-9,9);S.w.z=clamp(S.w.z+aY*dt,-7,7);
   S.Q.multiply(dq.setFromEuler(eul.set(S.w.y*dt,S.w.z*dt,-S.w.x*dt,'XYZ'))).normalize();
+  S.stalled=stS;S.alpha=alpha;S.va=V;const st=stS;
   if(st>.5&&agl>4&&S.air>1.5&&WIND.t-S.warn>4){S.warn=WIND.t;say('Strömungsabriss: Nase runter und Gas rein')}
   /* Bodenberührung */
   const h=ground(S.pos.x,S.pos.z);
