@@ -84,9 +84,40 @@ h3{font-size:var(--t20);font-stretch:112%;line-height:1.2}
 .cart-count{font-family:var(--f-mono);font-size:var(--t12);min-width:22px;height:22px;display:inline-grid;place-items:center;padding:0 6px;background:var(--accent);color:var(--accent-ink);border-radius:999px;font-variant-numeric:tabular-nums}
 .cart-count[data-zero="1"]{background:transparent;color:var(--muted);border:1px solid var(--line)}
 @media (max-width:1000px){.nav{display:none}.cart-btn{margin-left:auto}}
-/* auf dem Handy ist die Navigation ausgeblendet: das Flugspiel bekommt dort einen eigenen Knopf im Kopf */
-.fly-pill{display:none}
-@media (max-width:1000px){.fly-pill{display:inline-flex;align-items:center;gap:8px;margin-left:auto;min-height:40px;padding:7px 16px;border:1.5px solid var(--accent);border-radius:999px;color:var(--accent);font-size:var(--t14);font-weight:600;text-decoration:none}.fly-pill::before{content:"";width:16px;height:9px;background:currentColor;clip-path:polygon(0 60%,100% 0,62% 100%,48% 62%)}}
+/* Das Flugspiel bekommt im Kopf einen eigenen Knopf in der Akzentfarbe, am PC wie am Handy */
+.ico-fly::before,.fly-pill::before{content:"";flex:none;width:16px;height:9px;background:currentColor;clip-path:polygon(0 60%,100% 0,62% 100%,48% 62%)}
+.fly-pill{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:6px 16px;border:1.5px solid var(--accent);border-radius:999px;color:var(--accent);font-size:var(--t14);font-weight:600;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s}
+.fly-pill:hover{background:var(--accent);color:var(--accent-ink)}
+.fly-short{display:none}
+@media (max-width:1000px){.fly-pill{margin-left:auto;min-height:40px;padding:7px 16px}.cart-btn{margin-left:0}}
+@media (max-width:420px){.fly-long{display:none}.fly-short{display:inline}}
+
+/* Probefliegen: Band unter dem Kopf. Links, worum es geht und die vier Modelle, rechts ein echtes Bild aus dem Spiel. */
+.fly{padding-block:var(--s48) 0}
+.fly-in{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.28fr);gap:clamp(24px,4vw,56px);align-items:center;padding:clamp(18px,3vw,36px);background:var(--panel);border:1px solid var(--panel-line);border-radius:var(--panel-r)}
+.fly-txt{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s16)}
+.fly-txt h2{margin:0;font-size:clamp(1.6rem,3vw,2.25rem);line-height:1.1;letter-spacing:-.01em;text-wrap:balance}
+.fly-txt p{margin:0;color:var(--muted);max-width:52ch}
+.fly-models{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.fly-models a{display:inline-flex;align-items:center;min-height:36px;padding:6px 14px;border:1px solid var(--line);border-radius:999px;color:var(--ink);font-size:var(--t14);font-weight:500;text-decoration:none;transition:border-color .15s,color .15s}
+.fly-models a:hover{border-color:var(--accent);color:var(--accent)}
+.fly-go{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.fly-go .btn{padding:13px 26px;font-size:var(--t16)}
+.fly-go small{color:var(--muted);font-size:var(--t12)}
+.fly-shot{position:relative;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--panel-line);background:#0d0d0d;box-shadow:0 24px 48px rgba(0,0,0,.5)}
+.fly-shot img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;transition:transform .5s var(--fx-ease,ease)}
+.fly-shot:hover img{transform:scale(1.025)}
+.fly-play{position:absolute;left:50%;bottom:9%;translate:-50% 0;display:inline-flex;align-items:center;gap:10px;padding:12px 22px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:var(--t16);white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 0 6px rgba(244,198,31,.22)}
+.fly-shot:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+@media (max-width:900px){.fly{padding-block:var(--s32) 0}.fly-in{grid-template-columns:1fr}.fly-shot{order:-1}}
+@media (max-width:560px){.fly-play{bottom:7%;padding:8px 16px;font-size:var(--t14);box-shadow:0 8px 20px rgba(0,0,0,.45),0 0 0 4px rgba(244,198,31,.22)}}
+@media (prefers-reduced-motion: reduce){.fly-shot img{transition:none}.fly-shot:hover img{transform:none}}
+/* Knopf an der 3D-Bühne und Verweis an jeder Modellkarte */
+.h3d-fly{border-color:var(--accent);color:var(--accent)}
+.h3d-fly:hover{background:var(--accent-soft)}
+@media (max-width:640px){.h3d-side{flex-wrap:wrap;gap:8px}}
+.type-fly{display:inline-flex;align-items:center;gap:8px;align-self:flex-start;min-height:32px;color:var(--accent);font-size:var(--t14);font-weight:600;text-decoration:none}
+.type-fly:hover{text-decoration:underline;text-underline-offset:3px}
 
 /* Hero */
 .hero{padding-top:var(--s48)}
@@ -750,9 +781,8 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
       <a href="#drucker">Drucker</a>
       <a href="#ratgeber">Ratgeber</a>
       <a href="#faq">FAQ</a>
-      <a href="/fliegen.html">Fliegen</a>
     </nav>
-    <a class="fly-pill" href="/fliegen.html">Fliegen</a>
+    <a class="fly-pill" href="/fliegen.html"><span class="fly-long">Probefliegen</span><span class="fly-short">Fliegen</span></a>
     <button class="cart-btn" id="open-cart" aria-label="Warenkorb öffnen" hidden>Warenkorb <span class="cart-count" id="cart-count">0</span></button>
   </div>
 </header>
@@ -766,7 +796,7 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
       <button type="button" class="h3d-arrow h3d-next" id="h3d-next" aria-label="Nächstes Modell"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
       <div class="hero3d-meta">
         <div class="h3d-text" id="h3d-text" aria-live="polite"><p class="h3d-name" id="h3d-name">C-160<span class="h3d-new">Bald</span></p><p class="h3d-sub" id="h3d-sub">Zweimotoriger Transporter mit Heckklappe, 1369 mm Spannweite</p></div>
-        <div class="h3d-side"><div class="h3d-dots" id="h3d-dots" role="group" aria-label="Modell wählen"></div><button type="button" class="btn h3d-ex" id="h3d-ex" aria-pressed="false">In Teile zerlegen</button><button class="btn btn-primary" id="h3d-open" data-open="bf1">Datenblatt BF1</button></div>
+        <div class="h3d-side"><div class="h3d-dots" id="h3d-dots" role="group" aria-label="Modell wählen"></div><button type="button" class="btn h3d-ex" id="h3d-ex" aria-pressed="false">In Teile zerlegen</button><a class="btn h3d-fly ico-fly" id="h3d-fly" href="/fliegen.html?modell=c160">Probefliegen</a><button class="btn btn-primary" id="h3d-open" data-open="bf1">Datenblatt BF1</button></div>
       </div>
     </div>
   </section>
@@ -779,6 +809,29 @@ html.fx-go .logo svg path{stroke-dasharray:80;animation:fx-draw 1.3s cubic-bezie
           <a class="btn btn-primary" href="#modelle">Modelle ansehen</a>
           <a class="btn" href="#datei">Was in der Datei steckt</a>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="fly" id="fliegen" aria-labelledby="fly-h">
+    <div class="wrap">
+      <div class="fly-in">
+        <div class="fly-txt">
+          <p class="label">Im Browser, kostenlos</p>
+          <h2 id="fly-h">Flieg die Modelle, bevor du sie druckst</h2>
+          <p>Alle vier Flugzeuge fliegen im Spiel so, wie sie gebaut sind: der BF1 gutmütig, die F2 schnell, die C-160 mit Heckklappe. Auf dem Rundkurs warten zwölf Tore, eine Stoppuhr und die Bestenliste.</p>
+          <ul class="fly-models" aria-label="Modell direkt fliegen">
+            <li><a href="/fliegen.html?modell=bf1">BF1</a></li>
+            <li><a href="/fliegen.html?modell=busch">Buschflugzeug</a></li>
+            <li><a href="/fliegen.html?modell=f2">F2</a></li>
+            <li><a href="/fliegen.html?modell=c160">C-160</a></li>
+          </ul>
+          <div class="fly-go"><a class="btn btn-primary ico-fly" href="/fliegen.html">Jetzt fliegen</a><small>Ohne Anmeldung. Am PC mit Tastatur, am Handy mit zwei Knüppeln.</small></div>
+        </div>
+        <a class="fly-shot" href="/fliegen.html" aria-label="Flugspiel starten">
+          <img src="images/fliegen/flugspiel-bf1-tor-2-1280.webp" srcset="images/fliegen/flugspiel-bf1-tor-2-720.webp 720w, images/fliegen/flugspiel-bf1-tor-2-1280.webp 1280w" sizes="(max-width:900px) 92vw, 640px" width="1280" height="720" alt="Bild aus dem Flugspiel: der BF1 fliegt in Schräglage auf Tor 2 zu, unten die Instrumente, oben rechts die Stoppuhr" decoding="async">
+          <span class="fly-play ico-fly" aria-hidden="true">Spiel starten</span>
+        </a>
       </div>
     </div>
   </section>
@@ -1441,6 +1494,7 @@ function renderGrid(animate){
         <div><dt>Druckzeit</dt><dd>${p.time}</dd></div>
         <div><dt>Bauraum ab</dt><dd>${p.bed.split(' ')[0]} mm</dd></div>
       </dl>
+      <a class="type-fly ico-fly" href="/fliegen.html?modell=${p.id}">Im Browser probefliegen</a>
       <div class="type-actions"><button class="btn" data-open="${p.id}">Datenblatt</button>${cartBtn(p)}</div>
     </article>`).join(''):`<div class="empty">Für diese Kombination gibt es noch kein Modell. Wähle einen anderen Typ oder Drucker.</div>`;
 }
@@ -2053,6 +2107,7 @@ function initHero3D(){
     const apply=()=>{
       nameEl.innerHTML=`${M.name}<span class="h3d-new">${M.badge}</span>`;subEl.textContent=M.sub;
       openBtn.dataset.open=M.id;openBtn.textContent=`Datenblatt ${M.name}`;
+      {const f=$('#h3d-fly');if(f){f.href='/fliegen.html?modell='+M.id;f.setAttribute('aria-label',M.name+' im Browser probefliegen')}}
       textEl.classList.remove('is-out');
     };
     if(animate&&!reduce){textEl.classList.add('is-out');setTimeout(apply,220)}else apply();
