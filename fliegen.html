@@ -66,6 +66,14 @@ dl{margin:0}
 .acts{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:6px}
 .act{border:1px solid var(--panel-line);background:var(--panel);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;min-height:44px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .act kbd{font:inherit;font-weight:400;color:var(--muted);margin-left:6px}
+.ic{display:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.card .act{background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none}
+.card .act[aria-pressed="true"],.card .chip[aria-pressed="true"]{background:var(--accent)}
+.card .models{margin:16px 0 0;justify-content:flex-start}
+.card .chip:not([aria-pressed="true"]){background:transparent}
+.card .chip{-webkit-backdrop-filter:none;backdrop-filter:none}
+.mlink{display:inline-block;margin-top:18px;color:var(--muted);font-size:14px}
 
 /* Meldung in der Mitte oben */
 .note{position:fixed;left:50%;top:78px;translate:-50% 0;max-width:min(560px,calc(100vw - 32px));text-align:center;background:var(--panel);border:1px solid var(--panel-line);border-radius:999px;padding:9px 20px;font-size:16px;font-weight:600;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;transition:opacity .25s;pointer-events:none}
@@ -125,36 +133,51 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 .pad::before{left:50%;top:14px;bottom:14px;width:1px}
 .pad::after{top:50%;left:14px;right:14px;height:1px}
 .pad i{position:absolute;z-index:1;left:50%;top:50%;width:54px;height:54px;margin:-27px 0 0 -27px;border-radius:50%;background:var(--accent);box-shadow:0 4px 12px rgba(0,0,0,.4);will-change:transform}
-.pad span{position:absolute;left:0;right:0;top:-24px;text-align:center;font-size:12px;font-weight:600;color:var(--ink);text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.pad span{position:absolute;font-size:11px;font-weight:600;color:var(--muted);pointer-events:none}
+.pad .pt{top:7px;left:0;right:0;text-align:center}
+.pad .pb{bottom:7px;left:0;right:0;text-align:center}
+.pad .pr{right:8px;top:calc(50% + 30px)}
 @media (pointer:coarse){
   html,body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
   .card-in{touch-action:pan-y}
   .touch,.only-touch{display:block}
-  .clock{display:none}
   .only-keys{display:none}
-  .top{flex-wrap:wrap;gap:8px}
+  /* oberste Zeile: Zeichen, Stoppuhr, Kamera, Neustart, Menü. Alles Weitere liegt im Menü. */
+  .top{flex-wrap:nowrap;gap:6px;padding-top:max(8px,env(safe-area-inset-top))}
+  .home{font-size:0;gap:0;padding:9px 11px;min-height:44px}
   .home span{display:none}
-  .models{width:100%;margin:0;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;touch-action:pan-x}
-  .models .chip{padding:7px 13px;font-size:13px;white-space:nowrap}
-  .inst{left:max(16px,env(safe-area-inset-left));bottom:auto;top:114px;gap:4px;padding:5px 10px 5px 5px;border-radius:18px}
-  .inst svg{width:76px;height:76px}
-  .gt{font-size:10px}.gv{font-size:12.5px}.gu{font-size:0}
-  .side{gap:5px;margin-left:4px}.side div{min-width:58px}
-  .side dt{font-size:11px}.side dd{font-size:15px}.side dd small{font-size:10px}
-  .acts{bottom:auto;top:204px;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));gap:5px;flex-wrap:wrap}
-  .act{padding:7px 12px;font-size:13px;min-height:40px}
+  .top #b-cam{margin-left:auto}
+  .clock{position:static;flex:0 1 200px;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 14px;min-height:44px;border-radius:999px}
+  .clock b{font-size:18px}.clock span{font-size:13px;white-space:nowrap}.clock small{display:none}
+  .top .act{position:relative;flex:none;width:44px;height:44px;min-height:44px;padding:0;display:grid;place-items:center}
+  .ic{display:block;width:20px;height:20px}
+  .top .act .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .acts{display:none}
   .act kbd{display:none}
-  .note{top:300px;font-size:15px}
+  .card .act{min-height:44px;padding:9px 16px;font-size:14px}
+  .card .chip{min-height:44px;padding:9px 16px}
+  .inst{left:max(16px,env(safe-area-inset-left));bottom:auto;top:calc(max(8px,env(safe-area-inset-top)) + 52px);gap:4px;padding:5px 10px 5px 5px;border-radius:18px}
+  .inst svg{width:72px;height:72px}
+  .gt{font-size:10px}.gv{font-size:12.5px}.gu{font-size:0}
+  .side{gap:5px;margin-left:4px}.side div{min-width:54px}
+  .side dt{font-size:11px}.side dd{font-size:15px}.side dd small{font-size:10px}
+  .note{top:calc(max(8px,env(safe-area-inset-top)) + 144px);font-size:14px;padding:7px 16px}
+  .spec{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(max(22px,env(safe-area-inset-bottom)) + 160px);display:flex}
+  .spec .act{border-color:var(--accent);min-height:44px;padding:9px 16px;font-size:14px}
   .keys div{grid-template-columns:128px 1fr}
+  #v-help>p:not(.loadline){display:none}
+  #v-help .keys{margin-top:14px}
 }
 /* Handy quer: Modellwahl neben dem Logo, Instrumente links, Knöpfe rechts, Knüppel in den Ecken */
 @media (pointer:coarse) and (orientation:landscape){
-  .top{flex-wrap:nowrap;padding-top:8px}
-  .models{width:auto;margin-left:auto}
-  .inst{top:56px}
-  .inst svg{width:62px;height:62px}
-  .acts{top:56px;left:auto;max-width:54vw;justify-content:flex-end}
-  .note{top:136px}
+  .inst svg{width:60px;height:60px}
+  .note{top:calc(max(8px,env(safe-area-inset-top)) + 128px)}
+  #v-menu>p{display:none}
+  #v-menu .go{margin-top:12px}
+  .mrow{margin-top:12px}
+  .mlink{margin-top:10px}
+  .card .models{margin-top:12px}
+  .spec{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 138px);right:max(22px,env(safe-area-inset-right))}
   .pad{width:128px;height:128px;bottom:max(12px,env(safe-area-inset-bottom))}
   .pad-l{left:max(22px,env(safe-area-inset-left))}
   .pad-r{right:max(22px,env(safe-area-inset-right))}
@@ -183,6 +206,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 <div class="top">
   <a class="home" href="/" aria-label="LayerWing, zurück zum Shop"><svg viewBox="0 0 36 20" aria-hidden="true"><path d="M2 12 C 8 4, 20 3, 34 10 C 20 12, 10 14, 2 12 Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M6 16.5h22M11 19h12" stroke="currentColor" stroke-width="1.6"/></svg>LayerWing<span>Fliegen</span></a>
   <div class="models" id="models" role="group" aria-label="Modell wählen"></div>
+  <button class="act only-touch" id="b-menu" type="button"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 6h14M3 10h14M3 14h14"/></svg><span class="lb">Menü</span></button>
 </div>
 
 <div class="inst" aria-label="Instrumente">
@@ -191,7 +215,6 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   <svg id="g-n" viewBox="0 0 100 100" role="img" aria-label="Drehzahlmesser"></svg>
   <dl class="side">
     <div><dt>Wind</dt><dd><span id="i-w">0</span><small>km/h</small><i class="warr" id="i-wa" aria-hidden="true">↑</i></dd></div>
-    <div class="only-touch"><dt>Tor</dt><dd><span id="i-k">1/12</span><small id="i-kt"></small></dd></div>
   </dl>
 </div>
 
@@ -202,17 +225,18 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   <button class="act" id="b-ramp" type="button" aria-pressed="false" hidden>Heckklappe<kbd>F</kbd></button>
   <button class="act" id="b-smoke" type="button" aria-pressed="false">Rauch<kbd>Leer</kbd></button>
   <button class="act" id="b-snd" type="button" aria-pressed="true">Ton<kbd>M</kbd></button>
-  <button class="act" id="b-cam" type="button">Kamera<kbd>C</kbd></button>
-  <button class="act" id="b-reset" type="button">Neu starten<kbd>R</kbd></button>
+  <button class="act" id="b-cam" type="button"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h3l1.5-2h5L14 7h3v9H3z"/><circle cx="10" cy="11.5" r="3"/></svg><span class="lb">Kamera</span><kbd>C</kbd></button>
+  <button class="act" id="b-reset" type="button"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M4.2 10a5.8 5.8 0 1 0 1.9-4.3"/><path d="M4 2.8v3.4h3.4"/></svg><span class="lb">Neu starten</span><kbd>R</kbd></button>
   <button class="act" id="b-board" type="button">Bestzeiten<kbd>B</kbd></button>
   <button class="act" id="b-help" type="button">Hilfe<kbd>H</kbd></button>
 </div>
 
 <p class="note" id="note" role="status" aria-live="polite"></p>
 
+<div class="spec" id="spec"></div>
 <div class="touch" aria-hidden="true">
-  <div class="pad pad-l" id="pad-l"><span>Gas und Seite</span><i id="pad-l-k"></i></div>
-  <div class="pad pad-r" id="pad-r"><span>Höhe und Quer</span><i id="pad-r-k"></i></div>
+  <div class="pad pad-l" id="pad-l"><span class="pt">Gas</span><span class="pr">Seite</span><i id="pad-l-k"></i></div>
+  <div class="pad pad-r" id="pad-r"><span class="pb" id="pad-r-p">Ziehen</span><span class="pr">Rollen</span><i id="pad-r-k"></i></div>
 </div>
 
 <div class="card" id="card">
@@ -228,9 +252,9 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
     </dl>
     <p class="only-keys">Starten: Vollgas, mit A und D geradeaus halten, bei genug Fahrt ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Wer zu langsam wird oder zu hart zieht, reißt die Strömung ab. Bei Vollgas zieht das Modell nach links: mit D gegenhalten.</p>
     <dl class="keys only-touch">
-      <div><dt>Linker Knüppel</dt><dd>Hoch und runter ist das Gas, es bleibt stehen. Links und rechts ist das Seitenruder, damit lenkst du am Boden.</dd></div>
-      <div><dt>Rechter Knüppel</dt><dd id="t-pitch">Runter ziehen hebt die Nase, wie am Sender. Links und rechts rollt das Modell.</dd></div>
-      <div><dt>Knöpfe</dt><dd>Rauch, Ton, Kamera, neu starten und diese Hilfe</dd></div>
+      <div><dt>Linker Knüppel</dt><dd>Gas, bleibt stehen. Seitlich das Seitenruder.</dd></div>
+      <div><dt>Rechter Knüppel</dt><dd id="t-pitch">Ziehen hebt die Nase. Seitlich rollt das Modell.</dd></div>
+      <div><dt>Landen</dt><dd>Gas raus, kurz vor dem Boden leicht ziehen.</dd></div>
     </dl>
     <p class="only-touch">Starten: Gas ganz hoch, geradeaus halten, bei genug Fahrt rechts leicht ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Quer gehalten siehst du mehr.</p>
     <div class="go">
@@ -239,6 +263,14 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <label class="check"><input type="checkbox" id="c-inv"> Hoch und runter tauschen</label>
     </div>
     <p class="loadline" id="loadline">Modell lädt …</p>
+  </div>
+  <div class="card-in one" id="v-menu" role="dialog" aria-modal="true" aria-labelledby="menu-h" hidden>
+    <h2 id="menu-h">Flugplatz im Tal</h2>
+    <p>Flieg durch die zwölf Tore. Die Uhr läuft ab Tor 1.</p>
+    <div id="menu-models"></div>
+    <div class="go"><button class="btn btn-primary" id="b-go2" type="button">Losfliegen</button></div>
+    <div class="mrow" id="menu-acts"></div>
+    <a class="mlink" href="/">Zurück zum Shop</a>
   </div>
   <div class="card-in one" id="v-who" role="dialog" aria-modal="true" aria-labelledby="who-h" hidden>
     <h2 id="who-h">Wie heißt du?</h2>
@@ -257,7 +289,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
     <div class="board-wrap"><table class="board"><thead><tr><th scope="col">Platz</th><th scope="col">Name</th><th scope="col">Modell</th><th scope="col" class="num">Zeit</th><th scope="col" class="num">Datum</th></tr></thead><tbody id="board-rows"></tbody></table></div>
     <p id="board-empty" hidden>Hier steht noch keine Zeit. Flieg den Rundkurs durch alle zwölf Tore, dann trägt sich deine Runde ein.</p>
     <p class="fine">Gespeichert auf diesem Gerät. Du fliegst als <b id="board-me"></b>.</p>
-    <div class="go"><button class="btn btn-primary" id="b-board-close" type="button">Weiterfliegen</button><button class="btn" id="b-name" type="button">Name ändern</button></div>
+    <div class="go"><button class="btn btn-primary" id="b-board-close" type="button">Weiterfliegen</button><button class="btn" id="b-name" type="button">Name ändern</button><button class="btn" id="b-clear" type="button">Tabelle leeren</button></div>
   </div>
 </div>
 <noscript><p style="position:fixed;inset:auto 16px 16px;color:#ECE8DF">Das Flugspiel braucht JavaScript. <a href="/" style="color:#F4C61F">Zurück zum Shop</a></p></noscript>
@@ -268,7 +300,10 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 'use strict';
 const T=window.THREE, $=s=>document.querySelector(s);
 const note=$('#note');let noteT=0;
-function say(text,good,hold){note.textContent=text;note.classList.toggle('good',!!good);note.classList.add('on');clearTimeout(noteT);if(!hold)noteT=setTimeout(()=>note.classList.remove('on'),3200)}
+/* Am Handy erscheinen nur Meldungen, die man nicht ohnehin sieht: Absturz, Landung, Rundenzeit, Strömungsabriss */
+function say(text,good,hold){
+  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
+  note.textContent=text;note.classList.toggle('good',!!good);note.classList.add('on');clearTimeout(noteT);if(!hold)noteT=setTimeout(()=>note.classList.remove('on'),3200)}
 if(!T||!window.DecompressionStream||!window.fetch){$('#loadline').textContent='Dein Browser kann die 3D-Ansicht nicht starten. Probier es mit einem aktuellen Chrome, Safari oder Firefox.';$('#b-go').disabled=true;return}
 
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, lerp=(a,b,t)=>a+(b-a)*t, sstep=(a,b,x)=>{const t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)};
@@ -310,7 +345,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1.5:2));
 renderer.outputEncoding=T.sRGBEncoding;
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
 const HORIZON=0xD3E2EC;
-const scene=new T.Scene();scene.background=new T.Color(HORIZON);scene.fog=new T.Fog(HORIZON,1400,7000);
+const scene=new T.Scene();scene.background=new T.Color(HORIZON);scene.fog=new T.Fog(HORIZON,1150,7000);
 const cam=new T.PerspectiveCamera(55,1,.5,14000);
 scene.add(new T.HemisphereLight(0xdfeaff,0x6b7550,.44));
 const sun=new T.DirectionalLight(0xfff1d6,.86),SUN=new T.Vector3(-.55,.75,.35).normalize();sun.position.copy(SUN);scene.add(sun);scene.add(sun.target);
@@ -481,6 +516,13 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
  const gs=new T.Shape();gs.moveTo(-17.5,0);gs.lineTo(17.5,0);gs.lineTo(0,9);gs.closePath();
  const roof=new T.Mesh(new T.ExtrudeGeometry(gs,{depth:48,bevelEnabled:false}),std(0x2C2A27,.7));roof.position.set(63,20,306);scene.add(roof);
  COL.box.push({x0:47,x1:79,y0:20,y1:27,z0:306,z1:354,name:'haus'});
+ /* Schotterparkplatz neben dem Vereinsheim, mit drei Autos */
+ {const gm=new T.MeshStandardMaterial({map:grain,color:0xA8A294,roughness:1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1}),gp=new T.Mesh(new T.PlaneGeometry(56,74),shaded(gm));gp.rotation.x=-Math.PI/2;gp.position.set(112,.04,332);scene.add(gp);
+  const glass=std(0x1D2329,.2),tyre=std(0x1B1A19,.9);
+  [[0xB5433A,312,.06],[0x3D5A80,331,-.04],[0xE6E3DC,350,.03]].forEach(([colr,cz,rot])=>{const car=new T.Group(),paint=std(colr,.35),add=(geo,mat,x,y,z)=>{const o=new T.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=o.receiveShadow=true;car.add(o);return o};
+   add(new T.BoxGeometry(27,4.6,11),paint,0,4.1,0);add(new T.BoxGeometry(14,4,10),glass,-1.5,8.2,0);add(new T.BoxGeometry(14.4,.5,10.4),paint,-1.5,10.4,0);
+   for(const [wx,wz] of [[-8.5,5.4],[8.5,5.4],[-8.5,-5.4],[8.5,-5.4]]){const w=add(new T.CylinderGeometry(2.3,2.3,1.4,16),tyre,wx,2.3,wz);w.rotation.x=Math.PI/2}
+   car.position.set(108,0,cz);car.rotation.y=rot;scene.add(car);COL.box.push({x0:94,x1:122,y0:0,y1:10.8,z0:cz-6,z1:cz+6,name:'auto'})})}
  /* Windsack: dreht sich in den Wind und steht je nach Stärke steiler oder flacher */
  box(.9,46,.9,std(0xECE8DF,.6),-44,23,150);COL.cyl.push({x:-44,z:150,r:.8,y0:0,y1:46,name:'windsack'});COL.sph.push({x:-44,y:44,z:150,r:7,name:'windsack'});
  const sp=new T.Group();sp.position.set(-44,45,150);scene.add(sp);const stl=new T.Group();sp.add(stl);
@@ -506,7 +548,7 @@ const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COUR
   const cv=document.createElement('canvas');cv.width=128;cv.height=64;const cx=cv.getContext('2d');cx.fillStyle='#2C2A27';cx.fillRect(0,0,128,64);cx.fillStyle='#F4C61F';cx.font='800 52px system-ui,sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(String(i+1),64,35);
   const nt=new T.CanvasTexture(cv);nt.encoding=T.sRGBEncoding;
   for(const k of [1,-1]){const pl=add(new T.PlaneGeometry(15,7),new T.MeshBasicMaterial({map:nt}),x+nx*.76*k,top+4,z+nz*.76*k);pl.rotation.y=Math.atan2(nx*k,nz*k)}
-  COL.bars.push({x,z,tx,tz,nx,nz,hw:W/2+3,y0:top,y1:top+8});COL.gates.push({x,z,tx,tz,nx,nz,hw:W/2-1.6,y0:y,y1:top,top})});
+  COL.bars.push({x,z,tx,tz,nx,nz,hw:W/2+3,y0:top,y1:top+8});COL.gates.push({x,z,tx,tz,nx,nz,hw:W/2,y0:Math.min(ends[0][2],ends[1][2]),y1:top,top})});      /* gewertet wird der ganze Raum zwischen den Pfosten, vom Boden bis zum Balken */
  /* schlanke Betonpfeiler mit Warnkopf: stehen neben der Ideallinie und im Quertal */
  [[25,-745,140],[-150,-1330,170],[150,-260,120],[-470,-2190,150],[-300,330,110],[95,560,130],[-1180,-2080,160],[-690,-1560,130]].forEach(([x,z,h])=>{const y=ground(x,z)-2;
   add(new T.BoxGeometry(6,h,6),conc,x,y+h/2,z);add(new T.BoxGeometry(6.8,7,6.8),yel,x,y+h-3.5,z);add(new T.BoxGeometry(7,1.6,7),dark,x,y+h-3.5,z);
@@ -533,18 +575,27 @@ function hit(px,py,pz,pr){
     for(const t of a){const k=(py-t[2])/t[3];if(k<0||k>1)continue;const dx=px-t[0],dz=pz-t[1],rr=t[4]*(1-k)+pr*.5;if(dx*dx+dz*dz<rr*rr)return 'baum'}}
   return null;
 }
-const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.'};
+const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
 
-/* Wolken über den Gipfeln: mehrere weiche Ballen je Wolke */
-{const N=90,inst=new T.InstancedMesh(new T.IcosahedronGeometry(1,2),new T.MeshStandardMaterial({color:0xFFFFFF,roughness:1}),N),d=new T.Object3D();
- for(let i=0;i<N;i++){const c=Math.floor(i/5),cx=(hash(c,3.3)-.5)*11000,cz=(hash(c,8.1)-.5)*11000,cy=1800+hash(c,5.5)*700,k=i%5;
-  d.position.set(cx+(k-2)*120+hash(i,1.1)*70,cy+hash(i,2.9)*50-(k%2)*18,cz+hash(i,4.2)*150);const s=120+hash(i,6.6)*130;d.scale.set(s*1.5,s*.5,s*1.05);d.rotation.y=hash(i,7.3)*6;d.updateMatrix();inst.setMatrixAt(i,d.matrix)}
- scene.add(inst)}
+/* Wolken über den Gipfeln: jede besteht aus vielen weichen Ballen, oben von der Sonne hell, unten grau; in der Ferne verblassen sie im Dunst */
+{const NC=coarse?24:34,pos=[],siz=[],sha=[];
+ for(let c=0;c<NC;c++){const cx=(hash(c,3.3)-.5)*11500,cz=(hash(c,8.1)-.5)*11500,cy=1750+hash(c,5.5)*800,w=420+hash(c,1.9)*520,n=16+Math.floor(hash(c,7.7)*13);
+  for(let k=0;k<n;k++){const q=c*31+k,u=hash(q,1.1)*2-1,v=hash(q,2.3)*2-1,up=hash(q,4.7),r=1-.55*Math.abs(u);
+   pos.push(cx+u*w,cy+up*up*210*r,cz+v*w*.45);siz.push((210+hash(q,6.1)*250)*(.6+.4*r)*(1-.35*up));sha.push(.2+.8*up)}}
+ /* jeder Ballen ist eine Scheibe, die sich immer zur Kamera dreht */
+ const g=new T.PlaneGeometry(1,1);g.setAttribute('sh',new T.InstancedBufferAttribute(new Float32Array(sha),1));
+ const m=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{fogC:{value:new T.Color(HORIZON)}},
+  vertexShader:'attribute float sh;varying vec2 vU;varying float vs;varying float vf;void main(){vec4 c=modelViewMatrix*instanceMatrix*vec4(0.0,0.0,0.0,1.0);float s=length(instanceMatrix[0].xyz);vec4 mv=c+vec4(position.xy*s,0.0,0.0);vU=position.xy*2.0;vs=sh;vf=smoothstep(2600.0,9800.0,-mv.z);gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'uniform vec3 fogC;varying vec2 vU;varying float vs;varying float vf;void main(){float d=length(vU);if(d>1.0)discard;float a=smoothstep(1.0,0.4,d);vec3 c=mix(vec3(0.42,0.47,0.57),vec3(1.0),clamp(vs*0.75+vU.y*0.4+0.12,0.0,1.0));c=mix(c,fogC,vf*0.85);gl_FragColor=vec4(c,a*0.82*(1.0-vf*0.45));\n#include <encodings_fragment>\n}'});
+ const cl=new T.InstancedMesh(g,m,siz.length),o=new T.Object3D();
+ for(let i=0;i<siz.length;i++){o.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);o.scale.setScalar(siz[i]*2);o.updateMatrix();cl.setMatrixAt(i,o.matrix)}
+ cl.frustumCulled=false;cl.renderOrder=1;scene.add(cl)}
 /* Bäume an den unteren Hängen: geben ein Gefühl für Fahrt und Höhe */
-{const N=2600,tint=(g,c)=>{g=g.toNonIndexed();g.deleteAttribute('uv');const n=g.attributes.position.count,a=new Float32Array(n*3),k=new T.Color(c);for(let i=0;i<n;i++){a[i*3]=k.r;a[i*3+1]=k.g;a[i*3+2]=k.b}g.setAttribute('color',new T.BufferAttribute(a,3));return g};
+{const N=coarse?2600:4400,tint=(g,c)=>{g=g.toNonIndexed();g.deleteAttribute('uv');g.computeBoundingBox();const q=g.attributes.position,y0=g.boundingBox.min.y,dy=g.boundingBox.max.y-y0||1,n=q.count,a=new Float32Array(n*3),k=new T.Color(c);
+  for(let i=0;i<n;i++){const sh=.6+.4*(q.getY(i)-y0)/dy;a[i*3]=k.r*sh;a[i*3+1]=k.g*sh;a[i*3+2]=k.b*sh}g.setAttribute('color',new T.BufferAttribute(a,3));return g};      /* jede Stufe ist unten dunkler: das wirkt wie Schatten im Geäst */
  /* Fichte aus Stamm und zwei Kronenstufen, in einer Geometrie */
- const t1=new T.CylinderGeometry(.045,.065,.22,6);t1.translate(0,-.39,0);const t2=new T.ConeGeometry(.5,.52,7);t2.translate(0,-.06,0);const t3=new T.ConeGeometry(.36,.46,7);t3.translate(0,.27,0);
- const gs=[tint(t1,0x7A5F45),tint(t2,0xF2F5EC),tint(t3,0xFFFFFF)],tot=gs.reduce((q,g)=>q+g.attributes.position.count,0),trunk=new T.BufferGeometry();
+ const t1=new T.CylinderGeometry(.045,.065,.22,6);t1.translate(0,-.39,0);const t2=new T.ConeGeometry(.5,.44,8);t2.translate(0,-.12,0);const t3=new T.ConeGeometry(.38,.4,8);t3.translate(0,.12,0);const t4=new T.ConeGeometry(.24,.36,8);t4.translate(0,.33,0);
+ const gs=[tint(t1,0x7A5F45),tint(t2,0xEEF2E8),tint(t3,0xF7F9F2),tint(t4,0xFFFFFF)],tot=gs.reduce((q,g)=>q+g.attributes.position.count,0),trunk=new T.BufferGeometry();
  for(const key of ['position','normal','color']){const arr=new Float32Array(tot*3);let o=0;for(const g of gs){arr.set(g.attributes[key].array,o);o+=g.attributes[key].array.length}trunk.setAttribute(key,new T.BufferAttribute(arr,3))}
  const mat=new T.MeshStandardMaterial({vertexColors:true,flatShading:true,roughness:1});
  const inst=new T.InstancedMesh(trunk,mat,N),d=new T.Object3D(),col=new T.Color();let n=0,tries=0;
@@ -552,7 +603,7 @@ const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen
  const sc=document.createElement('canvas');sc.width=sc.height=64;const sx=sc.getContext('2d'),sg=sx.createRadialGradient(32,32,2,32,32,32);sg.addColorStop(0,'rgba(0,0,0,.55)');sg.addColorStop(.55,'rgba(0,0,0,.3)');sg.addColorStop(1,'rgba(0,0,0,0)');sx.fillStyle=sg;sx.fillRect(0,0,64,64);
  const bg=new T.PlaneGeometry(1,1);bg.rotateX(-Math.PI/2);
  const blob=new T.InstancedMesh(bg,new T.MeshBasicMaterial({map:new T.CanvasTexture(sc),transparent:true,opacity:.62,depthWrite:false,color:0x1c2a22,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),N),up=new T.Vector3(0,1,0),nrm=new T.Vector3(),o2=new T.Object3D();
- while(n<N&&tries<60000){tries++;const x=(hash(tries,1.7)-.5)*7200,z=(hash(tries,9.3)-.5)*7200,h=ground(x,z);
+ while(n<N&&tries<110000){tries++;const x=(hash(tries,1.7)-.5)*7200,z=(hash(tries,9.3)-.5)*7200,h=ground(x,z);
    if(h<3||h>360)continue;if(Math.abs(x)<175&&Math.abs(z)<600)continue;if(courseDist(x,z)<62)continue;
    const s=22+hash(tries,4.4)*30;d.position.set(x,h+s*.5-1,z);d.scale.set(s*.6,s,s*.6);d.rotation.y=hash(tries,2.2)*6;d.updateMatrix();inst.setMatrixAt(n,d.matrix);
    {const bx=x-SUN.x*s*.3,bz=z-SUN.z*s*.3;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm);o2.scale.set(s*1.05,1,s*.8);o2.updateMatrix();blob.setMatrixAt(n,o2.matrix)}
@@ -727,10 +778,10 @@ try{SND.on=localStorage.getItem('lw-fliegen-ton')!=='0'}catch(e){}
 const keys={};let invert=false;
 try{invert=localStorage.getItem('lw-fliegen-invert')==='1'}catch(e){}
 const inv=$('#c-inv');inv.checked=invert;
-const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Links und rechts rollt das Modell.':'Runter ziehen hebt die Nase, wie am Sender. Links und rechts rollt das Modell.';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
+const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Seitlich rollt das Modell.':'Runter ziehen hebt die Nase. Seitlich rollt das Modell.';$('#pad-r-p').className=invert?'pt':'pb';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
 inv.addEventListener('change',()=>{invert=inv.checked;pitchText();try{localStorage.setItem('lw-fliegen-invert',invert?'1':'0')}catch(e){}});pitchText();
 const card=$('#card');
-function start(){if(!LB.name){askName();return}card.hidden=true;view('help');card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
+function start(){if(!LB.name){askName();return}view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{view('help');$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
 $('#b-reset').addEventListener('click',()=>{reset('Zurück am Start');});
@@ -840,12 +891,12 @@ function crash(text,inAir){
 const fmtT=t=>Math.floor(t/60)+':'+(t%60<10?'0':'')+(Math.floor(t%60*10)/10).toFixed(1).replace('.',',');
 const fmtH=t=>{const c=Math.round(t*100),m=Math.floor(c/6000),r=c-m*6000;return m+':'+String(Math.floor(r/100)).padStart(2,'0')+','+String(r%100).padStart(2,'0')};
 /* Bestentabelle: Name, Zeit, Modell und Datum, sortiert nach Zeit. Sie liegt im Speicher dieses Browsers; die Seite hat keinen Server, der Zeiten sammeln könnte. */
-const LB={key:'lw-fliegen-bestzeiten',list:[],name:'',filter:'all',fresh:null};
+const LB={key:'lw-fliegen-bestzeiten-2',list:[],name:'',filter:'all',fresh:null};      /* neue Kennung: die Tabelle beginnt auf jedem Gerät leer */
 function lbLoad(){
   try{const a=JSON.parse(localStorage.getItem(LB.key)||'[]');LB.list=Array.isArray(a)?a.filter(e=>e&&typeof e.n==='string'&&typeof e.m==='string'&&e.t>0).slice(0,100):[]}catch(e){LB.list=[]}
   try{LB.name=(localStorage.getItem('lw-fliegen-name')||'').slice(0,16)}catch(e){LB.name=''}
-  /* frühere Bestzeiten je Modell übernehmen */
-  if(!LB.list.length){for(const pl of PLANES){let t=0;try{t=parseFloat(localStorage.getItem('lw-fliegen-runde-'+pl.id))}catch(e){}if(t>0)LB.list.push({n:LB.name||'Pilot',t,m:pl.id,d:0})}LB.list.sort((a,b)=>a.t-b.t)}
+  /* alte Stände entfernen */
+  try{localStorage.removeItem('lw-fliegen-bestzeiten');for(const pl of PLANES)localStorage.removeItem('lw-fliegen-runde-'+pl.id)}catch(e){}
 }
 function lbBest(m){const e=LB.list.find(x=>x.m===m);return e?e.t:null}
 function lbAdd(t){
@@ -854,13 +905,14 @@ function lbAdd(t){
   try{localStorage.setItem(LB.key,JSON.stringify(LB.list))}catch(err){}
   return LB.list.indexOf(e)+1;
 }
-function view(v){for(const id of ['help','who','board'])$('#v-'+id).hidden=id!==v;card.hidden=false}
+const HOME=coarse?'menu':'help';      /* am Handy ist das Menü zugleich der Startbildschirm */
+function view(v){for(const id of ['help','menu','who','board'])$('#v-'+id).hidden=id!==v;card.hidden=false}
 function askName(){view('who');const i=$('#in-name');i.value=LB.name;$('#who-err').textContent='';i.focus();i.select()}
 $('#f-who').addEventListener('submit',e=>{e.preventDefault();
   const n=$('#in-name').value.replace(/\s+/g,' ').trim().slice(0,16);
   if(n.length<2){$('#who-err').textContent='Gib einen Namen mit mindestens zwei Zeichen ein.';$('#in-name').focus();return}
   LB.name=n;try{localStorage.setItem('lw-fliegen-name',n)}catch(err){}
-  if(S.started)openBoard();else{view('help');$('#b-go').focus()}});
+  if(S.started)openBoard();else{view(HOME);$(coarse?'#b-go2':'#b-go').focus()}});
 function openBoard(){
   if(!LB.name){askName();return}
   const tabs=$('#board-tabs');tabs.textContent='';
@@ -869,11 +921,13 @@ function openBoard(){
   list.slice(0,25).forEach((e,i)=>{const tr=document.createElement('tr'),pl=PLANES.find(q=>q.id===e.m),cell=(t,c)=>{const td=document.createElement('td');td.textContent=t;if(c)td.className=c;tr.appendChild(td)};
     if(e.n===LB.name)tr.classList.add('me');if(e===LB.fresh)tr.classList.add('new');
     cell(i+1+'.');cell(e.n);cell(pl?pl.name:e.m);cell(fmtH(e.t),'num t');cell(e.d?new Date(e.d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'}):'','num');rows.appendChild(tr)});
-  $('#board-empty').hidden=list.length>0;document.querySelector('.board-wrap').hidden=!list.length;$('#board-me').textContent=LB.name;
+  $('#b-clear').hidden=!LB.list.length;$('#board-empty').hidden=list.length>0;document.querySelector('.board-wrap').hidden=!list.length;$('#board-me').textContent=LB.name;
   $('#b-board-close').textContent=S.started?'Weiterfliegen':'Zurück';view('board');$('#b-board-close').focus();
 }
-$('#b-board-close').addEventListener('click',()=>{if(S.started)start();else view('help')});
+$('#b-board-close').addEventListener('click',()=>{if(S.started)start();else view(HOME)});
 $('#b-name').addEventListener('click',askName);
+/* Leeren braucht zwei Klicks, damit es nicht aus Versehen passiert */
+{const b=$('#b-clear');let armed=0;b.addEventListener('click',()=>{if(Date.now()-armed<4000){armed=0;LB.list=[];LB.fresh=null;try{localStorage.setItem(LB.key,'[]')}catch(e){}S.best=null;S.last=null;S.rank=0;b.textContent='Tabelle leeren';openBoard()}else{armed=Date.now();b.textContent='Wirklich leeren?';setTimeout(()=>{if(armed&&Date.now()-armed>=4000){armed=0;b.textContent='Tabelle leeren'}},4100)}})}
 function passGate(i){
   const n=COL.gates.length;
   if(i!==S.next){if(i!==(S.next+n-1)%n)say('Das war Tor '+(i+1)+'. Als Nächstes kommt Tor '+(S.next+1));return}
@@ -1015,7 +1069,7 @@ function flying(dt){
   }
   {const o=hit(S.pos.x,S.pos.y,S.pos.z,P.span*.3);if(o){crash(HITTEXT[o],true);return}}
   for(let i=0;i<COL.gates.length;i++){const g=COL.gates[i],a=(S.px-g.x)*g.nx+(S.pz-g.z)*g.nz,b=(S.pos.x-g.x)*g.nx+(S.pos.z-g.z)*g.nz;
-    if(a<0&&b>=0&&Math.abs((S.pos.x-g.x)*g.tx+(S.pos.z-g.z)*g.tz)<g.hw&&S.pos.y>g.y0&&S.pos.y<g.y1)passGate(i)}
+    if(a<0&&b>=0&&Math.abs((S.pos.x-g.x)*g.tx+(S.pos.z-g.z)*g.tz)<g.hw&&S.pos.y<g.y1)passGate(i)}
   S.px=S.pos.x;S.pz=S.pos.z;
   if(Math.hypot(S.pos.x,S.pos.z)>4300)reset('Zu weit draußen. Zurück am Platz');
 }
@@ -1091,11 +1145,16 @@ function audioInit(){
   const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
   if(SND.ctx){if(SND.ctx.state==='suspended')SND.ctx.resume();return}
   const c=SND.ctx=new AC();SND.master=c.createGain();SND.master.gain.value=0;SND.master.connect(c.destination);
+  {const len=c.sampleRate*2,buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;SND.noise=buf}
   SND.v=[0,1].map(()=>{const o=c.createOscillator(),o2=c.createOscillator(),g=c.createGain(),g2=c.createGain(),f=c.createBiquadFilter();
-    o.type='sawtooth';o2.type='square';g.gain.value=0;g2.gain.value=.16;f.type='lowpass';f.frequency.value=700;f.Q.value=.7;
-    o.connect(f);o2.connect(g2);g2.connect(f);f.connect(g);g.connect(SND.master);o.start();o2.start();return {o,o2,g,f}});
-  const len=c.sampleRate*2,buf=c.createBuffer(1,len,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<len;i++)d[i]=Math.random()*2-1;
-  SND.noise=buf;const n=c.createBufferSource(),nf=c.createBiquadFilter(),ng=c.createGain();n.buffer=buf;n.loop=true;nf.type='bandpass';nf.frequency.value=500;nf.Q.value=.5;ng.gain.value=0;
+    /* Grundton des Motors, darüber ein weiches Singen; die Luftschraube kommt als Rauschen dazu, das im Takt der Blätter pulsiert */
+    o.type='sawtooth';o2.type='triangle';g.gain.value=0;g2.gain.value=.22;f.type='lowpass';f.frequency.value=700;f.Q.value=.5;
+    o.connect(f);o2.connect(g2);g2.connect(f);f.connect(g);g.connect(SND.master);o.start();o2.start();
+    const pn=c.createBufferSource(),pf=c.createBiquadFilter(),pg=c.createGain(),lfo=c.createOscillator(),ld=c.createGain();
+    pn.buffer=SND.noise;pn.loop=true;pf.type='bandpass';pf.frequency.value=900;pf.Q.value=.8;pg.gain.value=0;lfo.type='sine';ld.gain.value=0;
+    pn.connect(pf);pf.connect(pg);pg.connect(SND.master);lfo.connect(ld);ld.connect(pg.gain);pn.start(0,Math.random());lfo.start();
+    return {o,o2,g,f,pf,pg,lfo,ld}});
+  const buf=SND.noise,n=c.createBufferSource(),nf=c.createBiquadFilter(),ng=c.createGain();n.buffer=buf;n.loop=true;nf.type='bandpass';nf.frequency.value=500;nf.Q.value=.5;ng.gain.value=0;
   n.connect(nf);nf.connect(ng);ng.connect(SND.master);n.start();SND.wind={f:nf,g:ng};
 }
 function audioUpdate(dt){
@@ -1105,9 +1164,11 @@ function audioUpdate(dt){
   let vol=1,dop=1;
   if(camMode===1){const dx=S.pos.x-cam.position.x,dy=S.pos.y-cam.position.y,dz=S.pos.z-cam.position.z,dist=Math.max(1,Math.hypot(dx,dy,dz));
     vol=clamp(1.15/(1+dist/70),.1,1);dop=clamp(1/(1+(S.vel.x*dx+S.vel.y*dy+S.vel.z*dz)/dist/240),.82,1.22)}
-  SND.v.forEach((v,i)=>{const f=(q.f0+(q.f1-q.f0)*SND.rpm)*(i?q.detune:1)*dop;
-    v.o.frequency.setTargetAtTime(f,t,.03);v.o2.frequency.setTargetAtTime(f*q.whine,t,.03);v.f.frequency.setTargetAtTime(420+2500*SND.rpm,t,.05);
-    v.g.gain.setTargetAtTime(i<q.motors?(.03+.12*SND.rpm)*vol/Math.sqrt(q.motors):0,t,.05)});
+  const wob=1+.005*Math.sin(t*11.3)+.003*Math.sin(t*29.7);                 /* die Drehzahl steht nie ganz still */
+  SND.v.forEach((v,i)=>{const f=(q.f0+(q.f1-q.f0)*SND.rpm)*(i?q.detune:1)*dop*wob,on=i<q.motors?vol/Math.sqrt(q.motors):0,pl=(.012+.075*SND.rpm*SND.rpm)*on;
+    v.o.frequency.setTargetAtTime(f,t,.03);v.o2.frequency.setTargetAtTime(f*q.whine,t,.03);v.f.frequency.setTargetAtTime(380+1900*SND.rpm,t,.05);
+    v.g.gain.setTargetAtTime((.028+.085*SND.rpm)*on,t,.05);
+    v.lfo.frequency.setTargetAtTime(f,t,.03);v.pf.frequency.setTargetAtTime(700+1700*SND.rpm,t,.05);v.pg.gain.setTargetAtTime(pl,t,.05);v.ld.gain.setTargetAtTime(pl*.7,t,.05)});
   const a=clamp(S.va/d.vMax,0,1.4);SND.wind.g.gain.setTargetAtTime(S.crashed?0:a*a*.11*vol,t,.1);SND.wind.f.frequency.setTargetAtTime(280+900*a,t,.1);
 }
 function boom(k){
@@ -1133,7 +1194,7 @@ function whoosh(){
 function toggleSound(){SND.on=!SND.on;if(SND.on)audioInit();$('#b-snd').setAttribute('aria-pressed',SND.on);say(SND.on?'Ton an':'Ton aus');try{localStorage.setItem('lw-fliegen-ton',SND.on?'1':'0')}catch(e){}}
 
 /* ---------- Bild ---------- */
-const iw=$('#i-w'),iwa=$('#i-wa'),ik=$('#i-k'),ikt=$('#i-kt'),CK={el:$('#clock'),t:$('#ck-t'),g:$('#ck-g'),b:$('#ck-b')};let hudT=0,spin=0;
+const iw=$('#i-w'),iwa=$('#i-wa'),CK={el:$('#clock'),t:$('#ck-t'),g:$('#ck-g'),b:$('#ck-b')};let hudT=0,spin=0;
 /* Rundinstrumente wie im Cockpit: Fahrtmesser mit farbigen Bereichen, Höhenmesser mit zwei Zeigern, Drehzahlmesser mit Marke für die Gasstellung */
 function dial(svg,o){
   const sw=o.full?360:270,a0=o.full?0:-135,deg=v=>a0+sw*(o.full?v/o.max:clamp(v/o.max,0,1)),pt=(v,r)=>{const a=deg(v)*Math.PI/180;return [(50+r*Math.sin(a)).toFixed(2),(50-r*Math.cos(a)).toFixed(2)]};
@@ -1201,10 +1262,9 @@ function frame(dt,still){
      GA.v.set(kmh);GA.h.set(alt);GA.h.small(alt*.036);GA.n.set(rpm);GA.n.bug(GA.rpm0+(GA.rpm1-GA.rpm0)*S.thr);
      hudT+=dt;if(hudT>.1){GA.v.v.textContent=Math.round(kmh);GA.h.v.textContent=Math.round(alt);GA.n.v.textContent=(Math.round(rpm*10)/10).toFixed(1).replace('.',',')}}
     if(hudT>.1){hudT=0;touch.draw();
-      ik.textContent=(S.next+1)+'/'+COL.gates.length;ikt.textContent=S.lap0!==null?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):S.best?fmtH(S.best):'';
       /* Stoppuhr: läuft ab Tor 1, bleibt nach dem letzten Tor auf der Rundenzeit stehen */
       {const run=S.lap0!==null;CK.el.classList.toggle('run',run);CK.t.textContent=run?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):'0:00,0';
-       CK.g.textContent=run?'Tor '+(S.next+1)+'/'+COL.gates.length:S.last?(S.rank?'Platz '+S.rank:'Runde fertig'):'Start an Tor 1';CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
+       CK.g.textContent=run?'Tor '+(S.next+1)+'/'+COL.gates.length:S.last?(S.rank?'Platz '+S.rank:'Runde fertig'):coarse?'Tor 1':'Start an Tor 1';CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
       iw.textContent=Math.round(WIND.speed*3.6);iwa.style.transform='rotate('+(-(WIND.ang-Math.atan2(fwd.x,fwd.z))*180/Math.PI).toFixed(0)+'deg)'}
   }
   smoke(dt);audioUpdate(dt);
@@ -1218,7 +1278,13 @@ window.__flug={fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{upd
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
-lbLoad();if(!LB.name)askName();      /* beim ersten Start zuerst nach dem Namen fragen */
+/* Handy: Stoppuhr und die zwei wichtigsten Knöpfe wandern in die oberste Zeile, Modellwahl und Schalter ins Menü, Raketen und Heckklappe über den rechten Knüppel */
+if(coarse){const top=document.querySelector('.top');for(const id of ['clock','b-cam','b-reset','b-menu'])top.appendChild($('#'+id));
+  $('#menu-models').appendChild($('#models'));for(const id of ['b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
+  $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
+$('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'Weiterfliegen':'Losfliegen';view('menu')});
+$('#b-go2').addEventListener('click',start);
+lbLoad();if(!LB.name)askName();else if(coarse)view('menu');      /* beim ersten Start zuerst nach dem Namen fragen */
 choose(first).then(()=>{raf=requestAnimationFrame(loop)});
 })();
 </script>
