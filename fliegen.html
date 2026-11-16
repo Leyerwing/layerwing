@@ -76,6 +76,7 @@ dl{margin:0}
 .place:hover{border-color:var(--accent)}
 .place[aria-pressed="true"]{border-color:var(--accent);background:rgba(244,198,31,.12)}
 .place[aria-pressed="true"] small{color:var(--ink)}
+@media (max-width:1180px) and (pointer:fine){.acts #b-film{display:none}}      /* auf schmalen Fenstern bleibt die Taste V */
 .lights{display:flex;gap:8px;margin:0 0 6px}
 .lights .place{flex:1 1 0;min-height:44px;flex-direction:row;align-items:center;gap:8px;padding:6px 14px}
 .lights .place small{margin:0}
@@ -153,6 +154,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   #menu-places .place{flex:1 1 40%;min-height:40px;padding:6px 12px;justify-content:center}
   #menu-places .place small{display:none}
   #menu-places .lights{margin-top:6px}
+  @media (orientation:landscape){#menu-places .places:not(.lights) .place{flex:1 1 20%}}
   button,a,input,label,.act,.chip,.place,.btn{touch-action:manipulation}
   .card-in{touch-action:pan-y}
   .touch,.only-touch{display:block}
@@ -1037,7 +1039,7 @@ if(SC.grass&&GTEX.tex&&renderer.capabilities.vertexTextures){
      if(dens<0.5)return;
      float r1=fract(aB.z*7.13),r2=fract(aB.z*31.7),s=aC.y,sh=1.0+0.4*(s-1.0);
      float w=(kind<0.5?3.4:kind<1.5?3.0:3.0)*s*(0.8+0.4*r1),ht=(kind<0.5?1.5+0.8*r2+0.8*nz.a:kind<1.5?3.3+0.5*r2:2.3+0.2*r2)*sh*fade;
-     float col=kind<0.5?step(0.74,r2+(nz.b-0.5)*0.9):kind<1.5?2.0:3.0;
+     float col=kind<0.5?step(0.8,r2+(nz.b-0.5)*0.9):kind<1.5?2.0:3.0;
      float an=aB.z*6.2832,ca=cos(an),sa=sin(an);vec3 lp=vec3(position.x*ca-position.z*sa,position.y,position.x*sa+position.z*ca);
      vec3 wp=vec3(p.x+lp.x*w,h+lp.y*ht-0.06,p.y+lp.z*w);
      float sw=sin(uT*1.6+p.x*0.09+p.y*0.06)*0.55+sin(uT*2.9+p.x*0.23-p.y*0.17)*0.25+0.3;wp.xz+=uWind*sw*position.y*position.y*ht*0.16;
@@ -1057,7 +1059,7 @@ if(SC.grass&&GTEX.tex&&renderer.capabilities.vertexTextures){
      /* Halme stehen senkrecht: bei tiefer Sonne bekommen sie viel mehr Licht als der flache Boden, und gegen die Sonne leuchten sie durch */
      vec2 vd=normalize(vP-uCam.xz),sd=normalize(uSun.xz);float back=pow(max(dot(vd,sd),0.0),2.0)*(1.0-uSun.y),lowS=1.0-uSun.y;
      float dayK=smoothstep(0.25,0.7,uSun.y);ao=mix(ao,mix(0.6,1.0,y),dayK);
-     float sun=(mix(mix(0.03,0.42,dayK),mix(mix(0.24,0.36,step(0.5,vL.w)),0.86,dayK),y*y)+back*y*0.34*lowS)*vL.x*shd;
+     float sun=(mix(mix(0.03,0.42,dayK),mix(mix(0.19,0.36,step(0.5,vL.w)),0.86,dayK),y*y)+back*y*0.34*lowS)*vL.x*shd;
      gl_FragColor=vec4(alb*(uAmb*ao+uSunC*sun)*cl,1.0);
      #include <tonemapping_fragment>
      #include <encodings_fragment>
