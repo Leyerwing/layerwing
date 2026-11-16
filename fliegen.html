@@ -20,13 +20,15 @@
 <link rel="preload" href="/fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face{font-family:'DM Sans';font-style:normal;font-display:swap;font-weight:100 1000;src:url(/fonts/dm-sans-latin-opsz-normal.woff2) format('woff2')}
-:root{--paper:#151412;--surface:#1D1C19;--ink:#ECE8DF;--muted:#A6A196;--line:#33302A;--accent:#F4C61F;--accent-ink:#151412;--panel:rgba(21,20,18,.8);--panel-line:rgba(236,232,223,.16)}
+:root{--paper:#151412;--surface:#1D1C19;--ink:#ECE8DF;--muted:#A6A196;--line:#33302A;--accent:#F4C61F;--accent-ink:#151412;--panel:rgba(30,23,17,.78);--panel-line:rgba(255,228,196,.17)}
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--paper);color:var(--ink);font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;line-height:1.45;-webkit-font-smoothing:antialiased}
 [hidden]{display:none!important}
 button{font:inherit;color:inherit;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 #view{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+/* weicher, warmer Rand: lenkt den Blick zur Mitte, wie bei einem Foto im Abendlicht */
+.tone{position:fixed;inset:0;pointer-events:none;background:radial-gradient(130% 100% at 50% 44%,rgba(0,0,0,0) 56%,rgba(52,26,8,.30) 100%)}
 
 /* Kopf: Logo zurück zum Shop, rechts die Modellwahl */
 .top{position:fixed;left:0;right:0;top:0;display:flex;align-items:center;gap:16px;padding:14px max(16px,env(safe-area-inset-right)) 0 max(16px,env(safe-area-inset-left));pointer-events:none}
@@ -216,6 +218,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 </head>
 <body>
 <canvas id="view" aria-label="Flugspiel: 3D-Ansicht von Flugplatz, Tal und Bergen"></canvas>
+<div class="tone" aria-hidden="true"></div>
 <div class="vig" aria-hidden="true"></div>
 
 <div class="top">
@@ -364,15 +367,15 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=coarse?T.BasicShadowMap:
 /* ---------- Flugplätze: drei Landschaften mit eigenem Gelände, Licht, Bewuchs und Kurs. Platz und Bahn sind überall gleich.
    Der gewählte Platz steht in der Adresse (fliegen.html?platz=kueste) oder ist der zuletzt geflogene. ---------- */
 const SCENES={
- alpen:{name:'Alpental',sub:'Tal mit See, Wald und Fels',sun:[-.6,.64,.4],sunC:0xffe8c6,sunI:.98,hemi:[0xcfe0ff,0x6f7a58,.5],hor:0xD3E2EC,mid:0x7FB2DD,top:0x2C6DB6,envG:0x6E8650,fog:[1150,7000],water:-2.4,
+ alpen:{name:'Alpental',sub:'Tal mit See, Wald und Fels',sun:[.087,.24,.996],sunC:0xFFB679,sunI:2.5,hemi:[0x8EA6D0,0x5E4A36,.42],gold:{t:0xF3CFA4,g:0xFFB873,s:0xE3D5C8,a:0xB4C3D6},hor:0xE3D5C8,mid:0x8FB1D8,top:0x3C6BAD,envG:0x6E7350,fog:[900,6800],water:-2.4,
   pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
   mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.27,.07,.36,.25,.13],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
   course:[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]]},
- kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',sun:[-.72,.5,.3],sunC:0xffddb2,sunI:1.02,hemi:[0xc9dcf5,0x8a8468,.5],hor:0xE4DDD2,mid:0x86B3DC,top:0x2A62A8,envG:0x7C8A5A,fog:[1300,8200],water:-2.4,sea:true,
+ kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',sun:[-.966,.213,-.259],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x665640,.42],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x77795A,fog:[1000,7800],water:-2.4,sea:true,
   pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[70,150,380,520],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.3,.3,1],beach:[4.2,1.2],
   mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.24,.06,.34,.22,.11],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
   course:[[0,-600],[-250,-1060],[-620,-1430],[-1120,-1500],[-1520,-1120],[-1560,-560],[-1290,-60],[-960,420],[-900,960],[-560,1260],[-220,1120],[-60,700]]},
- wueste:{name:'Wüste',sub:'Tafelberge, Sand und Kakteen',sun:[-.45,.72,.5],sunC:0xfff0d4,sunI:1.06,hemi:[0xd6e2f2,0xb08a62,.52],hor:0xE9DDC9,mid:0x8DB6DA,top:0x2D6AB4,envG:0xB79468,fog:[1400,8500],water:-1e6,
+ wueste:{name:'Wüste',sub:'Tafelberge, Sand und Kakteen',sun:[.342,.268,.94],sunC:0xFFB577,sunI:2.15,hemi:[0x98AACF,0x7A5C40,.44],gold:{t:0xF6CD9C,g:0xFFAA62,s:0xEAD3BF,a:0xC0C9D8},hor:0xEAD3BF,mid:0x98B6D8,top:0x426DAB,envG:0xA88460,fog:[1100,8200],water:-1e6,
   pal:[0xB48A5C,0xC9A574,0xA6744A,0x8E7C50,0xAE7850,0xB5673F,0x86472E,0xE8D9BC,0xE4D6B8],belt:[-50,-40,9000,9001],lv:[45,170,9000,9001],rockS:[.15,.25],snow:[9000,9001],mix:[.16,0,.62,0],beach:[-900,-901],
   mow:['#C8AE80','#BFA476'],firs:0,firH:[0,0],firC:[.27,.07,.36,.25,.13],leafy:.75,leafH:[-30,70],leafS:[6,7],leafK:.47,leafC:[.17,.05,.24,.3,.1],rocks:(h,sl)=>h<120&&(sl>7||hash(h*7.3,sl*3.1)<.4),rockC:[.055,.34,.4],clouds:.55,cacti:coarse=>coarse?170:260,
   course:[[0,-600],[170,-1100],[540,-1500],[1000,-1380],[1280,-880],[1180,-320],[1360,240],[1060,760],[620,1080],[260,1240],[-40,1040],[-60,700]]}};
@@ -385,28 +388,48 @@ const cam=new T.PerspectiveCamera(55,1,1,14000);
 scene.add(new T.HemisphereLight(SC.hemi[0],SC.hemi[1],SC.hemi[2]));
 const sun=new T.DirectionalLight(SC.sunC,SC.sunI),SUN=new T.Vector3(SC.sun[0],SC.sun[1],SC.sun[2]).normalize();sun.position.copy(SUN);scene.add(sun);scene.add(sun.target);
 /* nur das Flugzeug wirft einen Schatten; die Schattenkamera wandert mit ihm mit */
+/* Goldene Stunde: der Dunst am Horizont ist zur Sonne hin golden, zur Seite cremig, von ihr weg kühl blau. Himmel, Nebel, Wolken und Wasser
+   holen ihre Farbe aus derselben Funktion, so verschwimmen ferne Berge nahtlos im Himmel. Die Farben sind so angegeben, wie sie am Bildschirm erscheinen. */
+const v3=h=>{const c=new T.Color(h);return 'vec3('+c.r.toFixed(4)+','+c.g.toFixed(4)+','+c.b.toFixed(4)+')'};
+const HZ=`const vec3 HZ_S=vec3(${SUN.x.toFixed(4)},${SUN.y.toFixed(4)},${SUN.z.toFixed(4)});
+ vec3 hazeC(vec3 d){d=normalize(d);float s=dot(d,HZ_S),k=s*0.5+0.5;
+  vec3 c=mix(${v3(SC.gold.a)},${v3(SC.gold.s)},smoothstep(0.0,0.75,k));c=mix(c,${v3(SC.gold.t)},smoothstep(0.55,1.0,k));
+  return mix(c,${v3(SC.gold.g)},pow(max(s,0.0),7.0)*0.85);}
+ vec3 toLin(vec3 c){return mix(c/12.92,pow((c+0.055)/1.055,vec3(2.4)),step(0.04045,c));}`;
+{const C=T.ShaderChunk;
+ C.fog_pars_vertex='#ifdef USE_FOG\n varying float fogDepth;varying vec3 vFogC;\n'+HZ+'\n#endif';      /* die Dunstfarbe ändert sich nur langsam mit der Blickrichtung: einmal je Eckpunkt genügt */
+ C.fog_vertex='#ifdef USE_FOG\n fogDepth=-mvPosition.z;vFogC=hazeC((vec4(mvPosition.xyz,0.0)*viewMatrix).xyz);\n#endif';
+ C.fog_pars_fragment='#ifdef USE_FOG\n uniform vec3 fogColor;varying float fogDepth;varying vec3 vFogC;\n #ifdef FOG_EXP2\n uniform float fogDensity;\n #else\n uniform float fogNear;uniform float fogFar;\n #endif\n'+HZ+'\n#endif';
+ C.fog_fragment='#ifdef USE_FOG\n float fogFactor=smoothstep(fogNear,fogFar,fogDepth);gl_FragColor.rgb=mix(gl_FragColor.rgb,vFogC,fogFactor);\n#endif';
+ /* Tonkurve: Lichter laufen weich aus statt hart abzuschneiden, Farben etwas satter */
+ C.tonemapping_pars_fragment=C.tonemapping_pars_fragment.replace('vec3 CustomToneMapping( vec3 color ) { return color; }',
+  'vec3 CustomToneMapping(vec3 c){c*=toneMappingExposure*vec3(1.05,1.0,0.9);float l=dot(c,vec3(0.2126,0.7152,0.0722));c=max(mix(vec3(l),c,1.07),0.0);vec3 x=max(c-0.68,0.0);return min(c,0.68)+0.32*(1.0-exp(-x/0.32));}');
+ renderer.toneMapping=T.CustomToneMapping;renderer.toneMappingExposure=1}
 sun.castShadow=true;sun.shadow.mapSize.set(coarse?1024:2048,coarse?1024:2048);sun.shadow.bias=-.0005;sun.shadow.normalBias=.03;sun.shadow.radius=2.5;
 function resize(){const w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
 window.addEventListener('resize',resize);window.addEventListener('orientationchange',()=>setTimeout(resize,250));if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);resize();
 
-/* Himmel: Verlauf vom dunstigen Horizont zum tiefen Blau, Sonnenscheibe mit Hof. Dieselbe Kuppel liefert die Spiegelung auf den Modellen. */
+/* Himmel der goldenen Stunde: oben tiefes Blau, zum Horizont goldener Dunst, um die tief stehende Sonne ein weiter warmer Hof.
+   Dieselbe Kuppel liefert die Spiegelung auf den Modellen. */
 let ENV=null;
-{const mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,
-  uniforms:{sun:{value:SUN},top:{value:new T.Color(SC.top)},mid:{value:new T.Color(SC.mid)},hor:{value:new T.Color(HORIZON)},gnd:{value:new T.Color(HORIZON)}},      /* nur die Spiegelung bekommt unter dem Horizont die Farbe der Wiese */
+{const lin=h=>new T.Color(h).convertSRGBToLinear();
+ const mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,
+  uniforms:{sun:{value:SUN},top:{value:lin(SC.top)},mid:{value:lin(SC.mid)},gnd:{value:lin(HORIZON)},uG:{value:0}},      /* nur die Spiegelung bekommt unter dem Horizont die Farbe der Wiese */
   vertexShader:'varying vec3 d;void main(){d=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
-  fragmentShader:`uniform vec3 sun,top,mid,hor,gnd;varying vec3 d;
+  fragmentShader:`uniform vec3 sun,top,mid,gnd;uniform float uG;varying vec3 d;
+   ${HZ}
    void main(){vec3 n=normalize(d);float h=max(n.y,0.0),s=max(dot(n,sun),0.0);
-    vec3 c=mix(hor,mid,smoothstep(0.0,0.2,h));c=mix(c,top,smoothstep(0.1,0.85,h));
+    vec3 hz=toLin(hazeC(n)),c=mix(hz,mid,smoothstep(0.0,0.24,h));c=mix(c,top,smoothstep(0.14,0.9,h));
     vec2 w=n.xz/(n.y+0.2);float ci=sin(w.x*2.3+1.7*sin(w.y*1.1+0.6))*sin(w.y*3.1+1.3*sin(w.x*0.7+2.0));
-    c=mix(c,vec3(1.0),smoothstep(0.3,1.0,ci)*smoothstep(0.05,0.28,n.y)*(1.0-smoothstep(0.7,1.0,n.y))*0.24);     // Schleierwolken
-    c+=vec3(1.0,0.86,0.62)*(pow(s,5.0)*0.08+pow(s,48.0)*0.22);
-    c=mix(c,vec3(1.0,0.97,0.9),smoothstep(0.99925,0.9997,s));
-    c=mix(c,gnd,smoothstep(0.0,-0.12,n.y));
+    c=mix(c,mix(vec3(1.0,0.9,0.8),vec3(1.0,0.72,0.45),pow(s,3.0)),smoothstep(0.3,1.0,ci)*smoothstep(0.05,0.28,n.y)*(1.0-smoothstep(0.7,1.0,n.y))*0.26);     // Schleierwolken, zur Sonne hin golden
+    c+=vec3(1.0,0.6,0.28)*(pow(s,5.0)*0.22+pow(s,36.0)*0.45)*(1.0-0.6*h);
+    c=mix(c,vec3(1.0,0.9,0.72)*1.6,smoothstep(0.99935,0.99972,s));
+    c=mix(c,mix(hz,gnd,uG),smoothstep(0.0,-0.1,n.y));
     gl_FragColor=vec4(c,1.0);
     #include <encodings_fragment>
    }`});
  const sky=new T.Mesh(new T.SphereGeometry(9000,32,18),mat);sky.renderOrder=-1;scene.add(sky);scene.userData.sky=sky;
- try{const pm=new T.PMREMGenerator(renderer),es=new T.Scene();const em=mat.clone();em.uniforms.gnd.value=new T.Color(SC.envG);es.add(new T.Mesh(new T.SphereGeometry(40,24,14),em));ENV=pm.fromScene(es,0,.1,100).texture;pm.dispose()}catch(e){ENV=null}}
+ try{const pm=new T.PMREMGenerator(renderer),es=new T.Scene();const em=mat.clone();em.uniforms.gnd.value=new T.Color(SC.envG).convertSRGBToLinear();em.uniforms.uG.value=1;es.add(new T.Mesh(new T.SphereGeometry(40,24,14),em));ENV=pm.fromScene(es,0,.1,100).texture;pm.dispose()}catch(e){ENV=null}}
 
 /* ---------- Gelände: Tal mit Landebahn, drumherum Berge ---------- */
 const hash=(x,z)=>{const s=Math.sin(x*127.1+z*311.7)*43758.5453;return s-Math.floor(s)};
@@ -528,25 +551,54 @@ const LIGHT={at:()=>1};
   f=coarse?f.replace('getShadowMask()','(getShadowMask()*vColor.r)'):f.replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directDiffuse*=vColor.r;reflectedLight.directSpecular*=vColor.r;reflectedLight.indirectDiffuse*=vColor.g;');
   q.fragmentShader=f};
  scene.add(new T.Mesh(g,tm));
- /* Wasser: kleine Wellen, flach gesehen spiegelt sich der Himmel bis zum Dunst am Horizont, die Sonne zieht eine Glitzerbahn.
-    Am Meer wird das Wasser zum Strand hin türkis, an der Wasserlinie läuft Schaum auf. */
+ /* Wasser: Die Tiefe unter jedem Punkt steht in einer kleinen Karte, gerechnet aus demselben Höhennetz wie das Gelände. Daraus entstehen
+    der weiche Übergang am Ufer, die hellere Farbe im Flachen und der Schaum an der Wasserlinie. Im zweiten Kanal steht, ob die Sonne den Punkt erreicht,
+    damit die Glitzerbahn im Bergschatten verschwindet. Gespiegelt wird die echte Landschaft (siehe mirror()); wo das nicht geht, der Himmel. */
+ /* Wellenkachel: viele Wellenzüge mit zufälliger Richtung und Phase, lange kräftig, kurze schwach wie im Meer. Ganzzahlige Wellenzahlen,
+    damit die Kachel nahtlos wiederholt. Gespeichert ist die Neigung in zwei Richtungen. */
+ const WAVES=(()=>{const N=128,a=new Uint8Array(N*N*4),W=[];for(let i=0;i<64;i++){const r=2+Math.pow(hash(i,1.7),1.6)*22,an=hash(i,3.1)*6.2832,kx=Math.round(Math.cos(an)*r),ky=Math.round(Math.sin(an)*r);if(!kx&&!ky)continue;
+   const kl=Math.hypot(kx,ky);W.push([kx,ky,.9/Math.pow(kl,1.5),hash(i,5.3)*6.2832])}
+  const n2=W.reduce((q,w)=>q+w[2]*w[2]*(w[0]*w[0]+w[1]*w[1]),0),sc=1/Math.sqrt(n2)/2.6;
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){let gx=0,gy=0;for(const [kx,ky,am,ph] of W){const s=-am*Math.sin(6.2832*(kx*x+ky*y)/N+ph);gx+=s*kx;gy+=s*ky}
+   const o=(y*N+x)*4;a[o]=clamp(128+gx*sc*127,0,255);a[o+1]=clamp(128+gy*sc*127,0,255);a[o+3]=255}
+  const t=new T.DataTexture(a,N,N,T.RGBAFormat);t.wrapS=t.wrapT=T.RepeatWrapping;t.magFilter=T.LinearFilter;t.minFilter=T.LinearMipmapLinearFilter;t.generateMipmaps=true;t.anisotropy=Math.min(4,renderer.capabilities.getMaxAnisotropy());t.needsUpdate=true;return t})();
+ const DB=SC.sea?[-6500,-6500,6500,6500]:[LAKE.x-LAKE.rx*1.35,LAKE.z-LAKE.rz*1.35,LAKE.x+LAKE.rx*1.35,LAKE.z+LAKE.rz*1.35],DX=WATER>-1e5?(SC.sea?512:256):1,DZ=WATER>-1e5?(SC.sea?512:128):1,DS=SC.sea?24:12,dd=new Uint8Array(DX*DZ*4);
+ if(WATER>-1e5)for(let j=0;j<DZ;j++)for(let i=0;i<DX;i++){const x=DB[0]+(i+.5)/DX*(DB[2]-DB[0]),z=DB[1]+(j+.5)/DZ*(DB[3]-DB[1]),o=(j*DX+i)*4;
+   dd[o]=clamp((WATER-grid(H,x,z))/DS,0,1)*255;dd[o+1]=clamp(grid(V,x,z),0,1)*255;dd[o+3]=255}
+ const dep=new T.DataTexture(dd,DX,DZ,T.RGBAFormat);dep.magFilter=dep.minFilter=T.LinearFilter;dep.needsUpdate=true;
+ const lw=h=>new T.Color(h).convertSRGBToLinear();
  const water=new T.Mesh(SC.sea?new T.PlaneGeometry(1,1):new T.CircleGeometry(1,64),new T.ShaderMaterial({transparent:true,fog:true,depthWrite:false,
-  uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{t:{value:0},uSea:{value:SC.sea?1:0},sun:{value:SUN},deep:{value:new T.Color(SC.sea?0x0E4263:0x0F3A55)},shal:{value:new T.Color(0x35999A)},sky:{value:new T.Color(SC.mid)},hor:{value:new T.Color(HORIZON)}}]),
-  vertexShader:'varying vec3 wp;varying vec2 vU;\n#include <fog_pars_vertex>\nvoid main(){vU=position.xy;vec4 w=modelMatrix*vec4(position,1.0);wp=w.xyz;vec4 mvPosition=viewMatrix*w;gl_Position=projectionMatrix*mvPosition;\n#include <fog_vertex>\n}',
-  fragmentShader:`uniform float t,uSea;uniform vec3 sun,deep,shal,sky,hor;varying vec3 wp;varying vec2 vU;
+  uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{t:{value:0},uSea:{value:SC.sea?1:0},uR:{value:0},uDS:{value:DS},uTM:{value:new T.Matrix4()},uDB:{value:new T.Vector4(DB[0],DB[1],1/(DB[2]-DB[0]),1/(DB[3]-DB[1]))},
+   sun:{value:SUN},deep:{value:lw(SC.sea?0x0F3550:0x10302B)},shal:{value:lw(SC.sea?0x2E9C98:0x3F6650)},sky:{value:lw(SC.mid)}}]),
+  vertexShader:'varying vec3 wp;\n#include <fog_pars_vertex>\nvoid main(){vec4 w=modelMatrix*vec4(position,1.0);wp=w.xyz;vec4 mvPosition=viewMatrix*w;gl_Position=projectionMatrix*mvPosition;\n#include <fog_vertex>\n}',
+  fragmentShader:`uniform float t,uSea,uR,uDS;uniform vec3 sun,deep,shal,sky;uniform sampler2D uNz,uRefl,uDep,uWv;uniform mat4 uTM;uniform vec4 uDB;varying vec3 wp;
    #include <fog_pars_fragment>
-   void main(){vec2 q=wp.xz*0.07;float cd=distance(cameraPosition,wp),amp=(1.0-smoothstep(700.0,2600.0,cd))/(1.0+cd*0.004);
-    vec3 n=normalize(vec3((sin(q.x*1.7+t*1.3)+sin(q.y*2.3-t*1.1)+0.6*sin((q.x+q.y)*4.1+t*2.0))*amp,13.0,(cos(q.y*1.9+t*1.2)+cos(q.x*2.7-t*0.9)+0.6*cos((q.x-q.y)*3.7-t*1.7))*amp));
-    vec3 v=normalize(cameraPosition-wp),r=reflect(-v,n);
-    float f=0.04+0.96*pow(1.0-max(dot(n,v),0.0),5.0),sd=max(dot(r,sun),0.0);
-    float sh=wp.x+780.0+170.0*sin(wp.z/900.0)+80.0*sin(wp.z/310.0+1.3);
-    vec3 c=mix(mix(deep,shal,uSea*smoothstep(-340.0,-12.0,sh)),mix(hor,sky,smoothstep(0.0,0.45,r.y)),clamp(f,0.0,1.0))+vec3(1.0,0.93,0.78)*(pow(sd,180.0)+0.22*pow(sd,22.0)*amp);
-    float fo=uSea*smoothstep(-44.0,-5.0,sh+7.0*sin(t*0.9+wp.z*0.03))*(0.55+0.45*sin(wp.z*0.21+sh*0.35-t*1.6));
-    c=mix(c,vec3(0.96),clamp(fo,0.0,1.0)*0.8);
-    gl_FragColor=vec4(c,mix(smoothstep(1.0,0.9,length(vU))*0.95,0.97,uSea));
+   void main(){float cd=distance(cameraPosition,wp);vec3 v=(cameraPosition-wp)/cd;
+    vec4 dm=texture2D(uDep,(wp.xz-uDB.xy)*uDB.zw);float dp=dm.r*uDS,lit=dm.g;
+    vec2 p=wp.xz;
+    /* Wellen: eine Kachel aus vielen überlagerten Wellenzügen (siehe WAVES), zweimal in verschiedener Größe und Richtung darübergezogen.
+       In der Ferne mittelt die Grafikkarte die kleinen Wellen weg, deshalb flimmert nichts. Der See liegt fast spiegelglatt, das Meer bewegt sich deutlich. */
+    vec2 g=(texture2D(uWv,p/mix(46.0,110.0,uSea)+vec2(t*0.011,t*0.006)).rg-0.5)*mix(0.10,0.42,uSea)
+          +(texture2D(uWv,mat2(0.8,-0.6,0.6,0.8)*p/mix(13.0,31.0,uSea)+vec2(-t*0.019,t*0.023)).rg-0.5)*mix(0.07,0.26,uSea);
+    g+=uSea*vec2(0.035*cos(p.x*0.09+p.y*0.03-t*0.95),0.02*cos(p.y*0.07-p.x*0.02-t*0.8));
+    float amp=1.0;
+    vec3 n=normalize(vec3(g.x*amp,1.0,g.y*amp)),r=reflect(-v,n);r.y=abs(r.y);
+    float f=0.02+0.98*pow(1.0-max(dot(n,v),0.0),5.0);
+    vec3 rf;
+    if(uR>0.5){vec4 q=uTM*vec4(wp,1.0);rf=toLin(texture2D(uRefl,q.xy/q.w+n.xz*0.12).rgb);}
+    else rf=mix(toLin(hazeC(r)),sky,smoothstep(0.02,0.4,r.y));
+    vec3 body=mix(shal,deep,1.0-exp(-dp*mix(0.35,0.16,uSea)))*(0.55+0.45*lit);
+    vec3 c=mix(body,rf,clamp(f*1.1,0.0,1.0));
+    float sd=max(dot(reflect(-v,n),sun),0.0);
+    c+=vec3(1.0,0.7,0.4)*lit*(pow(sd,900.0)*9.0+pow(sd,120.0)*0.9+pow(sd,14.0)*0.06);
+    float fn=texture2D(uNz,p/9.0+vec2(t*0.05,0.0)).r;
+    float fo=smoothstep(mix(0.5,1.3,uSea),0.0,dp)*smoothstep(0.35,0.75,fn+0.25*sin(dp*7.0-t*1.7))*mix(0.35,0.85,uSea);
+    c=mix(c,vec3(0.86,0.82,0.74)*(0.6+0.4*lit),fo);
+    float a=max(mix(0.35,0.97,smoothstep(0.0,mix(2.5,4.5,uSea),dp)),f)*smoothstep(0.0,0.25,dp);
+    gl_FragColor=vec4(c,max(a,fo));
     #include <encodings_fragment>
-    #include <fog_fragment>
-   }`}));scene.userData.water=water;
+    gl_FragColor.rgb=mix(gl_FragColor.rgb,hazeC(wp-cameraPosition),smoothstep(fogNear,fogFar,fogDepth));      // die Wasserfläche hat nur wenige Eckpunkte, der Dunst wird deshalb hier je Bildpunkt gerechnet
+   }`}));scene.userData.water=water;water.material.uniforms.uNz={value:NOISE};water.material.uniforms.uWv={value:WAVES};water.material.uniforms.uDep={value:dep};water.material.uniforms.uRefl={value:NOISE};
  water.rotation.x=-Math.PI/2;if(SC.sea){water.scale.set(18000,18000,1);water.position.set(0,WATER,0)}else{water.scale.set(LAKE.rx*1.3,LAKE.rz*1.3,1);water.position.set(LAKE.x,LAKE.y,LAKE.z)}
  if(WATER>-1e5)scene.add(water)}
 
@@ -708,11 +760,26 @@ const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.'
  /* jeder Ballen ist eine Scheibe, die sich immer zur Kamera dreht */
  const g=new T.PlaneGeometry(1,1);g.setAttribute('sh',new T.InstancedBufferAttribute(new Float32Array(sha),1));
  const m=new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:{fogC:{value:new T.Color(HORIZON)},uNz:{value:NOISE}},
-  vertexShader:'attribute float sh;varying vec2 vU;varying vec2 vN;varying float vs;varying float vf;void main(){vec4 c=modelViewMatrix*instanceMatrix*vec4(0.0,0.0,0.0,1.0);float s=length(instanceMatrix[0].xyz);vec4 mv=c+vec4(position.xy*s,0.0,0.0);vU=position.xy*2.0;vN=position.xy*0.42+instanceMatrix[3].xz*0.0031;vs=sh;vf=smoothstep(2600.0,9800.0,-mv.z);gl_Position=projectionMatrix*mv;}',
-  fragmentShader:'uniform vec3 fogC;uniform sampler2D uNz;varying vec2 vU;varying vec2 vN;varying float vs;varying float vf;void main(){vec4 nz=texture2D(uNz,vN);float d=length(vU*vec2(1.0,1.0+0.35*step(vU.y,0.0)))+(nz.r-0.5)*0.55+(nz.g-0.5)*0.2;if(d>1.0)discard;float a=smoothstep(1.0,0.5,d);vec3 c=mix(vec3(0.44,0.49,0.58),vec3(1.0),clamp(vs*0.7+vU.y*0.45+0.1+(nz.b-0.5)*0.22,0.0,1.0));c=mix(c,fogC,vf*0.85);gl_FragColor=vec4(c,a*0.82*(1.0-vf*0.45));\n#include <encodings_fragment>\n}'});
+  vertexShader:'attribute float sh;varying vec2 vU;varying vec2 vN;varying float vs;varying float vf;varying vec3 vD;void main(){vD=instanceMatrix[3].xyz-cameraPosition;vec4 c=modelViewMatrix*instanceMatrix*vec4(0.0,0.0,0.0,1.0);float s=length(instanceMatrix[0].xyz);vec4 mv=c+vec4(position.xy*s,0.0,0.0);vU=position.xy*2.0;vN=position.xy*0.42+instanceMatrix[3].xz*0.0031;vs=sh;vf=smoothstep(2600.0,9800.0,-mv.z);gl_Position=projectionMatrix*mv;}',
+  fragmentShader:'uniform vec3 fogC;uniform sampler2D uNz;varying vec2 vU;varying vec2 vN;varying float vs;varying float vf;varying vec3 vD;\n'+HZ.replace(/\n/g,' ')+'\nvoid main(){vec4 nz=texture2D(uNz,vN);float d=length(vU*vec2(1.0,1.0+0.35*step(vU.y,0.0)))+(nz.r-0.5)*0.55+(nz.g-0.5)*0.2;if(d>1.0)discard;float a=smoothstep(1.0,0.5,d);float sg=pow(max(dot(normalize(vD),HZ_S),0.0),4.0);vec3 c=mix(vec3(0.5,0.48,0.58),vec3(1.0,0.84,0.66),clamp(vs*0.7+vU.y*0.45+0.1+(nz.b-0.5)*0.22,0.0,1.0));c+=vec3(1.0,0.78,0.5)*sg*(0.12+0.7*smoothstep(0.45,1.0,d));c=mix(c,toLin(hazeC(vD)),vf*0.85);gl_FragColor=vec4(c,a*0.82*(1.0-vf*0.45));\n#include <encodings_fragment>\n}'});
  const cl=new T.InstancedMesh(g,m,siz.length),o=new T.Object3D();
  for(let i=0;i<siz.length;i++){o.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);o.scale.setScalar(siz[i]*2);o.updateMatrix();cl.setMatrixAt(i,o.matrix)}
  cl.frustumCulled=false;cl.renderOrder=1;scene.add(cl)}
+/* Schwebeteilchen: Pollen und Staub in der Luft, die im Gegenlicht der tiefen Sonne aufleuchten. Sie füllen einen Würfel um die Kamera, der mitwandert. */
+const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
+{const N=coarse?110:220,a=new Float32Array(N*3),r=new Float32Array(N);
+ for(let i=0;i<N;i++){a[i*3]=hash(i,1.3)*70;a[i*3+1]=hash(i,2.7)*70;a[i*3+2]=hash(i,4.1)*70;r[i]=hash(i,6.6)}
+ const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(a,3));g.setAttribute('rnd',new T.BufferAttribute(r,1));
+ const m=new T.ShaderMaterial({uniforms:MOTE,transparent:true,depthWrite:false,blending:T.AdditiveBlending,
+  vertexShader:`attribute float rnd;uniform float uT,uPx;uniform vec3 uC;varying float vA;
+   ${HZ}
+   void main(){vec3 p=position+vec3(sin(uT*0.3+rnd*40.0),sin(uT*0.23+rnd*17.0)*0.6+uT*0.15*(rnd-0.3),cos(uT*0.27+rnd*29.0))*3.0;
+    p=uC+mod(p-uC+35.0,70.0)-35.0;
+    vec4 mv=viewMatrix*vec4(p,1.0);float d=-mv.z,fw=pow(max(dot(normalize(p-cameraPosition),HZ_S),0.0),3.0);
+    vA=(0.1+1.2*fw)*smoothstep(1.5,5.0,d)*(1.0-smoothstep(18.0,34.0,d))*(0.55+0.45*sin(uT*1.3+rnd*50.0));
+    gl_PointSize=clamp((0.05+0.04*rnd)*uPx/max(d,0.1),1.0,5.0);gl_Position=projectionMatrix*mv;}`,
+  fragmentShader:'varying float vA;void main(){float a=smoothstep(0.5,0.1,length(gl_PointCoord-0.5))*vA;gl_FragColor=vec4(vec3(1.0,0.82,0.55)*a,a);}'});
+ const pts=new T.Points(g,m);pts.frustumCulled=false;pts.renderOrder=3;scene.add(pts)}
 /* Bäume an den unteren Hängen: geben ein Gefühl für Fahrt und Höhe */
 {const N=Math.max(1,Math.round((coarse?2600:4400)*SC.firs)),tint=(g,c)=>{g=g.toNonIndexed();g.deleteAttribute('uv');g.computeBoundingBox();const q=g.attributes.position,y0=g.boundingBox.min.y,dy=g.boundingBox.max.y-y0||1,n=q.count,a=new Float32Array(n*3),k=new T.Color(c);
   for(let i=0;i<n;i++){const sh=.6+.4*(q.getY(i)-y0)/dy;a[i*3]=k.r*sh;a[i*3+1]=k.g*sh;a[i*3+2]=k.b*sh}g.setAttribute('color',new T.BufferAttribute(a,3));return g};
@@ -739,15 +806,17 @@ const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.'
  const mat=shaded(new Tree(Object.assign({vertexColors:true,map:ft,alphaTest:.5,side:T.DoubleSide},rough)));
  const leafMat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
  const inst=new T.InstancedMesh(trunk,mat,N),d=new T.Object3D(),col=new T.Color();let n=0,tries=0;
+ /* tief stehende Sonne: die Schatten werden lang. Länge aus dem Sonnenstand, für einen kegelförmigen Baum etwas kürzer als für einen Mast */
+ const SHH=Math.hypot(SUN.x,SUN.z),SUX=SUN.x/SHH,SUZ=SUN.z/SHH,SHL=Math.min(3.2,SHH/SUN.y)*.78;
  const qYaw=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),Math.atan2(SUN.z,-SUN.x));
  /* weicher Schattenfleck unter jedem Baum, zur Sonne passend versetzt und an den Hang gelegt */
  const sc=document.createElement('canvas');sc.width=sc.height=64;const sx=sc.getContext('2d'),sg=sx.createRadialGradient(32,32,2,32,32,32);sg.addColorStop(0,'rgba(0,0,0,.55)');sg.addColorStop(.55,'rgba(0,0,0,.3)');sg.addColorStop(1,'rgba(0,0,0,0)');sx.fillStyle=sg;sx.fillRect(0,0,64,64);
  const bg=new T.PlaneGeometry(1,1);bg.rotateX(-Math.PI/2);
- const blob=new T.InstancedMesh(bg,new T.MeshBasicMaterial({map:new T.CanvasTexture(sc),transparent:true,opacity:.62,depthWrite:false,color:0x1c2a22,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),N),up=new T.Vector3(0,1,0),nrm=new T.Vector3(),o2=new T.Object3D();
+ const blob=new T.InstancedMesh(bg,new T.MeshBasicMaterial({map:new T.CanvasTexture(sc),transparent:true,opacity:.8,depthWrite:false,color:0x1a2232,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),N),up=new T.Vector3(0,1,0),nrm=new T.Vector3(),o2=new T.Object3D();
  while(SC.firs&&n<N&&tries<110000){tries++;const x=(hash(tries,1.7)-.5)*7200,z=(hash(tries,9.3)-.5)*7200,h=ground(x,z);
    if(h<SC.firH[0]||h>SC.firH[1])continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<62)continue;
    const s=22+hash(tries,4.4)*30;d.position.set(x,h+s*.5-1,z);d.scale.set(s*.6,s,s*.6);d.rotation.y=hash(tries,2.2)*6;d.updateMatrix();inst.setMatrixAt(n,d.matrix);
-   {const bx=x-SUN.x*s*.42,bz=z-SUN.z*s*.42;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(s*1.45,1,s*.72);o2.updateMatrix();blob.setMatrixAt(n,o2.matrix)}
+   {const ln=s*SHL,bx=x-SUX*ln*.45,bz=z-SUZ*ln*.45;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(ln+s*.55,1,s*.66);o2.updateMatrix();blob.setMatrixAt(n,o2.matrix)}
    col.setHSL(SC.firC[0]+hash(tries,6.1)*SC.firC[1],SC.firC[2],SC.firC[3]+hash(tries,7.7)*SC.firC[4]).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));inst.setColorAt(n,col);n++;
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.3])}
  /* Der Wald wird in Kacheln aufgeteilt: was nicht im Blickfeld liegt, wird gar nicht erst gezeichnet. Ferne Kacheln bekommen
@@ -779,7 +848,7 @@ const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.'
   while(m<NB&&tr<40000){tr++;const x=(hash(tr,12.7)-.5)*5200,z=(hash(tr,19.3)-.5)*6400,h=ground(x,z);
    if(h<SC.leafH[0]||h>SC.leafH[1])continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<70||lakeD(x,z)<1.5)continue;if(vnoise(x/150+4,z/150+8)<SC.leafK)continue;
    const s=SC.leafS[0]+hash(tr,4.4)*SC.leafS[1];d.position.set(x,h+s*.5-1,z);d.scale.set(s*(.85+hash(tr,3.1)*.4),s,s*(.85+hash(tr,5.9)*.4));d.rotation.set(0,hash(tr,2.2)*6,0);d.updateMatrix();li.setMatrixAt(m,d.matrix);lc.setMatrixAt(m,d.matrix);
-   {const bx=x-SUN.x*s*.3,bz=z-SUN.z*s*.3;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(s*1.5,1,s*1.0);o2.updateMatrix();lb.setMatrixAt(m,o2.matrix)}
+   {const ln=s*SHL*.55,bx=x-SUX*ln*.45,bz=z-SUZ*ln*.45;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(ln+s*.9,1,s*.95);o2.updateMatrix();lb.setMatrixAt(m,o2.matrix)}
    col.setHSL(SC.leafC[0]+hash(tr,6.1)*SC.leafC[1],SC.leafC[2],SC.leafC[3]+hash(tr,7.7)*SC.leafC[4]).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));li.setColorAt(m,col);lc.setColorAt(m,col);m++;
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.36])}
   split(li,m);split(lc,m);split(lb,m)}
@@ -1560,7 +1629,7 @@ function frame(dt,still){
     const h=ground(S.pos.x,S.pos.z),agl=Math.max(0,S.pos.y-P.gear-h);
     /* Schattenkamera: eng um das Flugzeug, reicht bis zum Boden */
     {const sc=sun.shadow.camera,r=Math.max(P.span,P.len)*.78+3;sun.position.copy(S.pos).addScaledVector(SUN,260);sun.target.position.copy(S.pos);sun.target.updateMatrixWorld();
-     if(sc.right!==r){sc.left=-r;sc.right=r;sc.top=r;sc.bottom=-r}sc.near=1;sc.far=420+agl*1.7;sc.updateProjectionMatrix()}
+     if(sc.right!==r){sc.left=-r;sc.right=r;sc.top=r;sc.bottom=-r}sc.near=1;sc.far=320+agl/Math.max(SUN.y,.1)*1.15;sc.updateProjectionMatrix()}
     fwd.set(0,0,-1).applyQuaternion(S.Q);
     if(camMode===0){
       /* die Kamera folgt der Flugrichtung, nicht der Fluglage: bei Rolle und Looping bleibt das Bild ruhig */
@@ -1586,7 +1655,7 @@ function frame(dt,still){
     scene.userData.water.material.uniforms.t.value=WIND.t;CSU.uCt.value=WIND.t;
     /* Anflugbefeuerung: Farbe nach dem Winkel, unter dem das Modell die Lampe sieht; sichtbar ist sie nur von der Anflugseite */
     if((QL.n&15)===0)for(const f of FOREST){const d=cam.position.distanceTo(f.c)-f.r,far=d>(f.far?620:780);if(far!==f.far){f.far=far;if(f.lo)f.m.geometry=far?f.lo:f.hi}if(f.fade)f.m.visible=d<2100}
-    LAMP.U.uT.value=WIND.t;LAMP.U.uPx.value=renderer.domElement.height/(2*Math.tan(cam.fov*Math.PI/360));
+    LAMP.U.uT.value=WIND.t;LAMP.U.uPx.value=renderer.domElement.height/(2*Math.tan(cam.fov*Math.PI/360));MOTE.uT.value=WIND.t;MOTE.uPx.value=LAMP.U.uPx.value;MOTE.uC.value.copy(cam.position);
     for(const q of PAPI){const dz=(S.pos.z-q.z)*q.e;if(dz<4&&q.k>=0)continue;
       const k=dz<4?1:clamp((Math.atan2(S.pos.y-2.5,Math.hypot(dz,S.pos.x-q.x))-q.ang)/.0024+.5,0,1);      /* am Übergang wird die Lampe kurz rosa, wie beim echten Gerät */
       if(Math.abs(k-q.k)>.03||(k!==q.k&&(k===0||k===1))){q.k=k;q.red=k<.5;const r=1,g=lerp(.14,.965,k),b=lerp(.08,.87,k);q.lm.color.setRGB(r,g,b);LAMP.col.setXYZ(q.li,r,g,b);LAMP.col.needsUpdate=true}}
@@ -1606,8 +1675,30 @@ function frame(dt,still){
   }
   smoke(dt);audioUpdate(dt);
   if(!coarse||(QL.n&1)===0)renderer.shadowMap.needsUpdate=true;QL.n++;
-  renderer.render(scene,cam);
+  mirror();renderer.render(scene,cam);
 }
+/* Spiegelung im Wasser: eine zweite Kamera steht gespiegelt unter der Wasserfläche und rechnet die Landschaft in ein kleineres Bild.
+   Was unter Wasser liegt, schneidet die schräg gestellte Nahebene ab. Am Handy halbe Bildrate und nur, solange die Qualität oben ist. */
+const REFL={on:WATER>-1e5,rt:null,cam:new T.PerspectiveCamera(),n:0,scale:coarse?.32:.5,every:coarse?2:1},RV={n:new T.Vector3(0,1,0),p:new T.Vector3(),c:new T.Vector3(),w:new T.Vector3(),la:new T.Vector3(),tg:new T.Vector3(),rot:new T.Matrix4(),m:new T.Matrix4(),pl:new T.Plane(),cp:new T.Vector4(),q:new T.Vector4(),fr:new T.Frustum()};
+function mirror(force){const w=scene.userData.water,U=w.material.uniforms;
+  if(!REFL.on||(!force&&coarse&&QL.lv>1)){U.uR.value=0;return}
+  if(!force&&(REFL.n++%REFL.every))return;
+  cam.updateMatrixWorld();const v=RV;v.c.setFromMatrixPosition(cam.matrixWorld);
+  if(v.c.y<WATER+.3){U.uR.value=0;return}
+  v.m.multiplyMatrices(cam.projectionMatrix,cam.matrixWorldInverse);v.fr.setFromProjectionMatrix(v.m);if(!force&&!v.fr.intersectsObject(w))return;
+  const W=Math.max(2,Math.round(renderer.domElement.width*REFL.scale)),H=Math.max(2,Math.round(renderer.domElement.height*REFL.scale));
+  if(!REFL.rt){REFL.rt=new T.WebGLRenderTarget(W,H,{minFilter:T.LinearFilter,magFilter:T.LinearFilter,format:T.RGBAFormat});REFL.rt.texture.encoding=T.sRGBEncoding;REFL.rt.texture.generateMipmaps=false;U.uRefl.value=REFL.rt.texture}
+  else if(REFL.rt.width!==W||REFL.rt.height!==H)REFL.rt.setSize(W,H);
+  v.p.set(v.c.x,WATER,v.c.z);v.w.subVectors(v.p,v.c).reflect(v.n).negate().add(v.p);
+  v.rot.extractRotation(cam.matrixWorld);v.la.set(0,0,-1).applyMatrix4(v.rot).add(v.c);v.tg.subVectors(v.p,v.la).reflect(v.n).negate().add(v.p);
+  const mc=REFL.cam;mc.position.copy(v.w);mc.up.set(0,1,0).applyMatrix4(v.rot).reflect(v.n);mc.lookAt(v.tg);mc.near=cam.near;mc.far=cam.far;mc.updateMatrixWorld();mc.projectionMatrix.copy(cam.projectionMatrix);
+  U.uTM.value.set(.5,0,0,.5,0,.5,0,.5,0,0,.5,.5,0,0,0,1).multiply(mc.projectionMatrix).multiply(mc.matrixWorldInverse);
+  v.pl.setFromNormalAndCoplanarPoint(v.n,v.p).applyMatrix4(mc.matrixWorldInverse);v.cp.set(v.pl.normal.x,v.pl.normal.y,v.pl.normal.z,v.pl.constant);
+  const e=mc.projectionMatrix.elements;v.q.set((Math.sign(v.cp.x)+e[8])/e[0],(Math.sign(v.cp.y)+e[9])/e[5],-1,(1+e[10])/e[14]);v.cp.multiplyScalar(2/v.cp.dot(v.q));
+  e[2]=v.cp.x;e[6]=v.cp.y;e[10]=v.cp.z+1;e[14]=v.cp.w;
+  const sky=scene.userData.sky;sky.position.copy(mc.position);w.visible=false;
+  renderer.setRenderTarget(REFL.rt);renderer.clear();renderer.render(scene,mc);renderer.setRenderTarget(null);
+  w.visible=true;sky.position.copy(cam.position);U.uR.value=1}
 const MI={v:$('#m-v'),h:$('#m-h'),w:$('#m-w'),wa:$('#m-wa'),low:false};
 /* Bildrate halten: läuft das Spiel zäh, sinkt zuerst die Auflösung, dann fällt der Schatten weg. Läuft es eine Weile leicht, geht es wieder hoch.
    Bringt das Absenken nichts (manche Geräte begrenzen selbst auf 30 Bilder), bleibt die volle Qualität. */
@@ -1622,7 +1713,7 @@ let last=0,raf=0;
 function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),ground,get plane(){return P},
+window.__flug={REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
@@ -1638,7 +1729,7 @@ $('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'We
 $('#b-go2').addEventListener('click',start);
 lbLoad();if(!LB.name)askName();else if(coarse)view('menu');      /* beim ersten Start zuerst nach dem Namen fragen */
 /* Shader übersetzen und Texturen hochladen, bevor es losgeht: sonst ruckt es beim ersten Blick auf ein Tor, beim ersten Rauch oder der ersten Rakete */
-const warm=()=>{try{scene.traverse(o=>{const m=o.material;if(!m)return;for(const k of ['map','alphaMap']){if(m[k]&&m[k].image)renderer.initTexture(m[k])}if(m.uniforms)for(const u in m.uniforms){const v=m.uniforms[u].value;if(v&&v.isTexture&&v.image)renderer.initTexture(v)}});renderer.compile(scene,cam)}catch(e){}};
+const warm=()=>{try{scene.traverse(o=>{const m=o.material;if(!m)return;for(const k of ['map','alphaMap']){if(m[k]&&m[k].image)renderer.initTexture(m[k])}if(m.uniforms)for(const u in m.uniforms){const v=m.uniforms[u].value;if(v&&v.isTexture&&v.image)renderer.initTexture(v)}});renderer.compile(scene,cam);mirror(true)}catch(e){}};
 choose(first).then(()=>{warm();raf=requestAnimationFrame(loop)});
 })();
 </script>
