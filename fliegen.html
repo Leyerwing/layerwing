@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" id="vp" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fliegen: die LayerWing-Modelle im Browser steuern | LayerWing</title>
 <meta name="description" content="Kleines Flugspiel: Starte mit BF1, Buschflugzeug, F2 oder C-160 vom Platz im Tal, flieg zwischen den Bergen und lande wieder. Läuft direkt im Browser.">
 <link rel="canonical" href="https://www.layerwing.de/fliegen.html">
@@ -142,7 +142,10 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 .pad .pb{bottom:7px;left:0;right:0;text-align:center}
 .pad .pr{right:8px;top:calc(50% + 30px)}
 @media (pointer:coarse){
-  html,body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  html,body{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+  /* kein Zoom am Handy: weder mit zwei Fingern noch durch Doppeltippen */
+  #view,.zone,.hud,.top,.pad{touch-action:none}
+  button,a,input,label,.act,.chip,.place,.btn{touch-action:manipulation}
   .card-in{touch-action:pan-y}
   .touch,.only-touch{display:block}
   .only-keys{display:none}
@@ -1047,9 +1050,25 @@ window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 /* am Handy: Vollbild, damit keine Browserleiste Platz wegnimmt, und der Bildschirm bleibt beim Fliegen an */
 let wake=null;
 function immersive(){if(!coarse)return;
-  try{const el=document.documentElement,fs=el.requestFullscreen||el.webkitRequestFullscreen;if(fs&&!document.fullscreenElement&&!document.webkitFullscreenElement){const r=fs.call(el,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}}catch(e){}
   try{if(navigator.wakeLock&&!wake)navigator.wakeLock.request('screen').then(w=>{wake=w;w.addEventListener('release',()=>{wake=null})},()=>{})}catch(e){}}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.started&&card.hidden)try{if(navigator.wakeLock&&!wake)navigator.wakeLock.request('screen').then(w=>{wake=w;w.addEventListener('release',()=>{wake=null})},()=>{})}catch(e){}});
+/* Zoom am Handy abstellen. Die Angabe im Seitenkopf allein reicht nicht: iPhones ignorieren sie. Deshalb werden die Gesten selbst abgefangen:
+   Spreizen mit zwei Fingern (auch wenn beide Daumen auf den Knüppeln liegen), Doppeltippen, und zur Sicherheit wird ein doch entstandener Zoom zurückgesetzt. */
+if(coarse){
+  for(const t of ['gesturestart','gesturechange','gestureend'])document.addEventListener(t,e=>e.preventDefault(),{passive:false});
+  document.addEventListener('touchmove',e=>{if(e.touches.length>1)e.preventDefault()},{passive:false});
+  /* auf Steuerflächen und Bild löst kein Tippen etwas im Browser aus; Knöpfe und Eingabefeld bleiben normal bedienbar */
+  for(const el of [canvas,$('#zone-l'),$('#zone-r')])el.addEventListener('touchstart',e=>e.preventDefault(),{passive:false});
+  let lastTap=0;document.addEventListener('touchend',e=>{const now=Date.now(),quick=now-lastTap<350;lastTap=now;if(quick&&!(e.target.closest&&e.target.closest('button,a,input,textarea,label,select')))e.preventDefault()      /* Knöpfe dürfen schnell hintereinander getippt werden, etwa Raketen */},{passive:false});
+  document.addEventListener('dblclick',e=>e.preventDefault());
+  const vv=window.visualViewport,vp=$('#vp'),base=vp.getAttribute('content');
+  if(vv){let busy=false;const fix=()=>{if(busy||vv.scale<1.02||(document.activeElement&&/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)))return;busy=true;
+    vp.setAttribute('content',base.replace('initial-scale=1','initial-scale=1.0001'));setTimeout(()=>{vp.setAttribute('content',base);window.scrollTo(0,0);busy=false;resize()},60)};
+   vv.addEventListener('resize',fix);vv.addEventListener('scroll',fix)}
+}
+/* Vollbild gibt es nur noch auf Wunsch: ein Knopf im Menü schaltet es ein und wieder aus */
+const fsOn=()=>!!(document.fullscreenElement||document.webkitFullscreenElement);
+function fullscreen(on){try{const el=document.documentElement;if(on){const f=el.requestFullscreen||el.webkitRequestFullscreen;if(f){const r=f.call(el);if(r&&r.catch)r.catch(()=>{})}}else{const f=document.exitFullscreen||document.webkitExitFullscreen;if(f&&fsOn()){const r=f.call(document);if(r&&r.catch)r.catch(()=>{})}}}catch(e){}}
 /* kurzer Ruck im Gerät: beim Tor ein Tippen, beim Absturz ein Schlag (wo das Gerät es kann) */
 const buzz=p=>{if(coarse)try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 
@@ -1612,6 +1631,8 @@ updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
 /* Handy: Stoppuhr und die zwei wichtigsten Knöpfe wandern in die oberste Zeile, Modellwahl und Schalter ins Menü, Raketen und Heckklappe über den rechten Knüppel */
 if(coarse){const top=document.querySelector('.top'),tl=document.createElement('div');tl.className='tl';tl.appendChild($('#clock'));tl.appendChild($('#mini'));top.appendChild(tl);for(const id of ['b-reset','b-menu'])top.appendChild($('#'+id));
   $('#menu-places').appendChild($('#places'));$('#menu-models').appendChild($('#models'));for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
+  if(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen){const b=document.createElement('button');b.type='button';b.className='act';b.id='b-full';b.textContent='Vollbild';b.setAttribute('aria-pressed','false');
+   b.addEventListener('click',()=>fullscreen(!fsOn()));for(const t of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(t,()=>{b.setAttribute('aria-pressed',fsOn()?'true':'false');setTimeout(resize,200)});$('#menu-acts').appendChild(b)}
   $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
 $('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'Weiterfliegen':'Losfliegen';view('menu')});
 $('#b-go2').addEventListener('click',start);
