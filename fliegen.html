@@ -41,9 +41,11 @@ button{font:inherit;color:inherit;cursor:pointer}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
 /* Instrumente unten links */
-.inst{position:fixed;left:max(16px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom));display:flex;align-items:center;gap:9px;padding:9px 11px;background:linear-gradient(#2A2825,#161513);border:1px solid rgba(255,255,255,.09);border-radius:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 12px 30px rgba(0,0,0,.34)}
-.inst svg{width:126px;height:126px;display:block;flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
-.inst #g-w{width:94px;height:94px}
+/* Instrumente: frei stehende Rundinstrumente mit Gehäusering und Schrauben, darunter nur ein weicher Schatten */
+.inst{position:fixed;left:max(18px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:10px;pointer-events:none}
+.inst svg{width:132px;height:132px;display:block;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)) drop-shadow(0 1px 2px rgba(0,0,0,.6))}
+.inst #g-w{width:100px;height:100px}
+@media (max-width:1250px) and (pointer:fine){.inst{gap:7px}.inst svg{width:104px;height:104px}.inst #g-w{width:80px;height:80px}}      /* schmale Fenster: kleinere Instrumente, damit sie nicht unter die Knöpfe geraten */
 .gM{stroke:#F2EEE5;stroke-width:1.45;stroke-linecap:round}
 .gm{stroke:rgba(236,232,223,.5);stroke-width:.75}
 .gt{fill:#F2EEE5;font-size:7.6px;font-weight:600;text-anchor:middle;dominant-baseline:central}
@@ -51,7 +53,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .gv{fill:#F2EEE5;font-size:10.6px;font-weight:700;text-anchor:middle;font-variant-numeric:tabular-nums}
 .gu{fill:#A6A196;font-size:4.9px;text-anchor:middle}
 .ga{fill:none;stroke-width:2.4}
-.gn{fill:#F4C61F}.gn2{fill:#ECE8DF}.gs{fill:#000;opacity:.5}.gb{fill:#ECE8DF;stroke:#0A0908;stroke-width:.5}
+.gn{fill:#F4F1EA}.gn2{fill:#ECE8DF}.gs{fill:#000;opacity:.5}.gb{fill:#ECE8DF;stroke:#0A0908;stroke-width:.5}
 .warr{display:inline-block;margin-left:9px;font-style:normal;font-size:20px;line-height:1;color:var(--accent);transition:transform .25s}
 .act[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 .act[aria-pressed="true"] kbd{color:inherit}
@@ -76,7 +78,7 @@ dl{margin:0}
 .place:hover{border-color:var(--accent)}
 .place[aria-pressed="true"]{border-color:var(--accent);background:rgba(244,198,31,.12)}
 .place[aria-pressed="true"] small{color:var(--ink)}
-@media (max-width:1180px) and (pointer:fine){.acts #b-film{display:none}}      /* auf schmalen Fenstern bleibt die Taste V */
+@media (max-width:1400px) and (pointer:fine){.acts #b-film{display:none}}      /* auf schmalen Fenstern bleibt die Taste V */
 .lights{display:flex;gap:8px;margin:0 0 6px}
 .lights .place{flex:1 1 0;min-height:44px;flex-direction:row;align-items:center;gap:8px;padding:6px 14px}
 .lights .place small{margin:0}
@@ -342,22 +344,22 @@ const K=.01;                       /* Maßstab: eine Einheit in der Welt sind 10
 
 /* Modelle: Schwerpunkt (x, z in mm), Ruderachsen und Luftschrauben wie in der 3D-Ansicht der Startseite, dazu Flugwerte: Abreißgeschwindigkeit, Höchstfahrt, Schub zu Gewicht, Roll- und Gierrate, Drehmoment der Luftschraube, Eigenstabilität um die Längsachse */
 const PLANES=[
- {id:'bf1',name:'BF1',pivot:[153,35],vS:16,vMax:58,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.008,wash:1,belly:true,
+ {id:'bf1',name:'BF1',pivot:[153,35],vS:16,vMax:68,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.008,wash:1,belly:true,
   HINGE:{Querruder_rechts:[[212,125-3.5*S5,30+3.5*C5],[0,C5,S5]],Querruder_links:[[212,-(125-3.5*S5),30+3.5*C5],[0,-C5,S5]],Ruder_rechts:[[480,10.95,14.54],[0,.819,.574]],Ruder_links:[[480,-10.95,14.54],[0,-.819,.574]]},
   CTL:/^(Querruder|Ruder)_/,MAT:{Motor_A2212:'dark',Haube:'glass'},props:[[80,-37,0,0,2,true]],
   snd:{f0:56,f1:188,motors:1,detune:1,whine:4.02},
   controls:(set,r)=>{set('Querruder_rechts',-r.da);set('Querruder_links',-r.da);set('Ruder_rechts',-(r.de+r.dr));set('Ruder_links',r.de-r.dr)}},
- {id:'busch',name:'Buschflugzeug',pivot:[275,30],vS:13.5,vMax:48,twr:.8,roll:2.5,yaw:1.2,tq:.25,dih:.45,ar:6.5,wo:.02,wash:1,tail:true,
+ {id:'busch',name:'Buschflugzeug',pivot:[275,30],vS:13.5,vMax:56,twr:.8,roll:2.5,yaw:1.2,tq:.25,dih:.45,ar:6.5,wo:.02,wash:1,tail:true,
   HINGE:{Querruder_R:[[373.5,0,108],[0,1,0]],Querruder_L:[[373.5,0,108],[0,1,0]],Hoehenruder_R:[[815,0,40],[0,1,0]],Hoehenruder_L:[[815,0,40],[0,1,0]],Seitenruder:[[815,0,0],[0,0,1]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Rad_R:'dark',Rad_L:'dark',Sporn:'dark'},wheels:/^(Rad|Felge)_/,props:[[152,-17,0,0,2,false]],
   snd:{f0:40,f1:132,motors:1,detune:1,whine:3.01},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
- {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:24.5,vMax:100,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,ar:2.4,wo:0,wash:0,belly:true,
+ {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:24.5,vMax:118,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,ar:2.4,wo:0,wash:0,belly:true,
   HINGE:{QR_R:[[765.13,160,-.83],[.1574,.9875,-.009]],QR_L:[[765.13,-160,-.83],[-.1574,.9875,.009]],HR_R:[[993.74,52,-6],[.4838,.8752,0]],HR_L:[[993.74,-52,-6],[-.4838,.8752,0]]},
   CTL:/^(QR|HR)_/,MAT:{Motor:'dark',Spinner:'dark',Schiene_R:'dark',Schiene_L:'dark',Haube_Glas_Druck:'glass'},props:[[101.6,1124,0,0,2,false]],
   snd:{f0:72,f1:262,motors:1,detune:1,whine:5.03},
   controls:(set,r)=>{set('QR_R',-r.da);set('QR_L',r.da);set('HR_R',-r.de);set('HR_L',-r.de)}},
- {id:'c160',name:'C-160',ramp:'Heckklappe',open:/^(Rumpf_[345]|Heckklappe)$/,pivot:[461,35],vS:20,vMax:64,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,ar:9,wo:.012,wash:.5,belly:true,
+ {id:'c160',name:'C-160',ramp:'Heckklappe',open:/^(Rumpf_[345]|Heckklappe)$/,pivot:[461,35],vS:20,vMax:75,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,ar:9,wo:.012,wash:.5,belly:true,
   HINGE:{Heckklappe:[[706.67,0,-35.33],[0,1,0]],Hoehenruder_L:[[981.33,-60,42.67],[0,1,0]],Hoehenruder_R:[[981.33,60,42.67],[0,1,0]],Querruder_L:[[535,-488,81.3],[.0022,.99954,-.0303]],Querruder_R:[[535,488,81.3],[.0022,.99954,.0303]],Seitenruder:[[985.07,0,56.67],[.3098,0,.9508]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder|Riegel)/,MAT:{Motor_R:'dark',Motor_L:'dark',Regler_R:'dark',Servo_Quer_R:'dark',Regler_L:'dark',Servo_Quer_L:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Heckklappe:'dark',Empfaenger:'dark',Akku:'dark'},
   props:[[101.6,299.5,180,45,2,false],[101.6,299.5,-180,45,2,false]],
@@ -381,7 +383,7 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=coarse?T.BasicShadowMap:
 const SCENES={
  felder:{name:'Felder',sub:'Raps, Wiesen und Hecken',L:{abend:{sun:[-.81,.2,-.55],sunC:0xFFB272,sunI:2.7,hemi:[0x8FA5CC,0x5A4A34,.34],gold:{t:0xF7CE9C,g:0xFFAE62,s:0xE2D2C6,a:0xAEBDD2},hor:0xE2D2C6,mid:0x8CAAD0,top:0x3A64A2,envG:0x5E6A3C,fog:[1500,8600],tint:[1.05,1,.9]},
    tag:{sun:[-.46,.72,-.52],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6F7A4C,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x6E8A34,fog:[1500,8600],tint:[1,1,1]}},water:-2.4,fields:true,grass:[-60,-59,330,420],
-  pal:[0x3A6626,0x58852F,0x7E8C3C,0x2A4722,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[78,150,9000,9001],lv:[9000,9001,9000,9001],rockS:[.4,.55],snow:[9000,9001],mix:[.5,0,.24,0],beach:[1.5,-1.5],
+  pal:[0x3A6626,0x58852F,0x6C8A38,0x2A4722,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[78,150,9000,9001],lv:[9000,9001,9000,9001],rockS:[.4,.55],snow:[9000,9001],mix:[.5,0,.24,0],beach:[1.5,-1.5],
   mow:['#76A04C','#699544'],firs:.22,firH:[90,420],firC:[.27,.07,.36,.22,.12],leafy:1.7,leafH:[-1,330],leafS:[15,13],leafK:.5,leafC:[.25,.07,.42,.21,.1],rocks:()=>false,rockC:[.09,.05,.42],clouds:.45,
   course:[[0,-600],[-170,-1080],[-520,-1440],[-1020,-1460],[-1400,-1100],[-1470,-540],[-1250,-20],[-960,440],[-820,960],[-470,1260],[-150,1100],[-60,700]]},
  alpen:{name:'Alpental',sub:'Tal mit See, Wald und Fels',L:{abend:{sun:[.087,.24,.996],sunC:0xFFB679,sunI:2.5,hemi:[0x8EA6D0,0x5E4A36,.36],gold:{t:0xF3CFA4,g:0xFFB873,s:0xE3D5C8,a:0xB4C3D6},hor:0xE3D5C8,mid:0x8FB1D8,top:0x3C6BAD,envG:0x6E7350,fog:[900,6800],tint:[1.05,1,.9]},tag:{sun:[-.52,.7,.49],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6A7550,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x5E7D3A,fog:[1300,7600],tint:[1,1,1]}},water:-2.4,
@@ -607,7 +609,7 @@ const LIGHT={at:()=>1},GTEX={tex:null,p:new T.Vector4()};
   f=f.replace('#include <color_fragment>',`vec2 P=vWp.xz;float hh=vWp.y;
    vec4 nA=texture2D(uNz,P/2300.0),nB=texture2D(uNz,P/410.0+0.37),nC=texture2D(uNz,P/83.0+0.11),nD=texture2D(uNz,P/34.0,0.8);
    float camD=distance(cameraPosition,vWp),tNear=1.0-smoothstep(60.0,520.0,camD),slope=1.0-normalize(vWn).y;
-   vec3 tc=mix(uGa,uGb,smoothstep(0.25,0.75,nA.r));tc=mix(tc,uGd,smoothstep(0.45,0.9,nB.r)*0.5);tc*=(0.84+0.32*nC.b)*uVeg;
+   vec3 tc=mix(uGa,uGb,smoothstep(0.25,0.75,nA.r));tc=mix(tc,uGd,smoothstep(0.45,0.9,nB.r)*0.5);tc*=(0.9+0.2*nC.b)*uVeg;
    float belt=smoothstep(uBelt.x,uBelt.y,hh)*(1.0-smoothstep(uBelt.z,uBelt.w,hh+(nB.g-0.5)*90.0));tc=mix(tc,uFo,belt*(uMix.x-0.05+uMix.x*nB.g));
    tc=mix(tc,uSc,smoothstep(uLv.x,uLv.y,hh+nB.g*90.0)*0.8);
    float rk=max(smoothstep(uRs.x,uRs.y,slope+(nB.b-0.5)*0.2+(nA.b-0.5)*0.1),smoothstep(uLv.z,uLv.w,hh+nB.r*90.0));
@@ -617,6 +619,7 @@ const LIGHT={at:()=>1},GTEX={tex:null,p:new T.Vector4()};
    tc=mix(tc,uSh,max(step(length((P-uLake.xy)/uLake.zw),${SC.fields?'1.2':'1.6'}),uMix.w*(1.0-smoothstep(60.0,230.0,P.x+780.0+170.0*sin(P.y/900.0)+80.0*sin(P.y/310.0+1.3))))*smoothstep(uBeach.x,uBeach.y,hh+(nB.r-0.5)*uMix.w*3.0)*(1.0-rk));
    {float fl=(1.0-smoothstep(10.0,34.0,hh))*(1.0-rk);vec2 cl=floor((P+(nB.gb-0.5)*130.0)/vec2(340.0,250.0));float pr=fract(sin(dot(cl,vec2(12.9898,78.233)))*43758.5453);
     tc=mix(tc,tc*mix(vec3(0.84,0.9,0.8),vec3(1.14,1.08,0.84),pr),fl*uMix.y);}
+   float veg=(1.0-rk)*(1.0-sn);
    ${FLD.on?`{vec4 lu=landuse(P);float e=lu.y,sft=camD*0.0026;
     float fm=(1.0-smoothstep(52.0,70.0,hh+(nB.g-0.5)*20.0))*(1.0-rk)*smoothstep(1.2,1.45,length((P-uLake.xy)/uLake.zw));
     float crop=smoothstep(0.4,2.6+sft*2.0,e)*fm;
@@ -627,8 +630,10 @@ const LIGHT={at:()=>1},GTEX={tex:null,p:new T.Vector4()};
     else if(lu.x>2.5){fc=mix(vec3(0.3,0.21,0.14),vec3(0.4,0.3,0.2),nC.g)*(0.8+0.4*rw)*(0.88+0.24*nA.a);}
     else if(lu.x>1.5){fc=mix(vec3(0.17,0.33,0.09),vec3(0.27,0.41,0.13),nB.a*0.55+lu.z*0.45)*(0.9+0.2*rw);fc=mix(fc,fc*vec3(0.6,0.58,0.5),tl)*uVeg;}
     else if(lu.x>0.5){vec3 ye=mix(vec3(0.74,0.62,0.035),vec3(0.6,0.57,0.05),nC.r*0.7+nB.b*0.3);fc=mix(ye,vec3(0.2,0.31,0.06),smoothstep(0.5,0.9,nC.g)*0.3+0.1);fc=mix(fc,vec3(0.16,0.24,0.06),tl*0.9);fc=mix(fc,vec3(0.2,0.24,0.05),(1.0-smoothstep(60.0,240.0,camD))*0.7)*mix(uVeg,1.0,0.35);}
+    if(lu.x>2.5)veg*=1.0-crop;
     tc=mix(tc,fc,crop);}`:''}
-   tc*=mix(1.0,0.8+0.4*nD.a,tNear*(1.0-sn));
+   tc*=mix(1.0,0.87+0.26*nD.a,tNear*(1.0-sn));
+   ${SC.grass?`tc*=mix(1.0,0.72,(1.0-smoothstep(${coarse?'46.0':'60.0'},${coarse?'92.0':'122.0'},camD))*veg);`:''}
    ${coarse?'':'tc*=mix(1.0,0.86+0.28*texture2D(uNz,P/6.3,0.4).g,(1.0-smoothstep(12.0,150.0,camD))*(1.0-sn)*(1.0-rk));'}
    diffuseColor.rgb*=tc*(1.0-0.3*texture2D(uCs,(P+vec2(uCt*7.0,uCt*3.0))/4300.0).r);`);
   /* Relief: die Neigung kommt aus drei Abtastungen des Rauschens, nicht aus Bildschirm-Ableitungen; so bleibt der Fels auch in der Ferne ruhig */
@@ -638,7 +643,7 @@ const LIGHT={at:()=>1},GTEX={tex:null,p:new T.Vector4()};
     ${coarse?'':'gr+=vec2(texture2D(uNz,(P+vec2(0.3,0.0))/34.0,0.8).a-nD.a,texture2D(uNz,(P+vec2(0.0,0.3))/34.0,0.8).a-nD.a)*(4.5*tNear);'}
     normal=normalize(normal-(viewMatrix*vec4(gr.x,0.0,gr.y,0.0)).xyz);}`);
   /* das gespeicherte Licht: im Bergschatten bleibt nur das Himmelslicht, in Mulden etwas weniger davon */
-  f=coarse?f.replace('getShadowMask()','(getShadowMask()*vColor.r)'):f.replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directDiffuse*=vColor.r;reflectedLight.directSpecular*=vColor.r;reflectedLight.indirectDiffuse*=vColor.g;');
+  f=coarse?f.replace('getShadowMask()','(getShadowMask()*vColor.r)'):f.replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directDiffuse*=vColor.r;reflectedLight.directSpecular*=vColor.r*(1.0-0.92*veg);reflectedLight.indirectDiffuse*=vColor.g;');
   q.fragmentShader=f};
  scene.add(new T.Mesh(g,tm));
  /* Wasser: Die Tiefe unter jedem Punkt steht in einer kleinen Karte, gerechnet aus demselben Höhennetz wie das Gelände. Daraus entstehen
@@ -668,17 +673,17 @@ const LIGHT={at:()=>1},GTEX={tex:null,p:new T.Vector4()};
     vec2 p=wp.xz;
     /* Wellen: eine Kachel aus vielen überlagerten Wellenzügen (siehe WAVES), zweimal in verschiedener Größe und Richtung darübergezogen.
        In der Ferne mittelt die Grafikkarte die kleinen Wellen weg, deshalb flimmert nichts. Der See liegt fast spiegelglatt, das Meer bewegt sich deutlich. */
-    vec2 g=(texture2D(uWv,p/mix(46.0,110.0,uSea)+vec2(t*0.011,t*0.006)).rg-0.5)*mix(0.10,0.42,uSea)
-          +(texture2D(uWv,mat2(0.8,-0.6,0.6,0.8)*p/mix(13.0,31.0,uSea)+vec2(-t*0.019,t*0.023)).rg-0.5)*mix(0.07,0.26,uSea);
+    vec2 g=(texture2D(uWv,p/mix(46.0,110.0,uSea)+vec2(t*0.014,t*0.008)).rg-0.5)*mix(0.24,0.56,uSea)
+          +(texture2D(uWv,mat2(0.8,-0.6,0.6,0.8)*p/mix(13.0,31.0,uSea)+vec2(-t*0.024,t*0.029)).rg-0.5)*mix(0.15,0.32,uSea);
     g+=uSea*vec2(0.035*cos(p.x*0.09+p.y*0.03-t*0.95),0.02*cos(p.y*0.07-p.x*0.02-t*0.8));
     float amp=1.0;
     vec3 n=normalize(vec3(g.x*amp,1.0,g.y*amp)),r=reflect(-v,n);r.y=abs(r.y);
-    float f=0.02+0.98*pow(1.0-max(dot(n,v),0.0),5.0);
+    float f=0.1+0.9*pow(1.0-max(dot(n,v),0.0),3.2);      // spiegelt schon bei steilem Blick deutlich
     vec3 rf;
-    if(uR>0.5){vec4 q=uTM*vec4(wp,1.0);rf=toLin(texture2D(uRefl,q.xy/q.w+n.xz*0.12).rgb);}
+    if(uR>0.5){vec4 q=uTM*vec4(wp,1.0);rf=toLin(texture2D(uRefl,q.xy/q.w+n.xz*0.16).rgb);}
     else rf=mix(toLin(hazeC(r)),sky,smoothstep(0.02,0.4,r.y));
     vec3 body=mix(shal,deep,1.0-exp(-dp*mix(0.35,0.16,uSea)))*(0.55+0.45*lit);
-    vec3 c=mix(body,rf,clamp(f*1.1,0.0,1.0));
+    vec3 c=mix(body,rf,clamp(f*1.15,0.0,1.0));
     float sd=max(dot(reflect(-v,n),sun),0.0);
     c+=vec3(1.0,0.7,0.4)*lit*(pow(sd,900.0)*9.0+pow(sd,120.0)*0.9+pow(sd,14.0)*0.06);
     float fn=texture2D(uNz,p/9.0+vec2(t*0.05,0.0)).r;
@@ -1003,19 +1008,21 @@ if(SC.grass&&GTEX.tex&&renderer.capabilities.vertexTextures){
   const NQ=coarse?2:3,pos=[],uv=[],idx=[];
   for(let q=0;q<NQ;q++){const a=q*Math.PI/NQ,cx=Math.cos(a)*.5,cz=Math.sin(a)*.5,o=q*4;const lx=-cz*.7*(q%2?-1:1),lz=cx*.7*(q%2?-1:1);pos.push(-cx,0,-cz, cx,0,cz, cx+lx,1,cz+lz, -cx+lx,1,-cz+lz);uv.push(0,0,1,0,1,1,0,1);idx.push(o,o+1,o+2,o,o+2,o+3)}
   const g=new T.InstancedBufferGeometry();g.setAttribute('position',new T.Float32BufferAttribute(pos,3));g.setAttribute('uv',new T.Float32BufferAttribute(uv,2));g.setIndex(idx);
-  /* Ringe: [Anzahl, Kantenlänge der wandernden Kachel, Größe]. Aus großer Höhe verschwinden die Büschel, dort trägt die Bodenfarbe allein */
-  const rings=coarse?[[9500,190,1],[5300,560,2.6]]:[[30000,250,1],[16000,720,2.6]],N=rings.reduce((q,r)=>q+r[0],0),aB=new Float32Array(N*3),aC=new Float32Array(N*2);
+  /* Ringe: [Anzahl, Kantenlänge der wandernden Kachel, Größe, ab welcher Entfernung, wie stark von Anfang an zur Bodenfarbe gemischt].
+     Die äußeren Ringe beginnen erst dort, wo der innere ausläuft, und nehmen mit der Entfernung die Farbe des Bodens an: so bleibt die Wiese
+     auch aus der Höhe ein geschlossener Teppich, ohne dass einzelne Büschel unruhig hervorstechen. */
+  const rings=coarse?[[9500,190,1,0,0],[4600,560,2.6,42,.72],[2400,1500,6.5,150,.94]]:[[30000,250,1,0,0],[14000,720,2.6,55,.72],[9000,1900,6.5,190,.94]],N=rings.reduce((q,r)=>q+r[0],0),aB=new Float32Array(N*3),aC=new Float32Array(N*4);
   /* gemischt ablegen, damit sich die Menge gleichmäßig ausdünnen lässt */
   {const ord=[];rings.forEach((r,k)=>{for(let i=0;i<r[0];i++)ord.push(k)});for(let i=N-1;i>0;i--){const j=Math.floor(hash(i,91.7)*(i+1)),t=ord[i];ord[i]=ord[j];ord[j]=t}
-   for(let i=0;i<N;i++){aB[i*3]=hash(i,41.3);aB[i*3+1]=hash(i,57.9);aB[i*3+2]=hash(i,73.1);aC[i*2]=rings[ord[i]][1];aC[i*2+1]=rings[ord[i]][2]}}
-  g.setAttribute('aB',new T.InstancedBufferAttribute(aB,3));g.setAttribute('aC',new T.InstancedBufferAttribute(aC,2));g.instanceCount=N;
-  const hs=new T.Color(SC.hemi[0]),hg=new T.Color(SC.hemi[1]),amb=hg.clone().lerp(hs,.72).multiplyScalar(SC.hemi[2]),sc=new T.Color(SC.sunC).multiplyScalar(SC.sunI),G=SC.grass;
+   for(let i=0;i<N;i++){aB[i*3]=hash(i,41.3);aB[i*3+1]=hash(i,57.9);aB[i*3+2]=hash(i,73.1);const r=rings[ord[i]];aC[i*4]=r[1];aC[i*4+1]=r[2];aC[i*4+2]=r[3];aC[i*4+3]=r[4]}}
+  g.setAttribute('aB',new T.InstancedBufferAttribute(aB,3));g.setAttribute('aC',new T.InstancedBufferAttribute(aC,4));g.instanceCount=N;
+  const hs=new T.Color(SC.hemi[0]),hg=new T.Color(SC.hemi[1]),amb=hg.clone().lerp(hs,.72).multiplyScalar(SC.hemi[2]),ambUp=hs.clone().multiplyScalar(SC.hemi[2]),sc=new T.Color(SC.sunC).multiplyScalar(SC.sunI),G=SC.grass;
   const U={uT:{value:0},uCam:{value:new T.Vector3()},uFw:{value:new T.Vector3()},uH:{value:GTEX.tex},uHp:{value:GTEX.p},uTex:{value:tex},uNz:{value:NOISE},uCs:CSU.uCs,uAmb:{value:amb},uSunC:{value:sc},uSun:{value:SUN},
-    uShM:{value:new T.Matrix4()},uShT:{value:null},uShOn:{value:0},uWind:{value:new T.Vector2(1,0)},uLake:{value:new T.Vector4(LAKE.x,LAKE.z,LAKE.rx,LAKE.rz)},uGa:{value:new T.Color(SC.pal[0])},uGb:{value:new T.Color(SC.pal[1])}};
+    uShM:{value:new T.Matrix4()},uShT:{value:null},uShOn:{value:0},uWind:{value:new T.Vector2(1,0)},uLake:{value:new T.Vector4(LAKE.x,LAKE.z,LAKE.rx,LAKE.rz)},uGa:{value:new T.Color(SC.pal[0])},uGb:{value:new T.Color(SC.pal[1])},uGd:{value:new T.Color(SC.pal[2])},uAmbUp:{value:ambUp},uVeg:{value:DAY?.9:.6}};
   if(FLD.on)U.uRnd={value:FLD.tex};
   const m=new T.ShaderMaterial({uniforms:U,side:T.DoubleSide,
-   vertexShader:`attribute vec3 aB;attribute vec2 aC;uniform float uT;uniform vec3 uCam,uFw,uSun,uGa,uGb;uniform sampler2D uH,uNz;uniform vec4 uHp,uLake;uniform mat4 uShM;uniform vec2 uWind;
-    varying vec2 vUv;varying vec3 vTint;varying vec4 vSh;varying vec4 vL;varying vec2 vP;
+   vertexShader:`attribute vec3 aB;attribute vec4 aC;uniform float uT,uVeg;uniform vec3 uCam,uFw,uSun,uGa,uGb,uGd,uAmbUp,uSunC;uniform sampler2D uH,uNz;uniform vec4 uHp,uLake;uniform mat4 uShM;uniform vec2 uWind;
+    varying vec2 vUv;varying vec3 vTint;varying vec4 vSh;varying vec4 vL;varying vec2 vP;varying vec4 vG;
     ${FLD.on?LUSE:''}
     vec4 gnd(vec2 g){return texture2D(uH,(g+0.5)/uHp.w);}
     void main(){float L=aC.x;vec2 p=aB.xy*L;p=uCam.xz+mod(p-uCam.xz+L*0.5,L)-L*0.5;
@@ -1026,7 +1033,7 @@ if(SC.grass&&GTEX.tex&&renderer.capabilities.vertexTextures){
      vec4 a=gnd(gi),b=gnd(gi+vec2(0.0,1.0)),d=gnd(gi+vec2(1.0,0.0)),c=gnd(gi+vec2(1.0,1.0)),hv;vec2 gr;
      if(gf.x+gf.y<1.0){hv=a+(d-a)*gf.x+(b-a)*gf.y;gr=vec2(d.r-a.r,b.r-a.r)/cs;}else{hv=c+(b-c)*(1.0-gf.x)+(d-c)*(1.0-gf.y);gr=vec2(c.r-b.r,c.r-d.r)/cs;}
      float h=hv.r,dist=length(vec3(p.x-uCam.x,h-uCam.y,p.y-uCam.z));
-     float fade=(1.0-smoothstep(0.3,0.47,dist/L))*(1.0-smoothstep(mix(34.0,20.0,step(1.5,aC.y)),mix(78.0,50.0,step(1.5,aC.y)),uCam.y-h));if(fade<=0.0)return;
+     float fade=(1.0-smoothstep(0.3,0.47,dist/L))*smoothstep(aC.z*0.8,aC.z*1.7+0.01,dist+0.01);if(fade<=0.0)return;
      /* was wächst hier? Art: 0 Gras, 1 Raps, 2 Getreide */
      float kind=0.0,dens=1.0;vec4 nz=texture2D(uNz,p/410.0+0.37);
      float mead=smoothstep(${G[0].toFixed(1)},${G[1].toFixed(1)},h)*(1.0-smoothstep(${G[2].toFixed(1)},${G[3].toFixed(1)},h+(nz.g-0.5)*60.0))*(1.0-smoothstep(0.2,0.34,length(gr)+(nz.b-0.5)*0.1));
@@ -1035,32 +1042,36 @@ if(SC.grass&&GTEX.tex&&renderer.capabilities.vertexTextures){
      dens*=mead*smoothstep(${SC.fields?'1.22':'1.62'},${SC.fields?'1.32':'1.75'},length((p-uLake.xy)/uLake.zw));
      ${SC.sea?'dens*=smoothstep(40.0,120.0,p.x+780.0+170.0*sin(p.y/900.0)+80.0*sin(p.y/310.0+1.3));':''}
      vec2 ar=abs(p);if((ar.x<${(RW.wid/2+43).toFixed(1)}&&ar.y<${(RW.len/2+41).toFixed(1)})||(p.x>40.0&&p.x<146.0&&p.y>136.0&&p.y<378.0))dens=0.0;
-     if(kind<0.5)dens*=step(0.12,aB.z+(nz.r-0.5)*0.5);            // Wiese: hier und da eine Lücke
      if(dens<0.5)return;
-     float r1=fract(aB.z*7.13),r2=fract(aB.z*31.7),s=aC.y,sh=1.0+0.4*(s-1.0);
-     float w=(kind<0.5?3.4:kind<1.5?3.0:3.0)*s*(0.8+0.4*r1),ht=(kind<0.5?1.5+0.8*r2+0.8*nz.a:kind<1.5?3.3+0.5*r2:2.3+0.2*r2)*sh*fade;
-     float col=kind<0.5?step(0.8,r2+(nz.b-0.5)*0.9):kind<1.5?2.0:3.0;
+     float r1=fract(aB.z*7.13),r2=fract(aB.z*31.7),s=aC.y,sh=1.0+0.24*(s-1.0);
+     float w=(kind<0.5?2.9:2.8)*s*(0.8+0.4*r1),ht=(kind<0.5?0.62+0.3*r2+0.3*nz.a:kind<1.5?1.9+0.3*r2:1.35+0.15*r2)*sh*fade;
+     float col=kind<0.5?step(0.9,r2+(nz.b-0.5)*0.9):kind<1.5?2.0:3.0;
      float an=aB.z*6.2832,ca=cos(an),sa=sin(an);vec3 lp=vec3(position.x*ca-position.z*sa,position.y,position.x*sa+position.z*ca);
      vec3 wp=vec3(p.x+lp.x*w,h+lp.y*ht-0.06,p.y+lp.z*w);
-     float sw=sin(uT*1.6+p.x*0.09+p.y*0.06)*0.55+sin(uT*2.9+p.x*0.23-p.y*0.17)*0.25+0.3;wp.xz+=uWind*sw*position.y*position.y*ht*0.16;
+     float sw=sin(uT*1.3+p.x*0.05+p.y*0.035)*0.6+0.3;wp.xz+=uWind*sw*position.y*position.y*ht*0.14;      // der Wind zieht in breiten, ruhigen Wellen durch
      vUv=vec2((mix(uv.x,1.0-uv.x,step(0.5,r1))*0.98+0.01+col)*0.25,uv.y);
-     vTint=kind<0.5?mix(uGa,uGb,nz.r*0.7+r1*0.3)*vec3(0.8,0.95,0.72):kind<1.5?vec3(0.2,0.33,0.07):mix(vec3(0.2,0.37,0.1),vec3(0.3,0.44,0.13),nz.a*0.6+r1*0.4);
+     vec4 nA=texture2D(uNz,p/2300.0);vec3 gm=mix(mix(uGa,uGb,smoothstep(0.25,0.75,nA.r)),uGd,smoothstep(0.45,0.9,nz.r)*0.5)*(0.9+0.2*texture2D(uNz,p/83.0+0.11).b);      // dieselben Flecken wie der Boden
+     vTint=kind<0.5?gm*vec3(0.88,1.0,0.78):kind<1.5?vec3(0.2,0.33,0.07):mix(vec3(0.2,0.37,0.1),vec3(0.3,0.44,0.13),nz.a*0.6+r1*0.4);
      vTint*=0.88+0.24*r2;
      vSh=uShM*vec4(wp.x,h+0.4,wp.z,1.0);vL=vec4(hv.g,position.y,dist,kind);vP=p;
+     /* so sähe an dieser Stelle der nackte Boden aus: dorthin wird die Farbe mit der Entfernung gemischt */
+     vec3 ga=gm*uVeg;
+     if(kind>1.5)ga=mix(vec3(0.17,0.33,0.09),vec3(0.27,0.41,0.13),nz.a*0.55+0.2)*uVeg;else if(kind>0.5)ga=mix(vec3(0.68,0.6,0.04),vec3(0.2,0.31,0.06),0.2)*mix(uVeg,1.0,0.35);
+     vG=vec4(ga*(uAmbUp+uSunC*uSun.y*hv.g),mix(aC.w,1.0,smoothstep(0.12,0.44,dist/L)));
      gl_Position=projectionMatrix*viewMatrix*vec4(wp,1.0);}`,
-   fragmentShader:`uniform sampler2D uTex,uCs,uShT;uniform vec3 uAmb,uSunC,uSun,uCam;uniform float uShOn,uT;varying vec2 vUv;varying vec3 vTint;varying vec4 vSh;varying vec4 vL;varying vec2 vP;
+   fragmentShader:`uniform sampler2D uTex,uCs,uShT;uniform vec3 uAmb,uSunC,uSun,uCam;uniform float uShOn,uT;varying vec2 vUv;varying vec3 vTint;varying vec4 vSh;varying vec4 vL;varying vec2 vP;varying vec4 vG;
     #include <packing>
     void main(){vec4 t=texture2D(uTex,vUv);if(t.a<mix(0.4,0.12,smoothstep(30.0,260.0,vL.z)))discard;
-     float y=vL.y,ao=mix(0.3,1.0,smoothstep(0.0,0.75,y));
+     float y=vL.y,ao=mix(0.5,1.0,smoothstep(0.0,0.75,y));
      vec3 fl=vL.w>0.5&&vL.w<1.5?vec3(0.6,0.47,0.03):vec3(0.8,0.6,0.07);if(vL.w>1.5)fl=vTint*1.5+vec3(0.08,0.07,0.0);
-     vec3 alb=mix(vTint*(0.3+0.95*t.r),vec3(0.5,0.42,0.16),smoothstep(0.7,1.0,y)*0.45*step(vL.w,0.5));alb=mix(alb,fl*(0.55+0.6*t.b),t.g);      // die Spitzen der Halme sind strohig und fangen das Licht
+     vec3 alb=mix(vTint*(0.5+0.72*t.r),vec3(0.5,0.42,0.16),smoothstep(0.7,1.0,y)*0.45*step(vL.w,0.5));alb=mix(alb,fl*(0.55+0.6*t.b),t.g);      // die Spitzen der Halme sind strohig und fangen das Licht
      float shd=1.0;if(uShOn>0.5){vec3 sc=vSh.xyz/vSh.w;if(sc.x>0.0&&sc.x<1.0&&sc.y>0.0&&sc.y<1.0&&sc.z<1.0)shd=mix(0.18,1.0,step(sc.z-0.003,unpackRGBAToDepth(texture2D(uShT,sc.xy))));}
      float cl=1.0-0.3*texture2D(uCs,(vP+vec2(uT*7.0,uT*3.0))/4300.0).r;
      /* Halme stehen senkrecht: bei tiefer Sonne bekommen sie viel mehr Licht als der flache Boden, und gegen die Sonne leuchten sie durch */
      vec2 vd=normalize(vP-uCam.xz),sd=normalize(uSun.xz);float back=pow(max(dot(vd,sd),0.0),2.0)*(1.0-uSun.y),lowS=1.0-uSun.y;
      float dayK=smoothstep(0.25,0.7,uSun.y);ao=mix(ao,mix(0.6,1.0,y),dayK);
-     float sun=(mix(mix(0.03,0.42,dayK),mix(mix(0.19,0.36,step(0.5,vL.w)),0.86,dayK),y*y)+back*y*0.34*lowS)*vL.x*shd;
-     gl_FragColor=vec4(alb*(uAmb*ao+uSunC*sun)*cl,1.0);
+     float sun=(mix(mix(0.11,0.62,dayK),mix(mix(0.3,0.4,step(0.5,vL.w)),1.05,dayK),y*y)+back*y*0.3*lowS)*vL.x*shd;      // im Mittel so hell wie der Boden daneben: Spitzen heller, Fuß dunkler
+     gl_FragColor=vec4(mix(alb*(uAmb*ao+uSunC*sun),vG.rgb*mix(0.5,1.0,shd),vG.a)*cl,1.0);
      #include <tonemapping_fragment>
      #include <encodings_fragment>
     }`});
@@ -1248,8 +1259,8 @@ async function build(def){
 const WIND={base:4.2,dir:Math.atan2(.38,.92),v:new T.Vector3(),speed:0,ang:0,t:0};   /* ang: Richtung, in die der Wind weht (0 = +z) */
 function updateWind(dt){
   WIND.t+=dt;const t=WIND.t;
-  WIND.speed=WIND.base*(1+.28*Math.sin(t*.23)+.14*Math.sin(t*.71+1.3)+.07*Math.sin(t*1.9+.4));
-  WIND.ang=WIND.dir+.22*Math.sin(t*.11+.7)+.08*Math.sin(t*.53);
+  WIND.speed=WIND.base*(1+.24*Math.sin(t*.23)+.1*Math.sin(t*.71+1.3)+.04*Math.sin(t*1.9+.4));
+  WIND.ang=WIND.dir+.14*Math.sin(t*.11+.7)+.04*Math.sin(t*.53);
   WIND.v.set(Math.sin(WIND.ang)*WIND.speed,.45*Math.sin(t*.83+2)+.3*Math.sin(t*2.1),Math.cos(WIND.ang)*WIND.speed);   /* mit leichten Auf- und Abwinden */
   const s=scene.userData.sock;
   s.pivot.rotation.y=WIND.ang+.07*Math.sin(t*2.3)+.04*Math.sin(t*5.1);
@@ -1556,7 +1567,7 @@ function tipDip(flat){      /* beim Rollen zählt die Höhe unter dem Rumpf: ein
   rgt.set(1,0,0).applyQuaternion(S.Q);upv.set(0,1,0).applyQuaternion(S.Q);let worst=0;
   for(const sgn of [-1,1]){tipV.copy(S.pos).addScaledVector(rgt,sgn*P.span*.5).addScaledVector(upv,P.tipUp);const dip=(flat!==undefined?flat:Math.max(ground(tipV.x,tipV.z),WATER))-tipV.y;if(dip>worst)worst=dip}
   return worst}
-const CQ=6,CY=4;      /* zusätzliche Nick- und Gierdämpfung von Rumpf und Fläche */
+const CQ=6,CY=4.6;      /* zusätzliche Nick- und Gierdämpfung von Rumpf und Fläche */
 function flying(dt){
   const d=P.def;S.air+=dt;
   const agl=S.pos.y-P.gear-ground(S.pos.x,S.pos.z);
@@ -1592,7 +1603,7 @@ function flying(dt){
   const de=clamp(ae.h*CLA*(aT+AZ)/ae.tv*tr*tr-aT*tr+.35*(aT+AZ)-qc*(ae.lt/Vs*tr+CQ*ae.kP2/(Vs*ae.tv)*tr*tr),-.42,.42);
   let Fx=0,Fy=0,Fz=0,Mx=0,My=0,Mz=0,stS=0,bufS=0;
   /* Fläche: vier Stücke. Die äußeren tragen die Querruder und sind leicht geschränkt, Böen treffen links und rechts verschieden */
-  const gst=(Math.sin(WIND.t*1.7+1)+Math.sin(WIND.t*4.3))*.0013*clamp(WIND.speed/4.2,0,1.6);
+  const gst=(Math.sin(WIND.t*1.7+1)+Math.sin(WIND.t*4.3))*.0007*clamp(WIND.speed/4.2,0,1.6);
   for(let i=0;i<4;i++){const y=ae.y[i],sg=y>0?1:-1,out=i===0||i===3;
     const lx=ur-oy*ae.h,ly=uu+oz*y+ox*ae.h,f=uf+oy*y,Vl2=f*f+ly*ly,Vl=Math.sqrt(Vl2)||1e-3;
     let a=Math.atan2(-ly,Math.max(f,.6))+AZ+sg*ae.dih*clamp(lx/Math.max(f,3),-.5,.5)+sg*gst;
@@ -1793,14 +1804,23 @@ function toggleSound(){SND.on=!SND.on;if(SND.on)audioInit();$('#b-snd').setAttri
 /* ---------- Bild ---------- */
 const CK={el:$('#clock'),t:$('#ck-t'),g:$('#ck-g'),b:$('#ck-b')};let hudT=0,spin=0;
 /* Rundinstrumente wie im Cockpit: Fahrtmesser mit farbigen Bereichen, Höhenmesser mit zwei Zeigern, Drehzahlmesser mit Marke für die Gasstellung */
+/* Gehäuse eines Rundinstruments: gewölbter Metallring, mattschwarzer Flansch mit vier Schlitzschrauben, vertieftes Zifferblatt */
+function dialCase(id){const sc=[45,135,225,315].map((a,i)=>{const r=a*Math.PI/180,x=(50+46.3*Math.sin(r)).toFixed(2),y=(50-46.3*Math.cos(r)).toFixed(2),t=[28,-40,63,-15][i];
+    return `<circle cx="${x}" cy="${y}" r="2.1" fill="#0B0A09"/><circle cx="${x}" cy="${y}" r="1.75" fill="url(#${id}-sc)"/><path d="M${x} ${y}m-1.5 0h3" stroke="#1B1A18" stroke-width=".55" transform="rotate(${t} ${x} ${y})"/>`}).join('');
+  return `<defs><linearGradient id="${id}-bz" x1=".2" y1="0" x2=".8" y2="1"><stop offset="0" stop-color="#D9D5CB"/><stop offset=".28" stop-color="#77736B"/><stop offset=".62" stop-color="#2C2A27"/><stop offset="1" stop-color="#0E0D0C"/></linearGradient>
+   <linearGradient id="${id}-fl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3A3834"/><stop offset="1" stop-color="#1A1917"/></linearGradient>
+   <linearGradient id="${id}-in" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#050505"/><stop offset="1" stop-color="#55524C"/></linearGradient>
+   <radialGradient id="${id}-sc" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#E4E0D6"/><stop offset="1" stop-color="#5A5750"/></radialGradient>
+   <radialGradient id="${id}-fc" cx=".5" cy=".38" r=".66"><stop offset="0" stop-color="#23211E"/><stop offset="1" stop-color="#080807"/></radialGradient>
+   <linearGradient id="${id}-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+   <radialGradient id="${id}-hb" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#8A867D"/><stop offset="1" stop-color="#131210"/></radialGradient></defs>
+   <circle cx="50" cy="50" r="49.7" fill="url(#${id}-bz)"/><circle cx="50" cy="50" r="48.5" fill="url(#${id}-fl)"/>${sc}
+   <circle cx="50" cy="50" r="43.6" fill="url(#${id}-in)"/><circle cx="50" cy="50" r="42.7" fill="#040404"/><circle cx="50" cy="50" r="42.2" fill="url(#${id}-fc)"/>`}
+const dialGlass=id=>`<path d="M12.8 38.6A39 39 0 0 1 87.2 38.6A61 61 0 0 0 12.8 38.6z" fill="url(#${id}-gl)"/><path d="M70 78A39 39 0 0 0 86 62A46 46 0 0 1 70 78z" fill="#fff" opacity=".05"/>`;
 function dial(svg,o){
   const id=svg.id,sw=o.full?360:270,a0=o.full?0:-135,deg=v=>a0+sw*(o.full?v/o.max:clamp(v/o.max,0,1)),pt=(v,r)=>{const a=deg(v)*Math.PI/180;return [(50+r*Math.sin(a)).toFixed(2),(50-r*Math.cos(a)).toFixed(2)]};
-  /* Gehäuse wie bei einem echten Rundinstrument: Metallring, dunkles Zifferblatt, Zeiger mit Schatten und Nabe, darüber ein Glanz wie von Glas */
-  let h=`<defs><linearGradient id="${id}-bz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#96928A"/><stop offset=".5" stop-color="#3B3935"/><stop offset="1" stop-color="#191815"/></linearGradient>
-   <radialGradient id="${id}-fc" cx=".5" cy=".4" r=".64"><stop offset="0" stop-color="#25231F"/><stop offset="1" stop-color="#0A0908"/></radialGradient>
-   <linearGradient id="${id}-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".17"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-   <radialGradient id="${id}-hb" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#77736B"/><stop offset="1" stop-color="#131210"/></radialGradient></defs>
-   <circle cx="50" cy="50" r="49.5" fill="url(#${id}-bz)"/><circle cx="50" cy="50" r="46.7" fill="#040404"/><circle cx="50" cy="50" r="45.9" fill="url(#${id}-fc)"/>`;
+  /* Zifferblatt etwas verkleinert im Gehäuse: Skala, Bögen, Zeiger mit Schatten und Nabe, darüber der Glanz des Glases */
+  let h=dialCase(id)+'<g transform="translate(50 50) scale(.92) translate(-50 -50)">';
   for(const [a,b,c] of o.arcs||[]){const p0=pt(a,43.9),p1=pt(b,43.9);h+=`<path d="M${p0[0]} ${p0[1]}A43.9 43.9 0 ${deg(b)-deg(a)>180?1:0} 1 ${p1[0]} ${p1[1]}" class="ga" stroke="${c}"/>`}
   const n=Math.round(o.max/o.minor)-(o.full?1:0);
   for(let i=0;i<=n;i++){const v=i*o.minor,M=i%Math.round(o.major/o.minor)===0,p0=pt(v,42.2),p1=pt(v,M?36:39.2);h+=`<line x1="${p0[0]}" y1="${p0[1]}" x2="${p1[0]}" y2="${p1[1]}" class="${M?'gM':'gm'}"/>`;
@@ -1811,22 +1831,17 @@ function dial(svg,o){
   h+=o.full?'<rect x="35" y="58.5" width="30" height="17.5" rx="3" class="gw"/>':'<rect x="35.5" y="72.6" width="29" height="12.6" rx="2.6" class="gw"/>';
   h+=`<text x="50" y="${o.full?69:82.6}" class="gv" data-v>0</text><text x="50" y="${o.full?74.2:90.4}" class="gu">${o.unit}</text>`;
   if(o.full)h+='<g data-s><path d="M50.5 50.7l-2 2 2-27 2 27z" class="gs"/><path d="M50 50l-2 2 2-27 2 27z" class="gn2"/></g>';
-  h+='<g data-n><path d="M50.6 56.3l-2.1-3.8 1.3-40.6h1.6l1.3 40.6z" class="gs"/><path d="M50 55.5l-2.1-3.8 1.3-40.6h1.6l1.3 40.6z" class="gn"/><path d="M49.2 12h1.6l.25 8h-2.1z" fill="#FFF3C4"/></g>';
-  h+=`<circle cx="50" cy="50" r="4.7" fill="url(#${id}-hb)" stroke="#000" stroke-width=".7"/><circle cx="50" cy="50" r="1.3" fill="#BDB8AD"/>
-   <path d="M9.6 37.5A42.5 42.5 0 0 1 90.4 37.5A66 66 0 0 0 9.6 37.5z" fill="url(#${id}-gl)"/>`;
+  h+='<g data-n><path d="M50.6 56.3l-2.1-3.8 1.3-40.6h1.6l1.3 40.6z" class="gs"/><path d="M50 55.5l-2.1-3.8 1.3-40.6h1.6l1.3 40.6z" class="gn"/><path d="M49.2 11.9h1.6l.3 11h-2.2z" fill="#F4C61F"/></g>';
+  h+=`<circle cx="50" cy="50" r="4.7" fill="url(#${id}-hb)" stroke="#000" stroke-width=".7"/><circle cx="50" cy="50" r="1.3" fill="#BDB8AD"/></g>`+dialGlass(id);
   svg.innerHTML=h;const q=k=>svg.querySelector('[data-'+k+']'),rot=(e,d)=>e.setAttribute('transform','rotate('+d.toFixed(1)+' 50 50)');
   return {deg,v:q('v'),set:x=>rot(q('n'),deg(x)),small:x=>rot(q('s'),x),bug:x=>rot(q('b'),deg(x))};
 }
 /* Windanzeige im selben Gehäuse: die Marke am Rand zeigt, woher der Wind relativ zur Flugzeugnase kommt */
-function windDial(svg){const id=svg.id;let h=`<defs><linearGradient id="${id}-bz" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#96928A"/><stop offset=".5" stop-color="#3B3935"/><stop offset="1" stop-color="#191815"/></linearGradient>
-   <radialGradient id="${id}-fc" cx=".5" cy=".4" r=".64"><stop offset="0" stop-color="#25231F"/><stop offset="1" stop-color="#0A0908"/></radialGradient>
-   <linearGradient id="${id}-gl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".17"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs>
-   <circle cx="50" cy="50" r="49.5" fill="url(#${id}-bz)"/><circle cx="50" cy="50" r="46.2" fill="#040404"/><circle cx="50" cy="50" r="45.2" fill="url(#${id}-fc)"/>`;
+function windDial(svg){const id=svg.id;let h=dialCase(id)+'<g transform="translate(50 50) scale(.92) translate(-50 -50)">';
   for(let i=0;i<24;i++){const a=i*Math.PI/12,M=i%6===0,r0=41.5,r1=M?34:38;h+=`<line x1="${(50+r0*Math.sin(a)).toFixed(2)}" y1="${(50-r0*Math.cos(a)).toFixed(2)}" x2="${(50+r1*Math.sin(a)).toFixed(2)}" y2="${(50-r1*Math.cos(a)).toFixed(2)}" class="${M?'gM':'gm'}"/>`}
   h+=`<path d="M50 20.5l2.2 6.8 9.4 5.2v2.6l-9.4-2.4.5 7.6 3 2.2v1.8l-5.7-1.3-5.7 1.3v-1.8l3-2.2.5-7.6-9.4 2.4v-2.6l9.4-5.2z" fill="rgba(236,232,223,.16)" transform="translate(0 6)"/>
    <text x="50" y="62" class="gv" style="font-size:19px" id="i-w">0</text><text x="50" y="72.5" class="gu" style="font-size:7.4px">km/h Wind</text>
-   <g id="i-wa"><path d="M50 79.5l7.2 12.6h-14.4z" fill="#F4C61F" stroke="#0A0908" stroke-width="1"/></g>
-   <path d="M9.6 37.5A42.5 42.5 0 0 1 90.4 37.5A66 66 0 0 0 9.6 37.5z" fill="url(#${id}-gl)"/>`;
+   <g id="i-wa"><path d="M50 79.5l7.2 12.6h-14.4z" fill="#F4C61F" stroke="#0A0908" stroke-width="1"/></g></g>`+dialGlass(id);
   svg.innerHTML=h}
 const GA={id:null};
 function gauges(d){
@@ -1954,7 +1969,7 @@ const POST=(()=>{
       col+=fl*vis;}
     /* dunklere, leicht warme Bildecken und feines Korn */
     vec2 e=(vUv-vec2(0.5,0.46))*vec2(1.0,1.18);float vg=smoothstep(0.38,0.98,length(e));col*=mix(vec3(1.0),vec3(0.66,0.6,0.56),vg);
-    col+=(ign(gl_FragCoord.xy+fract(uT*7.13)*113.0)-0.5)*0.022;}
+    col+=(ign(gl_FragCoord.xy+fract(uT*7.13)*113.0)-0.5)*0.013;}
     gl_FragColor=vec4(col,1.0);}`,{tC:{value:null},tD:{value:null},tB:{value:null},uRe:{value:new T.Matrix4()},uPx:{value:new T.Vector2()},uSun:{value:new T.Vector4()},uBlur:{value:0},uT:{value:0},uAsp:{value:1},uFx:{value:1}});
   o.quad=new T.Mesh(new T.PlaneGeometry(2,2),o.mF);o.quad.frustumCulled=false;o.sc.add(o.quad);
   const pass=(m,to)=>{o.quad.material=m;renderer.setRenderTarget(to);renderer.render(o.sc,o.cam)};
