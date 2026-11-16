@@ -380,10 +380,10 @@ renderer.shadowMap.enabled=true;renderer.shadowMap.type=coarse?T.BasicShadowMap:
    Der gewählte Platz steht in der Adresse (fliegen.html?platz=kueste) oder ist der zuletzt geflogene. ---------- */
 const SCENES={
  traeger:{name:'Flugzeugträger',sub:'Start und Landung auf dem Deck, mitten im Meer',L:{abend:{sun:[-.94,.2,-.28],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x5A5650,.38],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x4E6272,fog:[1400,8600],tint:[1.05,1,.9]},
-   tag:{sun:[-.55,.7,.45],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x70767A,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x3E6690,fog:[1700,9000],tint:[1,1,1]}},water:-38,sea:true,ship:true,
-  pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[-8,40,340,480],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.2,.3,0],beach:[-900,-901],
-  mow:['#3A3E42','#3A3E42'],firs:.16,firH:[-16,300],firC:[.24,.06,.34,.22,.11],leafy:.3,leafH:[-30,40],leafS:[13,13],leafK:.5,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>-34&&h<400&&sl>9,rockC:[.09,.06,.44],clouds:1,
-  course:[[0,-640],[-210,-1120],[-600,-1500],[-1100,-1520],[-1500,-1120],[-1560,-520],[-1300,-20],[-1000,460],[-900,960],[-560,1260],[-220,1120],[-60,720]]},
+   tag:{sun:[-.55,.7,.45],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x70767A,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x3E6690,fog:[1700,9000],tint:[1,1,1]}},water:-58,sea:true,ship:true,
+  pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[-28,20,340,480],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.2,.3,0],beach:[-900,-901],
+  mow:['#3A3E42','#3A3E42'],firs:.16,firH:[-36,300],firC:[.24,.06,.34,.22,.11],leafy:.3,leafH:[-50,20],leafS:[13,13],leafK:.5,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>-54&&h<400&&sl>9,rockC:[.09,.06,.44],clouds:1,
+  course:[[0,-800],[-210,-1180],[-600,-1500],[-1100,-1520],[-1500,-1120],[-1560,-520],[-1300,-20],[-1000,460],[-900,960],[-560,1260],[-220,1120],[-60,720]]},
  felder:{name:'Felder',sub:'Raps, Wiesen und Hecken',L:{abend:{sun:[-.81,.2,-.55],sunC:0xFFB272,sunI:2.7,hemi:[0x8FA5CC,0x5A4A34,.34],gold:{t:0xF7CE9C,g:0xFFAE62,s:0xE2D2C6,a:0xAEBDD2},hor:0xE2D2C6,mid:0x8CAAD0,top:0x3A64A2,envG:0x5E6A3C,fog:[1500,8600],tint:[1.05,1,.9]},
    tag:{sun:[-.46,.72,-.52],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6F7A4C,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x6E8A34,fog:[1500,8600],tint:[1,1,1]}},water:-2.4,fields:true,
   pal:[0x3A6626,0x58852F,0x6C8A38,0x2A4722,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[78,150,9000,9001],lv:[9000,9001,9000,9001],rockS:[.4,.55],snow:[9000,9001],mix:[.5,0,.24,0],beach:[1.5,-1.5],
@@ -484,8 +484,9 @@ const lakeD=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Mat
 /* einzelne Kuppen: Inseln vor der Küste, Tafelberge im Becken. x, z, Radius, Höhe, Form (1 rund, 0 mit flachem Dach) */
 const BUMPS=SID==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,2],[-1700,330,120,120,2],[-2700,900,520,210,1],[-1380,-1000,60,62,2]]:SID==='traeger'?[[-2500,-1500,520,230,1],[-2900,1500,440,170,1],[2700,-600,480,200,1],[-1250,-640,130,120,2],[-900,1650,110,95,2],[1500,900,140,130,2],[1300,-1500,90,80,2]]:SID==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
 /* Deck des Trägers von oben: Bug im Norden, wohin gestartet wird */
-const DECK=[[-52,-548],[62,-548],[102,-450],[102,505],[82,548],[-62,548],[-82,505],[-82,-450]];
-const onDeck=(x,z)=>{if(x<-82||x>102||z<-548||z>548)return false;for(let i=0;i<8;i++){const a=DECK[i],b=DECK[(i+1)%8];if((b[0]-a[0])*(z-a[1])-(b[1]-a[1])*(x-a[0])<0)return false}return true};
+/* Schräg nach Backbord ausgestellt wie bei einem echten Träger, an Steuerbord die Ausbuchtung für die Insel */
+const DECK=[[-46,-640],[52,-640],[96,-560],[128,-330],[128,430],[104,610],[-70,610],[-112,470],[-150,160],[-150,-150],[-112,-420],[-70,-600]];
+const onDeck=(x,z)=>{if(x<-150||x>128||z<-640||z>610)return false;for(let i=0;i<DECK.length;i++){const a=DECK[i],b=DECK[(i+1)%DECK.length];if((b[0]-a[0])*(z-a[1])-(b[1]-a[1])*(x-a[0])<0)return false}return true};
 const TERR={
  /* offenes Meer mit ein paar fernen Inseln und Felsen; der Träger selbst ist ein eigener Körper */
  traeger(x,z){let h=WATER-34+(fbm(x/500+3,z/500+7)-.5)*8;
@@ -771,7 +772,7 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
    for(let k=-6.5;k<=6.5;k++){const x=k*(RW.wid/9.4),out=Math.abs(k)>4.6;LAMPS.push([x+(out?Math.sign(k)*3:0),.5,e*(L+1.6),0x1FE070,1.7,10,0,e,1]);if(!out)LAMPS.push([x,.5,e*(L+1.2),0xFF2414,1.7,10,0,-e,1])}
    /* Anflugfeuer vor der Schwelle: Querreihen auf kurzen Masten, auf jeder ein Blitz; die Blitze laufen nacheinander auf die Bahn zu */
    const far=e>0?5:4;for(let j=1;j<=far;j++){const z=e*(L+30*j),wide=j===3?5:2;
-    if(SC.ship&&Math.abs(z)>540)continue;
+    if(SC.ship&&Math.abs(z)>590)continue;
      for(let k=-wide;k<=wide;k++){const x=k*2.6,y=ground(x,z)+2.6;LAMPS.push([x,y,z,0xFFF4D8,1.5,8,0,e,1]);if(k===-wide||k===wide||k===0){const m=new T.Mesh(new T.BoxGeometry(.28,2.6,.28),post);m.position.set(x,y-1.3,z);scene.add(m)}}
     LAMPS.push([0,ground(0,z)+3.1,z,0xFFFFFF,3.2,14,0,e,1,(far-j)*.13])}}
   /* Randfeuer: weiß, auf den letzten 180 Einheiten in Blickrichtung gelb */
@@ -824,28 +825,50 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
    add(new T.BoxGeometry(27,4.6,11),paint,0,4.1,0);add(new T.BoxGeometry(14,4,10),glass,-1.5,8.2,0);add(new T.BoxGeometry(14.4,.5,10.4),paint,-1.5,10.4,0);
    for(const [wx,wz] of [[-8.5,5.4],[8.5,5.4],[-8.5,-5.4],[8.5,-5.4]]){const w=add(new T.CylinderGeometry(2.3,2.3,1.4,16),tyre,wx,2.3,wz);w.rotation.x=Math.PI/2}
    car.position.set(108,0,cz);car.rotation.y=rot;scene.add(car);COL.box.push({x0:94,x1:122,y0:0,y1:10.8,z0:cz-6,z1:cz+6,name:'auto'})})}
-  /* ---------- Flugzeugträger: Rumpf, überkragendes Flugdeck, Insel mit Brücke, Mast und Radar. Die Bahn liegt längs auf dem Deck. ---------- */
-  if(SC.ship){const hullM=std(0x69737B,.7),deckM=shaded(new T.MeshStandardMaterial({map:grain,color:0x4A4F54,roughness:.92})),darkM=std(0x23272B,.6),isl=std(0x7B858D,.65),glassM=std(0x10161C,.2),lineM=new T.MeshBasicMaterial({color:0xE9E6DE,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),ylM=new T.MeshBasicMaterial({color:0xF4C61F,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3});
-   /* Deckfläche */
-   const sh=new T.Shape();DECK.forEach(([x,z],i)=>i?sh.lineTo(x,-z):sh.moveTo(x,-z));sh.closePath();const dg=new T.ShapeGeometry(sh);dg.rotateX(-Math.PI/2);{const uv=dg.attributes.uv,q=dg.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,q.getX(i)/26,q.getZ(i)/26)}
-   const dk=new T.Mesh(dg,deckM);dk.position.y=-.04;scene.add(dk);
-   /* Wände: vom Deck nach unten, erst die Deckkante, dann der eingezogene Rumpf bis unter die Wasserlinie */
-   const loft=(ring0,y0,ring1,y1,mat)=>{const P=[];for(let i=0;i<ring0.length;i++){const a=ring0[i],b=ring0[(i+1)%ring0.length],c=ring1[i],d2=ring1[(i+1)%ring0.length];P.push(a[0],y0,a[1],c[0],y1,c[1],b[0],y0,b[1], b[0],y0,b[1],c[0],y1,c[1],d2[0],y1,d2[1])}
-     const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.computeVertexNormals();const m=new T.Mesh(g,mat);scene.add(m);return m};
-   const inset=(k,zk,bow)=>DECK.map(([x,z])=>[10+(x-10)*k,z*zk+(z<-500?-bow:0)]),r1=inset(.86,.985,6),r2=inset(.6,.95,26),r3=inset(.5,.93,18);
-   loft(DECK,-.04,DECK,-4,darkM);{const cap=new T.Mesh(dg.clone(),darkM);cap.scale.y=-1;cap.position.y=-4;cap.material=new T.MeshStandardMaterial({color:0x23272B,roughness:.6,side:T.BackSide});scene.add(cap)}
-   loft(r1,-4,r2,WATER+4,hullM);loft(r2,WATER+4,r3,WATER-14,std(0x7A2E28,.8));
-   COL.box.push({x0:-62,x1:82,y0:WATER-14,y1:-3,z0:-530,z1:530,name:'rumpf'});
-   /* Insel an Steuerbord: Aufbau in Stufen, Brücke mit Fensterband, Schornstein, Mast mit Radar */
-   box(30,34,150,isl,84,17,-40,'insel');box(26,22,96,isl,84,45,-34,'insel');box(27,5.5,97,glassM,84,49,-34);box(20,16,52,isl,84,64,-28,'insel');box(21,4.5,53,glassM,84,66,-28);
-   box(13,22,24,darkM,84,58,-92,'insel');box(2.2,60,2.2,darkM,84,102,-20,'insel');box(26,1.4,5,darkM,84,112,-20);box(16,9,2,isl,84,96,-20);box(1,26,1,darkM,78,85,-52);box(1,26,1,darkM,90,85,-4);
-   {const cv=document.createElement('canvas');cv.width=256;cv.height=128;const x=cv.getContext('2d'),tex=new T.CanvasTexture(cv);tex.encoding=T.sRGBEncoding;const paint=()=>{x.clearRect(0,0,256,128);x.fillStyle='#ECE8DF';x.font='800 104px "DM Sans",system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('LW',128,68);tex.needsUpdate=true};paint();if(document.fonts&&document.fonts.load)document.fonts.load('800 104px "DM Sans"').then(paint,()=>{});
-    const nm=new T.Mesh(new T.PlaneGeometry(36,18),new T.MeshBasicMaterial({map:tex,transparent:true,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}));nm.rotation.y=-Math.PI/2;nm.position.set(68.9,19,-40);scene.add(nm)}
-   /* Deckmarkierung: Randlinie rundum, gelbe Linie vor der Insel, Landezone am Heck */
-   const strip=(x,z,w,l,m)=>{const q=new T.Mesh(new T.PlaneGeometry(w,l),m);q.rotation.x=-Math.PI/2;q.position.set(x,.02,z);scene.add(q)};
-   strip(-76,0,1.2,880,lineM);strip(96,25,1.2,930,lineM);strip(10,542,130,1.2,lineM);strip(5,-542,104,1.2,lineM);strip(64,-40,1.1,190,ylM);
-   /* Fangnetze und Antennen an der Deckkante */
-   for(const z of [-380,-200,180,360])box(1,.6,60,darkM,-85,-1.4,z);for(const z of [-300,300])box(.5,22,.5,darkM,-80,11,z)}
+  /* ---------- Flugzeugträger: ein großes Kriegsschiff mit überkragendem, schräg ausgestelltem Flugdeck. Der Rumpf zieht sich in Stufen zur
+    Wasserlinie ein, an Steuerbord steht die Insel mit Brücke, Schornstein, Masten und drehendem Radar. Dazu Aufzüge, Katapultbahnen,
+    Fangnetze, Nahbereichsgeschütze, Rettungsinseln, Schlepper und die Markierungen eines Landedecks. Die Bahn liegt längs auf dem Deck. ---------- */
+ if(SC.ship){const grey=0x77818A,hullM=std(grey,.72),hull2=std(0x67717A,.75),deckM=shaded(new T.MeshStandardMaterial({map:grain,color:0x383C40,roughness:.93})),darkM=std(0x1E2226,.6),isl=std(0x808A93,.66),isl2=std(0x6F7982,.66),glassM=std(0x0E141A,.18),whiteM=std(0xE4E6E6,.5),yelM=std(0xE3B21C,.6),redM=std(0x7C2C26,.8),
+   lineM=new T.MeshBasicMaterial({color:0xE9E6DE,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),ylM=new T.MeshBasicMaterial({color:0xF0BE1E,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3}),dkL=new T.MeshBasicMaterial({color:0x202428,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3});
+  /* Deckfläche */
+  const sh=new T.Shape();DECK.forEach(([x,z],i)=>i?sh.lineTo(x,-z):sh.moveTo(x,-z));sh.closePath();const dg=new T.ShapeGeometry(sh);dg.rotateX(-Math.PI/2);{const uv=dg.attributes.uv,q=dg.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,q.getX(i)/24,q.getZ(i)/24)}
+  const dk=new T.Mesh(dg,deckM);dk.position.y=-.04;scene.add(dk);
+  /* Wände aus Ringen: jeder Ring ist der Deckumriss, zur Wasserlinie hin immer weiter eingezogen und am Bug zurückgenommen */
+  const loft=(ring0,y0,ring1,y1,mat)=>{const P=[];for(let i=0;i<ring0.length;i++){const a=ring0[i],b=ring0[(i+1)%ring0.length],c=ring1[i],d2=ring1[(i+1)%ring0.length];P.push(a[0],y0,a[1],c[0],y1,c[1],b[0],y0,b[1], b[0],y0,b[1],c[0],y1,c[1],d2[0],y1,d2[1])}
+    const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.computeVertexNormals();const m=new T.Mesh(g,mat);scene.add(m);return m};
+  const ring=(kx,kz,bow)=>DECK.map(([x,z])=>[-8+(x+8)*kx,z*kz+(z<-500?bow:0)]),r1=ring(.93,.99,2),r2=ring(.74,.975,10),r3=ring(.6,.955,24),r4=ring(.56,.95,30),r5=ring(.46,.93,34);
+  loft(DECK,-.04,DECK,-5,darkM);loft(DECK,-5,r1,-5,darkM);loft(r1,-5,r2,-22,hull2);loft(r2,-22,r3,WATER+16,hullM);loft(r3,WATER+16,r4,WATER+3,hullM);loft(r4,WATER+3,r4,WATER-1.5,darkM);loft(r4,WATER-1.5,r5,WATER-18,redM);
+  COL.box.push({x0:-100,x1:92,y0:WATER-18,y1:-5,z0:-600,z1:585,name:'rumpf'});
+  /* Insel an Steuerbord: drei Stockwerke mit Fensterbändern, Schornstein, Hauptmast mit Rahen und drehendem Radar, Radarkuppel, hinterer Mast */
+  const ix=104;
+  box(40,26,190,isl,ix,13,14,'insel');box(34,20,128,isl2,ix-1,36,2,'insel');box(35,4.6,129,glassM,ix-1,39.5,2);box(28,15,74,isl,ix-2,53.5,-12,'insel');box(29,4.8,75,glassM,ix-2,55.5,-12);box(22,8,44,isl2,ix-2,65,-14,'insel');
+  box(30,2,84,darkM,ix-2,46.6,-12);box(24,1.6,50,darkM,ix-2,61.4,-12);                                   /* umlaufende Galerien */
+  box(20,34,36,isl2,ix+2,43,74,'insel');box(21,5,37,darkM,ix+2,62,74);                                    /* Schornstein mit dunkler Kappe */
+  box(2.6,74,2.6,darkM,ix-2,106,-14,'insel');box(36,1.3,1.8,darkM,ix-2,112,-14);box(24,1.3,1.8,darkM,ix-2,126,-14);box(1,10,1,darkM,ix-2,148,-14);box(7,5,7,isl,ix-2,84,-14);
+  box(1.8,36,1.8,darkM,ix+2,80,96);box(18,1.1,1.5,darkM,ix+2,90,96);
+  {const dome=new T.Mesh(new T.SphereGeometry(7,18,12),whiteM);dome.position.set(ix-2,74,22);scene.add(dome);box(5,6,5,isl,ix-2,68,22);
+   const rad=new T.Group(),rm=new T.MeshStandardMaterial({color:0x3A4046,roughness:.6,flatShading:true}),bar=new T.Mesh(new T.BoxGeometry(30,5,2.2),rm),arm=new T.Mesh(new T.BoxGeometry(3,3,6),rm);bar.position.set(0,2.5,3);arm.position.set(0,2.5,0);rad.add(bar);rad.add(arm);rad.position.set(ix-2,88,-14);scene.add(rad);scene.userData.radar=rad}
+  {const mk=(txt,w,h)=>{const cv=document.createElement('canvas');cv.width=256;cv.height=128;const x=cv.getContext('2d'),tex=new T.CanvasTexture(cv);tex.encoding=T.sRGBEncoding;const paint=()=>{x.clearRect(0,0,256,128);x.fillStyle='#ECE8DF';x.font='800 108px "DM Sans",system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(txt,128,68);tex.needsUpdate=true};paint();if(document.fonts&&document.fonts.load)document.fonts.load('800 108px "DM Sans"').then(paint,()=>{});
+     return new T.Mesh(new T.PlaneGeometry(w,h),new T.MeshBasicMaterial({map:tex,transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}))};
+   const n1=mk('LW',38,19);n1.rotation.y=-Math.PI/2;n1.position.set(ix-20.1,15,14);scene.add(n1);
+   const n2=mk('74',70,35);n2.rotation.x=-Math.PI/2;n2.position.set(-2,.03,-565);scene.add(n2)}
+  /* Markierungen: Randlinien, das schräge Landedeck mit Mittellinie, Katapultbahnen am Bug, Umrisse der Aufzüge */
+  const line=(x0,z0,x1,z1,w,m,y)=>{const q=new T.Mesh(new T.PlaneGeometry(w,Math.hypot(x1-x0,z1-z0)),m);q.rotation.set(-Math.PI/2,0,Math.atan2(x1-x0,z1-z0));q.position.set((x0+x1)/2,y||.02,(z0+z1)/2);scene.add(q)};
+  for(let i=0;i<DECK.length;i++){const a=DECK[i],b=DECK[(i+1)%DECK.length],k=.965;line(-8+(a[0]+8)*k,a[1]*k,-8+(b[0]+8)*k,b[1]*k,1.1,i%2?lineM:ylM)}
+  line(58,580,-80,-150,1.3,lineM);line(-8,590,-140,-120,1.3,lineM);for(let i=0;i<13;i++){const t0=i/13,t1=t0+.045;line(25+(-110-25)*t0,586+(-136-586)*t0,25+(-110-25)*t1,586+(-136-586)*t1,2,i%2?lineM:ylM)}
+  for(const cx of [-34,34]){line(cx,-300,cx*.82,-628,1.8,dkL,.025);line(cx-1.6,-300,cx*.82-1.6,-628,.35,lineM,.03);line(cx+1.6,-300,cx*.82+1.6,-628,.35,lineM,.03);box(26,.5,12,darkM,cx,.25,-286)}
+  /* Aufzüge an der Bordwand: Plattform auf Deckhöhe, darunter das dunkle Tor zum Hangar */
+  for(const [ex,ez,el] of [[142,250,96],[142,-170,96],[-164,10,110]]){box(28,2.6,el,deckM,ex,-1.4,ez);box(3,24,el-10,darkM,ex+(ex>0?-16:16),-17,ez);for(const dz of [-el/2,el/2])line(ex-13,ez+dz,ex+13,ez+dz,1,ylM,.02)}
+  /* Fangnetze außenbords, Rettungsinseln, Nahbereichsgeschütze, Antennen */
+  for(let z=-300;z<=400;z+=70)if(Math.abs(z-250)>60&&Math.abs(z+170)>60){box(7,.5,52,darkM,132.5,-2.6,z);for(let k=0;k<4;k++){const c=new T.Mesh(new T.CylinderGeometry(1.5,1.5,4.6,10),whiteM);c.rotation.x=Math.PI/2;c.position.set(131,-6.5,z-18+k*12);scene.add(c)}}
+  for(let z=-130;z<=140;z+=68)if(Math.abs(z-10)>66)box(7,.5,52,darkM,-154.5,-2.6,z);
+  for(const [gx,gz] of [[112,-470],[-98,-500],[116,540],[-92,548]]){box(12,2,12,hull2,gx,-7,gz);const c=new T.Mesh(new T.CylinderGeometry(2.6,3.2,7,14),whiteM);c.position.set(gx,-2.5,gz);scene.add(c);const d2=new T.Mesh(new T.SphereGeometry(2.6,14,10),whiteM);d2.position.set(gx,1,gz);scene.add(d2);box(.7,.7,6,darkM,gx,-1.5,gz-4.5)}
+  for(const z of [-360,-60,330,520])box(.5,26,.5,darkM,-(z>300?100:148)+0,13,z);
+  /* Schlepper und Gerät an Deck, neben der Insel abgestellt */
+  for(const [vx,vz,ry] of [[70,150,.2],[76,176,-.1],[64,-150,1.4]]){const g=new T.Group(),a=(geo,m,x,y,z)=>{const o=new T.Mesh(geo,m);o.position.set(x,y,z);g.add(o)};a(new T.BoxGeometry(8,2.6,13),yelM,0,2.5,0);a(new T.BoxGeometry(6,2.4,5),yelM,0,4.8,-2.6);a(new T.BoxGeometry(6.2,1.4,3),glassM,0,5,-1.4);for(const [wx,wz] of [[-4,4],[4,4],[-4,-4],[4,-4]]){const w=new T.Mesh(new T.CylinderGeometry(1.5,1.5,1.2,12),darkM);w.rotation.z=Math.PI/2;w.position.set(wx,1.5,wz);g.add(w)}g.position.set(vx,0,vz);g.rotation.y=ry;scene.add(g);COL.box.push({x0:vx-7,x1:vx+7,y0:0,y1:6.4,z0:vz-7,z1:vz+7,name:'schlepper'})}
+  /* Lichter: Deckkante, Mastspitze */
+  for(let i=0;i<DECK.length;i++){const a=DECK[i],b=DECK[(i+1)%DECK.length],n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/70));for(let k=0;k<n;k++){const t=k/n;LAMPS.push([a[0]+(b[0]-a[0])*t,.5,a[1]+(b[1]-a[1])*t,0x8FC2FF,1.3,6,0,1,0])}}
+  LAMPS.push([ix-2,154,-14,0xFF4030,2.6,10,0,1,0])}
  /* Windsack: dreht sich in den Wind und steht je nach Stärke steiler oder flacher */
  box(.9,46,.9,std(0xECE8DF,.6),-44,23,150);COL.cyl.push({x:-44,z:150,r:.8,y0:0,y1:46,name:'windsack'});COL.sph.push({x:-44,y:44,z:150,r:7,name:'windsack'});
  const sp=new T.Group();sp.position.set(-44,45,150);scene.add(sp);const stl=new T.Group();sp.add(stl);
@@ -868,7 +891,7 @@ const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COUR
   const cv=document.createElement('canvas');cv.width=128;cv.height=64;const cx=cv.getContext('2d');cx.fillStyle='#2C2A27';cx.fillRect(0,0,128,64);cx.fillStyle='#F4C61F';cx.font='800 52px system-ui,sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(String(i+1),64,35);
   const nt=new T.CanvasTexture(cv);nt.encoding=T.sRGBEncoding;nt.anisotropy=4;
   for(const k of [1,-1]){const pl=add(new T.PlaneGeometry(15,7),new T.MeshBasicMaterial({map:nt,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}),x+nx*.95*k,top+4,z+nz*.95*k);pl.rotation.y=Math.atan2(nx*k,nz*k)}
-  COL.bars.push({x,z,tx,tz,nx,nz,hw:W/2+3,y0:top,y1:top+8});COL.gates.push({x,z,tx,tz,nx,nz,hw:W/2,y0:Math.min(ends[0][2],ends[1][2]),y1:top,top})});      /* gewertet wird der ganze Raum zwischen den Pfosten, vom Boden bis zum Balken */
+  COL.bars.push({x,z,tx,tz,nx,nz,hw:W/2+3,y0:top,y1:top+8});COL.gates.push({x,z,tx,tz,nx,nz,hw:W/2,y0:Math.max(Math.min(ends[0][2],ends[1][2]),SC.ship?-8:-1e9),y1:top,top})});      /* gewertet wird der ganze Raum zwischen den Pfosten, vom Boden bis zum Balken */
  /* Leuchtturm auf der Steilküste: rot-weiß geringelt, oben blitzt das Feuer */
  if(SC.sea){const x=-880,z=1640,y=ground(x,z)-1,H=96;
   for(let i=0;i<4;i++)add(new T.CylinderGeometry(9-(i+1)*.75,9-i*.75,H/4,18),i%2?red:white,x,y+H/8+i*H/4,z);
@@ -896,7 +919,7 @@ function hit(px,py,pz,pr){
     for(const t of a){const k=(py-t[2])/t[3];if(k<0||k>1)continue;const dx=px-t[0],dz=pz-t[1],rr=t[4]*(1-k)+pr*.5;if(dx*dx+dz*dz<rr*rr)return t[5]||'baum'}}
   return null;
 }
-const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',hecke:'In die Hecke geflogen.',insel:'In die Insel des Trägers geflogen.',rumpf:'Gegen den Rumpf des Trägers geflogen.',kuh:'Eine Kuh gestreift. Sie grast schon wieder.',schaf:'Ein Schaf gestreift. Es blökt dir hinterher.',fels:'Gegen einen Felsen geflogen.',weidezaun:'Am Weidezaun hängen geblieben.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
+const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',hecke:'In die Hecke geflogen.',insel:'In die Insel des Trägers geflogen.',schlepper:'Einen Schlepper an Deck getroffen.',rumpf:'Gegen den Rumpf des Trägers geflogen.',kuh:'Eine Kuh gestreift. Sie grast schon wieder.',schaf:'Ein Schaf gestreift. Es blökt dir hinterher.',fels:'Gegen einen Felsen geflogen.',weidezaun:'Am Weidezaun hängen geblieben.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
 
 /* ---------- Felsen im Meer: Türme aus geschichtetem Gestein mit Simsen, Rissen und Überhängen. Jeder ist ein eigener, fein geteilter Körper;
    unten ein dunkler, nasser Saum mit Algen, oben heller Fels und etwas Grün. Um jeden großen stehen ein paar kleine Klippen. ---------- */
@@ -966,21 +989,13 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
    P.set(g.attributes.position.array,o*3);Nn.set(g.attributes.normal.array,o*3);U.set(g.attributes.uv.array,o*2);
    for(let i=0;i<n;i++){const sh=lerp(lo,1,(g.attributes.position.getY(i)-y0)/dy);C[(o+i)*3]=c[0]*sh;C[(o+i)*3+1]=c[1]*sh;C[(o+i)*3+2]=c[2]*sh}o+=n});
   out.setAttribute('position',new T.BufferAttribute(P,3));out.setAttribute('normal',new T.BufferAttribute(Nn,3));out.setAttribute('uv',new T.BufferAttribute(U,2));out.setAttribute('color',new T.BufferAttribute(C,3));return out};
- /* Fichte: ein Stamm und mehrere Astkränze. Die Kränze tragen ein Bild aus hängenden Zweigen mit durchsichtigen Lücken,
-    dadurch franst der Umriss aus wie bei einem echten Baum, aus jeder Richtung und auch von oben. */
- const ft=(()=>{const cv=document.createElement('canvas');cv.width=cv.height=256;const x=cv.getContext('2d'),gr=x.createLinearGradient(0,0,0,256);
-  gr.addColorStop(0,'#3d3f3d');gr.addColorStop(.55,'#8d908a');x.fillStyle=gr;x.fillRect(0,0,256,132);
-  for(let i=0;i<190;i++){const bx=hash(i,1.3)*256,len=118+hash(i,2.9)*138,w=7+hash(i,4.1)*11,sw=(hash(i,5.5)-.5)*30,l=150+hash(i,7.7)*105;
-   for(const ox of [-256,0,256]){x.beginPath();x.moveTo(bx+ox-w/2,0);x.quadraticCurveTo(bx+ox+sw*.35-w*.3,len*.62,bx+ox+sw,len);x.quadraticCurveTo(bx+ox+sw*.35+w*.3,len*.62,bx+ox+w/2,0);x.closePath();
-    const g2=x.createLinearGradient(0,0,0,len);g2.addColorStop(0,'rgb('+(l*.3|0)+','+(l*.32|0)+','+(l*.3|0)+')');g2.addColorStop(.7,'rgb('+(l*.8|0)+','+(l*.82|0)+','+(l*.76|0)+')');g2.addColorStop(1,'rgb('+(l|0)+','+(l|0)+','+(l*.9|0)+')');x.fillStyle=g2;x.fill()}}
-  const im=x.getImageData(0,0,256,256),dt=im.data;for(let i=0;i<65536;i++){const k=.82+.36*hash(i%256,(i/256)|0);dt[i*4]*=k;dt[i*4+1]*=k;dt[i*4+2]*=k;dt[i*4+3]=dt[i*4+3]>110?255:0}x.putImageData(im,0,0);
-  const t=new T.CanvasTexture(cv);t.wrapS=T.RepeatWrapping;t.encoding=T.sRGBEncoding;t.anisotropy=coarse?2:4;return t})();
- const RS=coarse?6:8,TIERS=coarse?[[-.37,.0,.5],[-.1,.3,.36],[.18,.5,.22]]:[[-.38,-.06,.5],[-.17,.16,.41],[.04,.35,.3],[.23,.5,.19]];
- const skirt=([y0,y1,r],j,a)=>{const g=new T.CylinderGeometry(j===a.length-1?0:r*.14,r,y1-y0,RS,1,true);g.rotateY(j*1.31);g.translate(0,(y0+y1)/2,0);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setX(i,uv.getX(i)*3+j*.37);return [g,[1,1,1],1]};
+ const RS=coarse?8:12,TIERS=coarse?[[-.37,.0,.5],[-.1,.3,.36],[.18,.5,.22]]:[[-.38,-.06,.5],[-.17,.16,.41],[.04,.35,.3],[.23,.5,.19]];
+ /* Fichte in klarer Form: gestufte, glatte Kegel, jeder oben etwas heller als unten */
+ const skirt=([y0,y1,r],j,a)=>{const g=new T.CylinderGeometry(j===a.length-1?0:r*.2,r,y1-y0,RS,1,false);g.rotateY(j*1.31);g.translate(0,(y0+y1)/2,0);return [g,[.86+.05*j,.9+.04*j,.84+.05*j],.6]};
  const st=new T.CylinderGeometry(.03,.05,.16,5,1,true);st.translate(0,-.42,0);{const uv=st.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.6)}
  const trunk=join([[st,[1.5,1.05,.75],1],...TIERS.map(skirt)]);
  const Tree=T.MeshStandardMaterial,rough={roughness:1};
- const mat=shaded(new Tree(Object.assign({vertexColors:true,map:ft,alphaTest:.5,side:T.DoubleSide},rough)));
+ const mat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
  const leafMat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
  const inst=new T.InstancedMesh(trunk,mat,N),d=new T.Object3D(),col=new T.Color();let n=0,tries=0;
  /* tief stehende Sonne: die Schatten werden lang. Länge aus dem Sonnenstand, für einen kegelförmigen Baum etwas kürzer als für einen Mast */
@@ -1010,16 +1025,11 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
  /* Laubbäume stehen in Gruppen auf dem Talboden */
  {const NB=Math.round((coarse?320:420)*SC.leafy),c1=new T.CylinderGeometry(.03,.05,.42,6,1,true);c1.translate(0,-.29,0);{const uv=c1.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5)}
   const ball=(r,x,y,z,sd,rep,det)=>{const g=new T.IcosahedronGeometry(r,det===undefined?1:det),q=g.attributes.position,nn=g.attributes.normal,uv=g.attributes.uv;
-   for(let i=0;i<q.count;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,k=r*(1+.24*(vnoise(ux*2.6+sd,uy*2.6+uz*2.1)-.5));q.setXYZ(i,ux*k,uy*k*.86,uz*k);nn.setXYZ(i,ux,uy,uz);uv.setXY(i,uv.getX(i)*rep*2,uv.getY(i)*rep)}
+   for(let i=0;i<q.count;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,k=r*(1+.2*(vnoise(ux*2.1+sd,uy*2.1+uz*1.7)-.5));q.setXYZ(i,ux*k,uy*k*.86,uz*k);nn.setXYZ(i,ux,uy,uz);uv.setXY(i,uv.getX(i)*rep*2,uv.getY(i)*rep)}
    g.translate(x,y,z);return g};
-  const lt=(()=>{const cv=document.createElement('canvas');cv.width=cv.height=128;const x=cv.getContext('2d');
-   for(let i=0;i<620;i++){const bx=hash(i,11.3)*128,by=hash(i,12.9)*128,r=3+hash(i,14.1)*4.2,l=178+hash(i,17.7)*77;x.fillStyle='rgb('+(l*.92|0)+','+(l|0)+','+(l*.86|0)+')';
-    for(const ox of [-128,0,128])for(const oy of [-128,0,128]){x.beginPath();x.ellipse(bx+ox,by+oy,r,r*.62,hash(i,19.1)*3.1,0,6.3);x.fill()}}
-   const im=x.getImageData(0,0,128,128),dt=im.data;for(let i=0;i<16384;i++)dt[i*4+3]=dt[i*4+3]>110?255:0;x.putImageData(im,0,0);
-   const t=new T.CanvasTexture(cv);t.wrapS=t.wrapT=T.RepeatWrapping;t.encoding=T.sRGBEncoding;t.anisotropy=coarse?2:4;return t})();
-  const shellMat=shaded(new Tree(Object.assign({vertexColors:true,map:lt,alphaTest:.5,side:T.DoubleSide},rough)));
-  const core=join([[c1,[.6,.47,.36],1],[ball(.27,0,.17,0,1,1,0),[.5,.52,.48],.6],[ball(.17,.2,.04,.08,5,1,0),[.46,.48,.44],.6]]);
-  const leaf=join([[ball(.34,0,.17,0,1,3),[1,1,1],.55],[ball(.23,.2,.04,.08,5,3),[.93,.96,.9],.55]].concat(coarse?[]:[[ball(.21,-.17,.1,-.12,9,3),[.9,.94,.86],.55]]));
+  const shellMat=leafMat;      /* Laub als glatte, runde Körper: klare Formen, die zur ruhigen Landschaft passen */
+  const core=join([[c1,[.62,.47,.34],1]]);
+  const BD=coarse?1:2,leaf=join([[ball(.33,0,.17,0,1,1,BD),[1,1,1],.5],[ball(.23,.21,.05,.08,5,1,BD),[.94,.97,.9],.5],[ball(.21,-.18,.09,-.12,9,1,BD),[.9,.95,.86],.5],[ball(.19,.02,.36,.05,13,1,BD),[1.06,1.07,1],.62]]);
   const lc=new T.InstancedMesh(core,leafMat,NB);
   const li=new T.InstancedMesh(leaf,shellMat,NB),lb=new T.InstancedMesh(bg,blob.material,NB);let m=0,tr=0;
   while(m<NB&&tr<(FLD.on?90000:40000)){tr++;let x=(hash(tr,12.7)-.5)*(FLD.on?6400:5200),z=(hash(tr,19.3)-.5)*6400,sk=1;if(FLD.on){const q=FLD.snap(x,z,tr);if(!q)continue;x=q[0];z=q[1];sk=q[2]}const h=ground(x,z);
@@ -1056,7 +1066,7 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
        const u=hash(si*97+t,4.3);arr.push([x,z,hash(si*97+t,3.7)*6.283,isCow?.9+u*.25:.85+u*.35,isCow?(u<.3?[.62,.4,.26]:u<.42?[.3,.24,.2]:[1,1,1]):(u<.12?[.42,.36,.32]:[1,1,1])]);k++}});
    herd([cow(true),cow(false)],cows,[13,9],'kuh');herd([sheep(true),sheep(false)],shp,[6.4,5],'schaf')}
   /* Hecken: niedrige, dichte Wälle aus Laub entlang mancher Feldwege, an den Wegkreuzungen offen */
-  if(FLD.on){const hg0=new T.IcosahedronGeometry(.5,coarse?1:2),q=hg0.attributes.position,nn=hg0.attributes.normal,uv=hg0.attributes.uv;
+  if(FLD.on){const hg0=new T.IcosahedronGeometry(.5,coarse?2:3),q=hg0.attributes.position,nn=hg0.attributes.normal,uv=hg0.attributes.uv;
    for(let i=0;i<q.count;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,bx=Math.sign(ux)*Math.pow(Math.abs(ux),.4),by=Math.sign(uy)*Math.pow(Math.abs(uy),.55),bz=Math.sign(uz)*Math.pow(Math.abs(uz),.6),k=.5*(1+.34*(vnoise(ux*3.4+2,uy*2.6+uz*2.9)-.5)),X=bx*k*3.3,Y=Math.max(0,by*k+.46),Z=bz*k;q.setXYZ(i,X,Y,Z);nn.setXYZ(i,ux*.5,uy,uz);uv.setXY(i,X*1.5+Z*.6,Y*1.5+Z*.9)}      /* kantiger als eine Kugel: ein Wall mit stumpfen Enden */
    hg0.computeBoundingBox();const hgeo=join([[hg0,[1,1,1],.5]]),segs=[],seg=6.8*3.3*.8;
    const put=(fx,fy,ang)=>{const x=FLD.c*fx-FLD.s*fy,z=FLD.s*fx+FLD.c*fy;if(Math.abs(x)>3600||Math.abs(z)>3600||(Math.abs(x)<FLD.ax+8&&Math.abs(z)<FLD.az+8)||FLD.road(x,z,12))return;const h=ground(x,z);if(h>56||h<WATER+1.5||lakeD(x,z)<1.5||courseDist(x,z)<34)return;segs.push([x,z,h,ang])};
@@ -1220,7 +1230,7 @@ async function build(def){
   const fit=new T.Group();fit.matrixAutoUpdate=false;
   fit.matrix.copy(BASIS).multiply(new T.Matrix4().makeScale(K,K,K)).multiply(new T.Matrix4().makeTranslation(-def.pivot[0],0,-def.pivot[1]));
   /* Lack mit Klarlack-Schicht: der Himmel spiegelt sich flach gesehen deutlich. Die Flächen liegen etwas hinter den Kantenlinien, die Ruder vor der Fläche. */
-  const body=new T.MeshPhysicalMaterial({color:0xDCDAD3,roughness:.46,clearcoat:.9,clearcoatRoughness:.14,envMap:ENV,envMapIntensity:.6,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:2}),ctl=new T.MeshPhysicalMaterial({color:0xEDB106,roughness:.46,clearcoat:.9,clearcoatRoughness:.16,envMap:ENV,envMapIntensity:.45,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}),lineMat=new T.LineBasicMaterial({color:0x4A4843,transparent:true,opacity:.3});      /* Ruder liegen sauber vor der Fläche, statt mit ihr zu flimmern */
+  const body=new T.MeshPhysicalMaterial({color:0xDCDAD3,roughness:.46,clearcoat:.9,clearcoatRoughness:.14,envMap:ENV,envMapIntensity:.6,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:2}),ctl=new T.MeshPhysicalMaterial({color:0xEDB106,roughness:.46,clearcoat:.9,clearcoatRoughness:.16,envMap:ENV,envMapIntensity:.45,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}),lineMat=new T.LineBasicMaterial({color:0x3A3834,transparent:true,opacity:.5});      /* Ruder liegen sauber vor der Fläche, statt mit ihr zu flimmern */
   const parts=[],hinge={},box=new T.Box3(),wheels=[],bodyIn=body.clone();bodyIn.side=T.DoubleSide;
   /* gedruckter Kunststoff ist dünn: steht die Sonne hinter einer Fläche, scheint etwas Licht durch und sie glimmt warm */
   [body,ctl,bodyIn].forEach(m=>{m.onBeforeCompile=sh=>{sh.uniforms.uBnc=BNC.u;sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nuniform vec3 uBnc;').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n#if NUM_DIR_LIGHTS > 0\n{float bk=max(dot(-geometry.normal,directionalLights[0].direction),0.0);reflectedLight.directDiffuse+=directionalLights[0].color*material.diffuseColor*bk*0.2;}\n#endif\n{vec3 nW=inverseTransformDirection(geometry.normal,viewMatrix);reflectedLight.indirectDiffuse+=uBnc*material.diffuseColor*max(-nW.y,0.0);}')};keepSharp(m,'pla')});      /* wo man in den Rumpf sehen kann, wird auch die Innenseite gezeichnet */
@@ -1885,7 +1895,7 @@ function frame(dt,still){
   updateWind(dt);
   if(!still&&P&&S.started&&card.hidden){const n=Math.max(1,Math.ceil(dt*120));for(let i=0;i<n;i++)step(dt/n)}
   if(P){
-    craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.3*clamp(1.5-cam.position.distanceTo(S.pos)/(P.span*7),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
+    craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.5*clamp(1.6-cam.position.distanceTo(S.pos)/(P.span*9),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
     if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,.5):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);const run=S.crashed?0:sstep(.06,.3,S.pw);p.bl.visible=run<.98;p.disc.material.opacity=run*(.45+.3*S.pw);p.disc.rotation.z=spin*.031*(i%2?-1:1)});
     if(P.lamps){P.lamps.g.visible=!S.crashed;const k=WIND.t%1.4;P.lamps.strobe.material.opacity=k<.06||(k>.18&&k<.24)?1:0}
@@ -1909,7 +1919,7 @@ function frame(dt,still){
       let want=camYaw,rate=0;const hs=Math.hypot(S.vel.x,S.vel.z),sp=S.vel.length();
       if(S.ground){want=Math.atan2(fwd.x,fwd.z);rate=4}else if(hs>3){want=Math.atan2(S.vel.x,S.vel.z);rate=2.4*(hs/Math.max(sp,1))*(hs/Math.max(sp,1))}
       let dy=want-camYaw;dy=Math.atan2(Math.sin(dy),Math.cos(dy));camYaw+=dy*(1-Math.exp(-rate*dt));
-      const D=(Math.max(P.span,P.len)*2.5+3)*clamp(1.15/cam.aspect,1,1.9),H=P.span*.42+1.6,cx=Math.sin(camYaw),cz=Math.cos(camYaw);
+      const D=(Math.max(P.span,P.len)*2.2+3)*clamp(1.15/cam.aspect,1,1.9),H=P.span*.42+1.6,cx=Math.sin(camYaw),cz=Math.cos(camYaw);
       tmp.set(S.pos.x-cx*D,S.pos.y+H,S.pos.z-cz*D);
       camPos.lerp(tmp,1-Math.exp(-3.6*dt));const ch=ground(camPos.x,camPos.z)+2.4;if(camPos.y<ch)camPos.y=ch;
       cam.position.copy(camPos);camLook.set(S.pos.x+cx*P.span*.9,S.pos.y+P.span*.1,S.pos.z+cz*P.span*.9);
@@ -1925,7 +1935,7 @@ function frame(dt,still){
     }
     /* der Pilot dreht sich mit dem Modell mit */
     const man=scene.userData.pilot;man.visible=camMode!==1;man.rotation.y=Math.atan2(-(S.pos.x-FIELD.pilot.x),-(S.pos.z-FIELD.pilot.z));
-    scene.userData.sky.position.copy(cam.position);scene.userData.sky.material.uniforms.uT.value=WIND.t;
+    scene.userData.sky.position.copy(cam.position);scene.userData.sky.material.uniforms.uT.value=WIND.t;if(scene.userData.radar)scene.userData.radar.rotation.y=WIND.t*1.5;
     scene.userData.water.material.uniforms.t.value=WIND.t;CSU.uCt.value=WIND.t;
     /* Anflugbefeuerung: Farbe nach dem Winkel, unter dem das Modell die Lampe sieht; sichtbar ist sie nur von der Anflugseite */
     if((QL.n&15)===0)for(const f of FOREST){const d=cam.position.distanceTo(f.c)-f.r,far=d>(f.far?620:780);if(far!==f.far){f.far=far;if(f.lo)f.m.geometry=far?f.lo:f.hi}if(f.fade)f.m.visible=d<2100}
