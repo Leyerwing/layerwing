@@ -67,6 +67,13 @@ dl{margin:0}
 .card .act[aria-pressed="true"],.card .chip[aria-pressed="true"]{background:var(--accent)}
 .card .models{margin:16px 0 0;justify-content:flex-start}
 .card .chip:not([aria-pressed="true"]){background:transparent}
+/* Flugplatz wählen: drei Knöpfe mit Name und einer Zeile, was einen dort erwartet */
+.places{display:flex;flex-wrap:wrap;gap:8px;margin:2px 0 4px}
+.place{flex:1 1 150px;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-height:48px;padding:8px 14px;border:1px solid var(--panel-line);border-radius:14px;background:transparent;color:var(--ink);font:inherit;font-size:15px;font-weight:600;text-align:left;cursor:pointer}
+.place small{font-size:12px;font-weight:400;color:var(--muted);line-height:1.3}
+.place:hover{border-color:var(--accent)}
+.place[aria-pressed="true"]{border-color:var(--accent);background:rgba(244,198,31,.12)}
+.place[aria-pressed="true"] small{color:var(--ink)}
 .mlink{display:inline-block;margin-top:18px;color:var(--muted);font-size:14px}
 
 /* Meldung in der Mitte oben */
@@ -120,7 +127,10 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 /* Touch: zwei Knüppel wie am Sender (Mode 2). Links Gas und Seitenruder, rechts Höhen- und Querruder */
 .vig{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse 85% 80% at 50% 46%,rgba(12,16,22,0) 58%,rgba(12,16,22,.3) 100%)}
 .touch,.only-touch,.mini{display:none}
-.pad{position:fixed;bottom:max(22px,env(safe-area-inset-bottom));width:148px;height:148px;border-radius:26px;background:var(--panel);border:1px solid var(--panel-line);touch-action:none;}
+/* Jede Bildschirmhälfte ist eine Steuerfläche: der Knüppel entsteht dort, wo der Daumen aufsetzt */
+.zone{position:fixed;top:72px;bottom:0;width:50%;touch-action:none}
+.zone-l{left:0}.zone-r{right:0}
+.pad{position:fixed;bottom:max(22px,env(safe-area-inset-bottom));width:148px;height:148px;border-radius:26px;background:var(--panel);border:1px solid var(--panel-line);pointer-events:none;transition:transform .22s ease-out,opacity .2s}
 .pad-l{left:max(18px,env(safe-area-inset-left))}
 .pad-r{right:max(18px,env(safe-area-inset-right))}
 .pad::before,.pad::after{content:"";position:absolute;background:var(--panel-line)}
@@ -158,12 +168,14 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   .card .chip{min-height:44px;padding:9px 16px}
   .inst{display:none}
   .note{top:calc(max(8px,env(safe-area-inset-top)) + 64px);font-size:14px;padding:7px 16px}
-  .pad{width:136px;height:136px;border-radius:50%;background:rgba(21,20,18,.16);border:1.5px solid rgba(236,232,223,.3)}
+  .pad{width:148px;height:148px;border-radius:50%;background:rgba(21,20,18,.16);border:1.5px solid rgba(236,232,223,.3)}
   .pad::before,.pad::after{display:none}
   .pad i{width:52px;height:52px;margin:-26px 0 0 -26px;box-shadow:0 3px 10px rgba(0,0,0,.35)}
   .pad span{color:var(--ink);opacity:.85;text-shadow:0 1px 2px rgba(0,0,0,.7);transition:opacity .5s}
   .pad .pt{top:10px}.pad .pb{bottom:10px}.pad .pr{right:14px;top:calc(50% + 28px)}
   .pad.used span{opacity:0}
+  .pad.used{opacity:.55}.pad.live{opacity:1}
+  .spec{z-index:2}
   .spec{position:fixed;right:max(18px,env(safe-area-inset-right));bottom:calc(max(22px,env(safe-area-inset-bottom)) + 160px);display:flex}
   .spec .act{border-color:var(--accent);min-height:44px;padding:9px 16px;font-size:14px}
   .keys div{grid-template-columns:128px 1fr}
@@ -177,8 +189,8 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   .mrow{margin-top:12px}
   .mlink{margin-top:10px}
   .card .models{margin-top:12px}
-  .spec{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 138px);right:max(22px,env(safe-area-inset-right))}
-  .pad{width:132px;height:132px;bottom:max(12px,env(safe-area-inset-bottom))}
+  .spec{bottom:calc(max(12px,env(safe-area-inset-bottom)) + 156px);right:max(22px,env(safe-area-inset-right))}
+  .pad{width:144px;height:144px;bottom:max(12px,env(safe-area-inset-bottom))}
   .pad-l{left:max(22px,env(safe-area-inset-left))}
   .pad-r{right:max(22px,env(safe-area-inset-right))}
   /* Startkarte zweispaltig, damit der Knopf ohne Scrollen erreichbar ist */
@@ -234,14 +246,16 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 
 <div class="spec" id="spec"></div>
 <div class="touch" aria-hidden="true">
+  <div class="zone zone-l" id="zone-l"></div><div class="zone zone-r" id="zone-r"></div>
   <div class="pad pad-l" id="pad-l"><span class="pt">Gas</span><span class="pr">Seite</span><i id="pad-l-k"></i></div>
   <div class="pad pad-r" id="pad-r"><span class="pb" id="pad-r-p">Ziehen</span><span class="pr">Rollen</span><i id="pad-r-k"></i></div>
 </div>
 
 <div class="card" id="card">
   <div class="card-in" id="v-help" role="dialog" aria-modal="true" aria-labelledby="card-h">
-    <h1 id="card-h">Flugplatz im Tal</h1>
-    <p>Starte auf Bahn 36, flieg die zwölf Tore über den Hang und setz wieder auf. Die Zeit läuft ab Tor 1. Oben wechselst du das Modell.</p>
+    <h1 id="card-h">Flugplatz</h1>
+    <p>Starte auf Bahn 36, flieg die zwölf Tore und setz wieder auf. Die Zeit läuft ab Tor 1. Oben wechselst du das Modell, hier den Flugplatz.</p>
+    <div class="places" id="places" role="group" aria-label="Flugplatz wählen"></div>
     <dl class="keys only-keys">
       <div><dt><kbd class="k">W</kbd><kbd class="k">S</kbd></dt><dd>Gas rauf und runter</dd></div>
       <div><dt><kbd class="k">←</kbd><kbd class="k">→</kbd></dt><dd>Querruder: rollen, bis zur ganzen Rolle</dd></div>
@@ -264,8 +278,9 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
     <p class="loadline" id="loadline">Modell lädt …</p>
   </div>
   <div class="card-in one" id="v-menu" role="dialog" aria-modal="true" aria-labelledby="menu-h" hidden>
-    <h2 id="menu-h">Flugplatz im Tal</h2>
+    <h2 id="menu-h">Flugplatz</h2>
     <p>Flieg durch die zwölf Tore. Die Uhr läuft ab Tor 1.</p>
+    <div id="menu-places"></div>
     <div id="menu-models"></div>
     <div class="go"><button class="btn btn-primary" id="b-go2" type="button">Losfliegen</button></div>
     <div class="mrow" id="menu-acts"></div>
@@ -283,7 +298,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   </div>
   <div class="card-in one" id="v-board" role="dialog" aria-modal="true" aria-labelledby="board-h" hidden>
     <h2 id="board-h">Bestentabelle</h2>
-    <p>Die Uhr läuft ab Tor 1 und stoppt nach Tor 12. Von jedem Piloten zählt die schnellste Runde je Modell.</p>
+    <p>Die Uhr läuft ab Tor 1 und stoppt nach Tor 12. Jeder Flugplatz hat seine eigene Tabelle.</p>
     <div class="tabs" id="board-tabs" role="group" aria-label="Modell wählen"></div>
     <div class="board-wrap"><table class="board"><thead><tr><th scope="col">Platz</th><th scope="col">Name</th><th scope="col">Modell</th><th scope="col" class="num">Zeit</th><th scope="col" class="num">Datum</th></tr></thead><tbody id="board-rows"></tbody></table></div>
     <p id="board-empty" hidden>Hier steht noch keine Zeit. Flieg den Rundkurs durch alle zwölf Tore, dann trägt sich deine Runde ein.</p>
@@ -342,12 +357,30 @@ catch(e){$('#loadline').textContent='Dein Browser kann die 3D-Ansicht nicht star
 const coarse=window.matchMedia&&window.matchMedia('(pointer:coarse)').matches;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,coarse?1.5:2));
 renderer.outputEncoding=T.sRGBEncoding;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=coarse?T.PCFShadowMap:T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
-const HORIZON=0xD3E2EC;
-const scene=new T.Scene();scene.background=new T.Color(HORIZON);scene.fog=new T.Fog(HORIZON,1150,7000);
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=coarse?T.BasicShadowMap:T.PCFSoftShadowMap;renderer.shadowMap.autoUpdate=false;
+/* ---------- Flugplätze: drei Landschaften mit eigenem Gelände, Licht, Bewuchs und Kurs. Platz und Bahn sind überall gleich.
+   Der gewählte Platz steht in der Adresse (fliegen.html?platz=kueste) oder ist der zuletzt geflogene. ---------- */
+const SCENES={
+ alpen:{name:'Alpental',sub:'Tal mit See, Wald und Fels',sun:[-.6,.64,.4],sunC:0xffe8c6,sunI:.98,hemi:[0xcfe0ff,0x6f7a58,.5],hor:0xD3E2EC,mid:0x7FB2DD,top:0x2C6DB6,envG:0x6E8650,fog:[1150,7000],water:-2.4,
+  pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
+  mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.27,.07,.36,.25,.13],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
+  course:[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]]},
+ kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',sun:[-.72,.5,.3],sunC:0xffddb2,sunI:1.02,hemi:[0xc9dcf5,0x8a8468,.5],hor:0xE4DDD2,mid:0x86B3DC,top:0x2A62A8,envG:0x7C8A5A,fog:[1300,8200],water:-2.4,sea:true,
+  pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[70,150,380,520],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.3,.3,1],beach:[4.2,1.2],
+  mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.24,.06,.34,.22,.11],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
+  course:[[0,-600],[-250,-1060],[-620,-1430],[-1120,-1500],[-1520,-1120],[-1560,-560],[-1290,-60],[-960,420],[-900,960],[-560,1260],[-220,1120],[-60,700]]},
+ wueste:{name:'Wüste',sub:'Tafelberge, Sand und Kakteen',sun:[-.45,.72,.5],sunC:0xfff0d4,sunI:1.06,hemi:[0xd6e2f2,0xb08a62,.52],hor:0xE9DDC9,mid:0x8DB6DA,top:0x2D6AB4,envG:0xB79468,fog:[1400,8500],water:-1e6,
+  pal:[0xB48A5C,0xC9A574,0xA6744A,0x8E7C50,0xAE7850,0xB5673F,0x86472E,0xE8D9BC,0xE4D6B8],belt:[-50,-40,9000,9001],lv:[45,170,9000,9001],rockS:[.15,.25],snow:[9000,9001],mix:[.16,0,.62,0],beach:[-900,-901],
+  mow:['#C8AE80','#BFA476'],firs:0,firH:[0,0],firC:[.27,.07,.36,.25,.13],leafy:.75,leafH:[-30,70],leafS:[6,7],leafK:.47,leafC:[.17,.05,.24,.3,.1],rocks:(h,sl)=>h<120&&(sl>7||hash(h*7.3,sl*3.1)<.4),rockC:[.055,.34,.4],clouds:.55,cacti:coarse=>coarse?170:260,
+  course:[[0,-600],[170,-1100],[540,-1500],[1000,-1380],[1280,-880],[1180,-320],[1360,240],[1060,760],[620,1080],[260,1240],[-40,1040],[-60,700]]}};
+let SID='alpen';try{const sv=localStorage.getItem('lw-fliegen-platz');if(SCENES[sv])SID=sv}catch(e){}
+try{const q=new URLSearchParams(location.search).get('platz');if(SCENES[q])SID=q}catch(e){}
+const SC=SCENES[SID],WATER=SC.water;try{localStorage.setItem('lw-fliegen-platz',SID)}catch(e){}
+const HORIZON=SC.hor;
+const scene=new T.Scene();scene.background=new T.Color(HORIZON);scene.fog=new T.Fog(HORIZON,SC.fog[0],SC.fog[1]);
 const cam=new T.PerspectiveCamera(55,1,1,14000);
-scene.add(new T.HemisphereLight(0xcfe0ff,0x6f7a58,.5));
-const sun=new T.DirectionalLight(0xffe8c6,.98),SUN=new T.Vector3(-.6,.64,.4).normalize();sun.position.copy(SUN);scene.add(sun);scene.add(sun.target);
+scene.add(new T.HemisphereLight(SC.hemi[0],SC.hemi[1],SC.hemi[2]));
+const sun=new T.DirectionalLight(SC.sunC,SC.sunI),SUN=new T.Vector3(SC.sun[0],SC.sun[1],SC.sun[2]).normalize();sun.position.copy(SUN);scene.add(sun);scene.add(sun.target);
 /* nur das Flugzeug wirft einen Schatten; die Schattenkamera wandert mit ihm mit */
 sun.castShadow=true;sun.shadow.mapSize.set(coarse?1024:2048,coarse?1024:2048);sun.shadow.bias=-.0005;sun.shadow.normalBias=.03;sun.shadow.radius=2.5;
 function resize(){const w=window.innerWidth,h=window.innerHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
@@ -356,7 +389,7 @@ window.addEventListener('resize',resize);window.addEventListener('orientationcha
 /* Himmel: Verlauf vom dunstigen Horizont zum tiefen Blau, Sonnenscheibe mit Hof. Dieselbe Kuppel liefert die Spiegelung auf den Modellen. */
 let ENV=null;
 {const mat=new T.ShaderMaterial({side:T.BackSide,depthWrite:false,fog:false,
-  uniforms:{sun:{value:SUN},top:{value:new T.Color(0x2C6DB6)},mid:{value:new T.Color(0x7FB2DD)},hor:{value:new T.Color(HORIZON)},gnd:{value:new T.Color(HORIZON)}},      /* nur die Spiegelung bekommt unter dem Horizont die Farbe der Wiese */
+  uniforms:{sun:{value:SUN},top:{value:new T.Color(SC.top)},mid:{value:new T.Color(SC.mid)},hor:{value:new T.Color(HORIZON)},gnd:{value:new T.Color(HORIZON)}},      /* nur die Spiegelung bekommt unter dem Horizont die Farbe der Wiese */
   vertexShader:'varying vec3 d;void main(){d=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}',
   fragmentShader:`uniform vec3 sun,top,mid,hor,gnd;varying vec3 d;
    void main(){vec3 n=normalize(d);float h=max(n.y,0.0),s=max(dot(n,sun),0.0);
@@ -370,7 +403,7 @@ let ENV=null;
     #include <encodings_fragment>
    }`});
  const sky=new T.Mesh(new T.SphereGeometry(9000,32,18),mat);sky.renderOrder=-1;scene.add(sky);scene.userData.sky=sky;
- try{const pm=new T.PMREMGenerator(renderer),es=new T.Scene();const em=mat.clone();em.uniforms.gnd.value=new T.Color(0x6E8650);es.add(new T.Mesh(new T.SphereGeometry(40,24,14),em));ENV=pm.fromScene(es,0,.1,100).texture;pm.dispose()}catch(e){ENV=null}}
+ try{const pm=new T.PMREMGenerator(renderer),es=new T.Scene();const em=mat.clone();em.uniforms.gnd.value=new T.Color(SC.envG);es.add(new T.Mesh(new T.SphereGeometry(40,24,14),em));ENV=pm.fromScene(es,0,.1,100).texture;pm.dispose()}catch(e){ENV=null}}
 
 /* ---------- Gelände: Tal mit Landebahn, drumherum Berge ---------- */
 const hash=(x,z)=>{const s=Math.sin(x*127.1+z*311.7)*43758.5453;return s-Math.floor(s)};
@@ -378,21 +411,36 @@ function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=x
   return lerp(lerp(hash(xi,zi),hash(xi+1,zi),u),lerp(hash(xi,zi+1),hash(xi+1,zi+1),u),v)}
 function fbm(x,z){let a=.5,f=1,s=0;for(let i=0;i<5;i++){s+=a*vnoise(x*f,z*f);a*=.5;f*=2.03}return s}
 const RW={len:920,wid:46};          /* Bahn liegt auf der z-Achse, Mitte im Ursprung, Höhe 0 */
-/* ein See im Quertal */
-const LAKE={x:-1500,z:-2260,rx:430,rz:150,y:-2.4};
+/* ein See im Quertal des Alpentals; die anderen Plätze haben keinen */
+const LAKE=SID==='alpen'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
 const lakeD=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Math.sqrt(dx*dx+dz*dz)};
+/* einzelne Kuppen: Inseln vor der Küste, Tafelberge im Becken. x, z, Radius, Höhe, Form (1 rund, 0 mit flachem Dach) */
+const BUMPS=SID==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,1],[-1700,330,120,120,1],[-2700,900,520,210,1],[-1380,-1000,60,62,1]]:SID==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
+const TERR={
+ /* Haupttal schlängelt sich in z-Richtung, ein Quertal zweigt im Norden ab */
+ alpen(x,z){const cx=280*Math.sin(z/1250), w=300+110*Math.sin(z/760+1);
+  const m1=sstep(w,w+950,Math.abs(x-cx)),m2=sstep(190,1000,Math.abs(z+2000-240*Math.sin(x/820))),m3=sstep(160,900,Math.abs(z-2300+200*Math.sin(x/700))),m=Math.min(m1,m2,m3);
+  const ridge=Math.pow(fbm(x/1050+3.1,z/1050+7.7),1.55)*1350+fbm(x/260,z/260)*90,meadow=(fbm(x/170+11,z/170+5)-.5)*14;
+  return m*(70+ridge)+meadow*(1-m*.5)},
+ /* Küstenebene: im Westen das Meer mit Inseln, im Süden eine Steilküste, landeinwärts Hügel */
+ kueste(x,z){const sh=x+780+170*Math.sin(z/900)+80*Math.sin(z/310+1.3),land=sstep(-50,240,sh);
+  const hills=Math.max(sstep(520,2700,x-220*Math.sin(z/1100)+(fbm(x/900+2,z/900)-.5)*520),sstep(2700,4700,Math.abs(z)))*sstep(0,600,sh);
+  const ridge=Math.pow(fbm(x/1000+5.2,z/1000+1.3),1.5)*760+fbm(x/240,z/240)*70,dune=(fbm(x/150+3,z/150+9)-.5)*11;
+  const cliff=sstep(820,1500,z+120*Math.sin(x/400))*sstep(-70,90,sh)*(96+70*fbm(x/300+1,z/300));
+  let h=land*(7+dune*.8)+hills*(40+ridge)+cliff-(1-land)*36;
+  for(const [bx,bz,r,ht] of BUMPS){const d=Math.hypot(x-bx,z-bz)/r;if(d<1)h=Math.max(h,-36+(ht+36)*Math.pow(1-d*d,1.4)*(.72+.56*fbm(x/90+bx,z/90)))}
+  return h},
+ /* Wüstenbecken: welliger Sandboden, ringsum Tafelberge mit steilen Wänden und flachen Dächern */
+ wueste(x,z){const f=fbm(x/1500+9.4,z/1500+2.2),f2=fbm(x/420+1.7,z/420+6.1),r=Math.hypot(x*.85,z*.6);
+  const basin=Math.max(sstep(560,1500,r-240*(f2-.5)),0),rim=sstep(3500,5200,Math.hypot(x,z));
+  const mesa=Math.max(sstep(.5,.57,f+(f2-.5)*.1)*basin,rim),top=250+400*sstep(.55,.8,f)+(f2-.5)*36;
+  let h=(fbm(x/260+4,z/260+8)-.5)*24+basin*34*f2+mesa*top;
+  for(const [bx,bz,rr,ht] of BUMPS){const d=Math.hypot(x-bx,z-bz)/rr*(.86+.28*fbm(x/140+bx,z/140));if(d<1)h=Math.max(h,ht*sstep(1,.74,d)+(f2-.5)*18)}
+  return h}}[SID];
 function ground(x,z){
-  /* Haupttal schlängelt sich in z-Richtung, ein Quertal zweigt im Norden ab */
-  const cx=280*Math.sin(z/1250), w=300+110*Math.sin(z/760+1);
-  const m1=sstep(w,w+950,Math.abs(x-cx));
-  const m2=sstep(190,1000,Math.abs(z+2000-240*Math.sin(x/820)));
-  const m3=sstep(160,900,Math.abs(z-2300+200*Math.sin(x/700)));
-  const m=Math.min(m1,m2,m3);
-  const ridge=Math.pow(fbm(x/1050+3.1,z/1050+7.7),1.55)*1350+fbm(x/260,z/260)*90;
-  const meadow=(fbm(x/170+11,z/170+5)-.5)*14;
   /* um die Bahn herum ist es eben */
   const flat=1-sstep(85,215,Math.max(Math.abs(x)-RW.wid/2,Math.abs(z)-RW.len/2));
-  return (m*(70+ridge)+meadow*(1-m*.5))*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
+  return TERR(x,z)*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
 }
 const onRunway=(x,z)=>Math.abs(x)<RW.wid/2+2&&Math.abs(z)<RW.len/2+4;
 /* Wolkenschatten ziehen langsam über Tal, Platz und Bahn. Aus der Nähe bekommt der Boden eine zweite, feinere Körnung und ein leichtes Relief,
@@ -443,27 +491,29 @@ const LIGHT={at:()=>1};
    c[i*3]=V[i];c[i*3+1]=1-clamp((m/6-h)/170,0,.42);c[i*3+2]=0}
  LIGHT.at=(x,z)=>grid(V,x,z);
  g.setAttribute('color',new T.BufferAttribute(c,3));g.computeVertexNormals();grain.repeat.set(150,150);
- const tm=new T.MeshStandardMaterial({vertexColors:true,roughness:.95,metalness:0}),lin=h=>new T.Color(h);
- const U={uNz:{value:NOISE},uGa:{value:lin(0x3F6A2B)},uGb:{value:lin(0x5F8A3A)},uGd:{value:lin(0x8E8C4C)},uFo:{value:lin(0x294825)},uSc:{value:lin(0x8F8878)},uRa:{value:lin(0x817A72)},uRb:{value:lin(0x55504B)},uSn:{value:lin(0xF1F4F8)},uSh:{value:lin(0xB8AC88)},
+ /* Am Handy rechnet das Gelände sein Licht an den Netzpunkten statt für jeden Bildpunkt; Farbe und Felskanten bleiben pro Bildpunkt */
+ const tm=coarse?new T.MeshLambertMaterial({vertexColors:true}):new T.MeshStandardMaterial({vertexColors:true,roughness:.95,metalness:0}),lin=h=>new T.Color(h);
+ const U={uNz:{value:NOISE},uGa:{value:lin(SC.pal[0])},uGb:{value:lin(SC.pal[1])},uGd:{value:lin(SC.pal[2])},uFo:{value:lin(SC.pal[3])},uSc:{value:lin(SC.pal[4])},uRa:{value:lin(SC.pal[5])},uRb:{value:lin(SC.pal[6])},uSn:{value:lin(SC.pal[7])},uSh:{value:lin(SC.pal[8])},
+          uBelt:{value:new T.Vector4(...SC.belt)},uLv:{value:new T.Vector4(...SC.lv)},uRs:{value:new T.Vector2(...SC.rockS)},uSnow:{value:new T.Vector2(...SC.snow)},uMix:{value:new T.Vector4(...SC.mix)},uBeach:{value:new T.Vector2(...SC.beach)},
           uLake:{value:new T.Vector4(LAKE.x,LAKE.z,LAKE.rx,LAKE.rz)}};
  tm.onBeforeCompile=q=>{Object.assign(q.uniforms,U);q.uniforms.uCs=CSU.uCs;q.uniforms.uCt=CSU.uCt;
   q.vertexShader=q.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vWp;varying vec3 vWn;').replace('#include <project_vertex>','#include <project_vertex>\nvWp=(modelMatrix*vec4(transformed,1.0)).xyz;vWn=normal;');
-  let f=q.fragmentShader.replace('#include <common>','#include <common>\nuniform sampler2D uNz,uCs;uniform float uCt;uniform vec3 uGa,uGb,uGd,uFo,uSc,uRa,uRb,uSn,uSh;uniform vec4 uLake;varying vec3 vWp;varying vec3 vWn;');
+  let f=q.fragmentShader.replace('#include <common>','#include <common>\nuniform sampler2D uNz,uCs;uniform float uCt;uniform vec3 uGa,uGb,uGd,uFo,uSc,uRa,uRb,uSn,uSh;uniform vec4 uLake,uBelt,uLv,uMix;uniform vec2 uRs,uSnow,uBeach;varying vec3 vWp;varying vec3 vWn;');
   f=f.replace('#include <color_fragment>',`vec2 P=vWp.xz;float hh=vWp.y;
    vec4 nA=texture2D(uNz,P/2300.0),nB=texture2D(uNz,P/410.0+0.37),nC=texture2D(uNz,P/83.0+0.11),nD=texture2D(uNz,P/34.0,0.8);
-   float tNear=1.0-smoothstep(60.0,520.0,length(vViewPosition)),slope=1.0-normalize(vWn).y;
+   float camD=distance(cameraPosition,vWp),tNear=1.0-smoothstep(60.0,520.0,camD),slope=1.0-normalize(vWn).y;
    vec3 tc=mix(uGa,uGb,smoothstep(0.25,0.75,nA.r));tc=mix(tc,uGd,smoothstep(0.45,0.9,nB.r)*0.5);tc*=0.84+0.32*nC.b;
-   float belt=smoothstep(22.0,75.0,hh)*(1.0-smoothstep(330.0,470.0,hh+(nB.g-0.5)*90.0));tc=mix(tc,uFo,belt*(0.4+0.45*nB.g));
-   tc=mix(tc,uSc,smoothstep(300.0,430.0,hh+nB.g*90.0)*0.8);
-   float rk=max(smoothstep(0.23,0.33,slope+(nB.b-0.5)*0.2+(nA.b-0.5)*0.1),smoothstep(430.0,540.0,hh+nB.r*90.0));
-   vec3 rc=mix(uRa,uRb,nB.a)*(0.78+0.44*nC.a);rc*=0.88+0.24*texture2D(uNz,vec2(hh/170.0+nA.g*0.6,(P.x+P.y)/1300.0)).b;
+   float belt=smoothstep(uBelt.x,uBelt.y,hh)*(1.0-smoothstep(uBelt.z,uBelt.w,hh+(nB.g-0.5)*90.0));tc=mix(tc,uFo,belt*(uMix.x-0.05+uMix.x*nB.g));
+   tc=mix(tc,uSc,smoothstep(uLv.x,uLv.y,hh+nB.g*90.0)*0.8);
+   float rk=max(smoothstep(uRs.x,uRs.y,slope+(nB.b-0.5)*0.2+(nA.b-0.5)*0.1),smoothstep(uLv.z,uLv.w,hh+nB.r*90.0));
+   vec3 rc=mix(uRa,uRb,nB.a)*(0.78+0.44*nC.a);rc*=1.0-uMix.z*0.5+uMix.z*texture2D(uNz,vec2(hh/170.0+nA.g*0.6,(P.x+P.y)/1300.0)).b;
    tc=mix(tc,rc,rk);
-   float sn=smoothstep(560.0,640.0,hh+(nB.a-0.5)*150.0+(nA.a-0.5)*110.0)*(1.0-0.8*smoothstep(0.3,0.5,slope+(nB.g-0.5)*0.15));tc=mix(tc,uSn,sn);
-   tc=mix(tc,uSh,step(length((P-uLake.xy)/uLake.zw),1.6)*smoothstep(2.0,-1.5,hh));
+   float sn=smoothstep(uSnow.x,uSnow.y,hh+(nB.a-0.5)*150.0+(nA.a-0.5)*110.0)*(1.0-0.8*smoothstep(0.3,0.5,slope+(nB.g-0.5)*0.15));tc=mix(tc,uSn,sn);
+   tc=mix(tc,uSh,max(step(length((P-uLake.xy)/uLake.zw),1.6),uMix.w*(1.0-smoothstep(60.0,230.0,P.x+780.0+170.0*sin(P.y/900.0)+80.0*sin(P.y/310.0+1.3))))*smoothstep(uBeach.x,uBeach.y,hh+(nB.r-0.5)*uMix.w*3.0)*(1.0-rk));
    {float fl=(1.0-smoothstep(10.0,34.0,hh))*(1.0-rk);vec2 cl=floor((P+(nB.gb-0.5)*130.0)/vec2(340.0,250.0));float pr=fract(sin(dot(cl,vec2(12.9898,78.233)))*43758.5453);
-    tc=mix(tc,tc*mix(vec3(0.84,0.9,0.8),vec3(1.14,1.08,0.84),pr),fl*0.55);}
+    tc=mix(tc,tc*mix(vec3(0.84,0.9,0.8),vec3(1.14,1.08,0.84),pr),fl*uMix.y);}
    tc*=mix(1.0,0.8+0.4*nD.a,tNear*(1.0-sn));
-   ${coarse?'':'tc*=mix(1.0,0.86+0.28*texture2D(uNz,P/6.3,0.4).g,(1.0-smoothstep(12.0,150.0,length(vViewPosition)))*(1.0-sn)*(1.0-rk));'}
+   ${coarse?'':'tc*=mix(1.0,0.86+0.28*texture2D(uNz,P/6.3,0.4).g,(1.0-smoothstep(12.0,150.0,camD))*(1.0-sn)*(1.0-rk));'}
    diffuseColor.rgb*=tc*(1.0-0.3*texture2D(uCs,(P+vec2(uCt*7.0,uCt*3.0))/4300.0).r);`);
   /* Relief: die Neigung kommt aus drei Abtastungen des Rauschens, nicht aus Bildschirm-Ableitungen; so bleibt der Fels auch in der Ferne ruhig */
   f=f.replace('#include <normal_fragment_maps>',`#include <normal_fragment_maps>
@@ -472,25 +522,30 @@ const LIGHT={at:()=>1};
     ${coarse?'':'gr+=vec2(texture2D(uNz,(P+vec2(0.3,0.0))/34.0,0.8).a-nD.a,texture2D(uNz,(P+vec2(0.0,0.3))/34.0,0.8).a-nD.a)*(4.5*tNear);'}
     normal=normalize(normal-(viewMatrix*vec4(gr.x,0.0,gr.y,0.0)).xyz);}`);
   /* das gespeicherte Licht: im Bergschatten bleibt nur das Himmelslicht, in Mulden etwas weniger davon */
-  f=f.replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directDiffuse*=vColor.r;reflectedLight.directSpecular*=vColor.r;reflectedLight.indirectDiffuse*=vColor.g;');
+  f=coarse?f.replace('getShadowMask()','(getShadowMask()*vColor.r)'):f.replace('#include <lights_fragment_end>','#include <lights_fragment_end>\nreflectedLight.directDiffuse*=vColor.r;reflectedLight.directSpecular*=vColor.r;reflectedLight.indirectDiffuse*=vColor.g;');
   q.fragmentShader=f};
  scene.add(new T.Mesh(g,tm));
- /* See: kleine Wellen, der Himmel spiegelt sich flach gesehen stärker, die Sonne glitzert */
- const water=new T.Mesh(new T.CircleGeometry(1,64),new T.ShaderMaterial({transparent:true,fog:true,depthWrite:false,
-  uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{t:{value:0},sun:{value:SUN},deep:{value:new T.Color(0x0F3A55)},sky:{value:new T.Color(0x7FB0D6)}}]),
+ /* Wasser: kleine Wellen, flach gesehen spiegelt sich der Himmel bis zum Dunst am Horizont, die Sonne zieht eine Glitzerbahn.
+    Am Meer wird das Wasser zum Strand hin türkis, an der Wasserlinie läuft Schaum auf. */
+ const water=new T.Mesh(SC.sea?new T.PlaneGeometry(1,1):new T.CircleGeometry(1,64),new T.ShaderMaterial({transparent:true,fog:true,depthWrite:false,
+  uniforms:T.UniformsUtils.merge([T.UniformsLib.fog,{t:{value:0},uSea:{value:SC.sea?1:0},sun:{value:SUN},deep:{value:new T.Color(SC.sea?0x0E4263:0x0F3A55)},shal:{value:new T.Color(0x35999A)},sky:{value:new T.Color(SC.mid)},hor:{value:new T.Color(HORIZON)}}]),
   vertexShader:'varying vec3 wp;varying vec2 vU;\n#include <fog_pars_vertex>\nvoid main(){vU=position.xy;vec4 w=modelMatrix*vec4(position,1.0);wp=w.xyz;vec4 mvPosition=viewMatrix*w;gl_Position=projectionMatrix*mvPosition;\n#include <fog_vertex>\n}',
-  fragmentShader:`uniform float t;uniform vec3 sun,deep,sky;varying vec3 wp;varying vec2 vU;
+  fragmentShader:`uniform float t,uSea;uniform vec3 sun,deep,shal,sky,hor;varying vec3 wp;varying vec2 vU;
    #include <fog_pars_fragment>
-   void main(){vec2 q=wp.xz*0.07;
-    vec3 n=normalize(vec3(sin(q.x*1.7+t*1.3)+sin(q.y*2.3-t*1.1)+0.6*sin((q.x+q.y)*4.1+t*2.0),13.0,cos(q.y*1.9+t*1.2)+cos(q.x*2.7-t*0.9)+0.6*cos((q.x-q.y)*3.7-t*1.7)));
+   void main(){vec2 q=wp.xz*0.07;float cd=distance(cameraPosition,wp),amp=(1.0-smoothstep(700.0,2600.0,cd))/(1.0+cd*0.004);
+    vec3 n=normalize(vec3((sin(q.x*1.7+t*1.3)+sin(q.y*2.3-t*1.1)+0.6*sin((q.x+q.y)*4.1+t*2.0))*amp,13.0,(cos(q.y*1.9+t*1.2)+cos(q.x*2.7-t*0.9)+0.6*cos((q.x-q.y)*3.7-t*1.7))*amp));
     vec3 v=normalize(cameraPosition-wp),r=reflect(-v,n);
-    float f=0.05+0.95*pow(1.0-max(dot(n,v),0.0),4.0);
-    vec3 c=mix(deep,sky,clamp(f,0.0,1.0))+vec3(1.0,0.93,0.78)*pow(max(dot(r,sun),0.0),160.0);
-    gl_FragColor=vec4(c,smoothstep(1.0,0.9,length(vU))*0.95);
+    float f=0.04+0.96*pow(1.0-max(dot(n,v),0.0),5.0),sd=max(dot(r,sun),0.0);
+    float sh=wp.x+780.0+170.0*sin(wp.z/900.0)+80.0*sin(wp.z/310.0+1.3);
+    vec3 c=mix(mix(deep,shal,uSea*smoothstep(-340.0,-12.0,sh)),mix(hor,sky,smoothstep(0.0,0.45,r.y)),clamp(f,0.0,1.0))+vec3(1.0,0.93,0.78)*(pow(sd,180.0)+0.22*pow(sd,22.0)*amp);
+    float fo=uSea*smoothstep(-44.0,-5.0,sh+7.0*sin(t*0.9+wp.z*0.03))*(0.55+0.45*sin(wp.z*0.21+sh*0.35-t*1.6));
+    c=mix(c,vec3(0.96),clamp(fo,0.0,1.0)*0.8);
+    gl_FragColor=vec4(c,mix(smoothstep(1.0,0.9,length(vU))*0.95,0.97,uSea));
     #include <encodings_fragment>
     #include <fog_fragment>
    }`}));scene.userData.water=water;
- water.rotation.x=-Math.PI/2;water.scale.set(LAKE.rx*1.3,LAKE.rz*1.3,1);water.position.set(LAKE.x,LAKE.y,LAKE.z);scene.add(water)}
+ water.rotation.x=-Math.PI/2;if(SC.sea){water.scale.set(18000,18000,1);water.position.set(0,WATER,0)}else{water.scale.set(LAKE.rx*1.3,LAKE.rz*1.3,1);water.position.set(LAKE.x,LAKE.y,LAKE.z)}
+ if(WATER>-1e5)scene.add(water)}
 
 /* ---------- Modellflugplatz: gemähte Fläche, Bahn 18/36, Sicherheitslinie, Fangzaun, Pilotenstand, Vorbereitung, Vereinsheim, Windsack ---------- */
 const FIELD={pilot:new T.Vector3(31,0,262),eye:9.9};
@@ -498,7 +553,7 @@ const COL={box:[],cyl:[],sph:[],gates:[],bars:[]},PAPI=[],LAMPS=[],FOREST=[];   
 const TREE=new Map();                             /* Bäume in einem Raster, damit die Kollisionsprüfung billig bleibt */
 {const std=(c,r)=>new T.MeshStandardMaterial({color:c,roughness:r===undefined?.85:r});
  const box=(w,h,d,m,x,y,z,hit)=>{const b=new T.Mesh(new T.BoxGeometry(w,h,d),m);b.position.set(x,y,z);scene.add(b);if(hit)COL.box.push({x0:x-w/2,x1:x+w/2,y0:y-h/2,y1:y+h/2,z0:z-d/2,z1:z+d/2,name:hit});return b};
- const mc=document.createElement('canvas');mc.width=16;mc.height=2;const mx=mc.getContext('2d');mx.fillStyle='#7BA550';mx.fillRect(0,0,8,2);mx.fillStyle='#6E9A47';mx.fillRect(8,0,8,2);
+ const mc=document.createElement('canvas');mc.width=16;mc.height=2;const mx=mc.getContext('2d');mx.fillStyle=SC.mow[0];mx.fillRect(0,0,8,2);mx.fillStyle=SC.mow[1];mx.fillRect(8,0,8,2);
  const mt=new T.CanvasTexture(mc);mt.wrapS=mt.wrapT=T.RepeatWrapping;mt.repeat.set((RW.wid+84)/13,1);mt.encoding=T.sRGBEncoding;
  const mow=new T.Mesh(new T.PlaneGeometry(RW.wid+84,RW.len+80),shaded(new T.MeshStandardMaterial({map:mt,roughness:1,polygonOffset:true,polygonOffsetFactor:-1,polygonOffsetUnits:-1})));   /* Mähstreifen längs zur Bahn */mow.rotation.x=-Math.PI/2;mow.position.y=.03;scene.add(mow);
  /* Bahn 18/36: gleichmäßiger Asphalt mit feiner Körnung. Randlinien, Mittellinie, Schwellen und Aufsetzmarken liegen als eigene Flächen darauf
@@ -596,19 +651,16 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
  for(let i=0;i<5;i++){const r0=3.4-.36*i,r1=3.4-.36*(i+1),seg=new T.Mesh(new T.CylinderGeometry(r1,r0,4.4,16,1,true),new T.MeshStandardMaterial({color:i%2?0xF3EFE6:0xE8662C,side:T.DoubleSide,roughness:.9}));seg.rotation.x=Math.PI/2;seg.position.z=2.2+i*4.4;stl.add(seg)}
  scene.userData.sock={pivot:sp,tilt:stl}}
 
-/* ---------- Hindernisse: Pylonen am Platz, ein Rundkurs aus zwölf Toren das Tal hinauf und über den Hang zurück, dazu Pfeiler ---------- */
-const COURSE=[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]];
+/* ---------- Rundkurs aus zwölf Toren; je Flugplatz ein eigener Verlauf ---------- */
+const COURSE=SC.course;
 /* Abstand eines Punkts zur Kurslinie: dort bleibt der Wald licht */
 const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COURSE[i],b=COURSE[(i+1)%COURSE.length],dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz),0,1);m=Math.min(m,Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t))}return m};
 {const m=(c,r)=>new T.MeshStandardMaterial({color:c,roughness:r||.75}),red=m(0xD8412F),white=m(0xF3EFE6),yel=m(0xF4C61F),dark=m(0x2C2A27),conc=m(0xB7B2A6,.9);
  const add=(g,mat,x,y,z)=>{const o=new T.Mesh(g,mat);o.position.set(x,y,z);scene.add(o);return o};
- const pylon=(x,z)=>{const y=ground(x,z)-1,H=64;for(let i=0;i<8;i++)add(new T.CylinderGeometry(1.5,1.5,H/8,12),i%2?white:red,x,y+H/16+i*H/8,z).userData.ax=[x,z,1.5];
-  add(new T.ConeGeometry(2.7,5,12),yel,x,y+H+2.5,z);COL.cyl.push({x,z,r:1.8,y0:y,y1:y+H+5,name:'pylone'});LAMPS.push([x,y+H+5.6,z,0xFF2A18,2.2,7])};
- pylon(-135,-300);pylon(-135,300);pylon(-330,0);
  /* Tore: stehen quer zur Flugrichtung, auch am Hang; die Nummer zeigt die Reihenfolge */
  const NG=COURSE.length,W=84,H=56;
  COURSE.forEach(([x,z],i)=>{const a=COURSE[(i+NG-1)%NG],b=COURSE[(i+1)%NG],l1=Math.hypot(x-a[0],z-a[1]),l2=Math.hypot(b[0]-x,b[1]-z);let nx=(x-a[0])/l1+(b[0]-x)/l2,nz=(z-a[1])/l1+(b[1]-z)/l2;if(i===0){nx=0;nz=-1}const l=Math.hypot(nx,nz);nx/=l;nz/=l;      /* das Tor steht quer zur Kurve */
-  const tx=-nz,tz=nx,ends=[[x+tx*W/2,z+tz*W/2],[x-tx*W/2,z-tz*W/2]].map(([px,pz])=>[px,pz,ground(px,pz)]),y=Math.max(ends[0][2],ends[1][2]),top=y+H;
+  const tx=-nz,tz=nx,ends=[[x+tx*W/2,z+tz*W/2],[x-tx*W/2,z-tz*W/2]].map(([px,pz])=>[px,pz,Math.max(ground(px,pz),WATER)]),y=Math.max(ends[0][2],ends[1][2]),top=y+H;
   for(const [px,pz,pg] of ends){const hh=top+9.5-pg+2,n=Math.max(5,Math.round(hh/11));for(let k=0;k<n;k++)add(new T.CylinderGeometry(1.3,1.3,hh/n,10),k%2?yel:dark,px,pg-2+hh/n/2+k*hh/n,pz).userData.ax=[px,pz,1.3];
    COL.cyl.push({x:px,z:pz,r:1.6,y0:pg-2,y1:top+8,name:'tor'})}
   add(new T.BoxGeometry(W+6,8,1.4),yel,x,top+4,z).rotation.y=Math.atan2(-tz,tx);
@@ -616,10 +668,11 @@ const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COUR
   const nt=new T.CanvasTexture(cv);nt.encoding=T.sRGBEncoding;nt.anisotropy=4;
   for(const k of [1,-1]){const pl=add(new T.PlaneGeometry(15,7),new T.MeshBasicMaterial({map:nt,polygonOffset:true,polygonOffsetFactor:-4,polygonOffsetUnits:-4}),x+nx*.95*k,top+4,z+nz*.95*k);pl.rotation.y=Math.atan2(nx*k,nz*k)}
   COL.bars.push({x,z,tx,tz,nx,nz,hw:W/2+3,y0:top,y1:top+8});COL.gates.push({x,z,tx,tz,nx,nz,hw:W/2,y0:Math.min(ends[0][2],ends[1][2]),y1:top,top})});      /* gewertet wird der ganze Raum zwischen den Pfosten, vom Boden bis zum Balken */
- /* schlanke Betonpfeiler mit Warnkopf: stehen neben der Ideallinie und im Quertal */
- [[25,-745,140],[-150,-1330,170],[150,-260,120],[-470,-2190,150],[-300,330,110],[95,560,130],[-1180,-2080,160],[-690,-1560,130]].forEach(([x,z,h])=>{const y=ground(x,z)-2;
-  add(new T.BoxGeometry(6,h,6),conc,x,y+h/2,z);add(new T.BoxGeometry(7.2,7,7.2),yel,x,y+h-3.4,z);add(new T.BoxGeometry(8.2,1.6,8.2),dark,x,y+h-3.5,z);
-  COL.box.push({x0:x-3.4,x1:x+3.4,y0:y,y1:y+h,z0:z-3.4,z1:z+3.4,name:'pfeiler'});LAMPS.push([x,y+h+1.2,z,0xFF2A18,2.6,8])});
+ /* Leuchtturm auf der Steilküste: rot-weiß geringelt, oben blitzt das Feuer */
+ if(SC.sea){const x=-880,z=1640,y=ground(x,z)-1,H=96;
+  for(let i=0;i<4;i++)add(new T.CylinderGeometry(9-(i+1)*.75,9-i*.75,H/4,18),i%2?red:white,x,y+H/8+i*H/4,z);
+  add(new T.CylinderGeometry(8.4,8.4,2.4,18),dark,x,y+H+1.2,z);add(new T.CylinderGeometry(4.4,4.4,9,12),m(0xFFF1BC,.3),x,y+H+6.9,z);add(new T.ConeGeometry(6.2,6.5,14),red,x,y+H+14.6,z);
+  COL.cyl.push({x,z,r:9.2,y0:y,y1:y+H+17,name:'turm'});LAMPS.push([x,y+H+7,z,0xFFF6D8,8,18,0,0,0,0])}
  /* Wegweiser über dem nächsten Tor */
  const mark=add(new T.OctahedronGeometry(5),new T.MeshBasicMaterial({color:0xF4C61F}),0,0,0);scene.userData.mark=mark}
 /* LayerWing am Platz: Banner am Fangzaun und Schriftzug im Gras neben der Bahn */
@@ -642,10 +695,10 @@ function hit(px,py,pz,pr){
     for(const t of a){const k=(py-t[2])/t[3];if(k<0||k>1)continue;const dx=px-t[0],dz=pz-t[1],rr=t[4]*(1-k)+pr*.5;if(dx*dx+dz*dz<rr*rr)return 'baum'}}
   return null;
 }
-const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
+const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
 
 /* Wolken über den Gipfeln: jede besteht aus vielen weichen Ballen, oben von der Sonne hell, unten grau; in der Ferne verblassen sie im Dunst */
-{const NC=coarse?24:34,pos=[],siz=[],sha=[];
+{const NC=Math.round((coarse?24:34)*SC.clouds),pos=[],siz=[],sha=[];
  for(let c=0;c<NC;c++){const cx=(hash(c,3.3)-.5)*11500,cz=(hash(c,8.1)-.5)*11500,cy=1750+hash(c,5.5)*800,w=420+hash(c,1.9)*520,n=16+Math.floor(hash(c,7.7)*13);
   for(let k=0;k<n;k++){const q=c*31+k,u=hash(q,1.1)*2-1,v=hash(q,2.3)*2-1,up=hash(q,4.7),r=1-.55*Math.abs(u);
    pos.push(cx+u*w,cy+up*up*210*r,cz+v*w*.45);siz.push((210+hash(q,6.1)*250)*(.6+.4*r)*(1-.35*up));sha.push(.2+.8*up)}}
@@ -658,7 +711,7 @@ const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen
  for(let i=0;i<siz.length;i++){o.position.set(pos[i*3],pos[i*3+1],pos[i*3+2]);o.scale.setScalar(siz[i]*2);o.updateMatrix();cl.setMatrixAt(i,o.matrix)}
  cl.frustumCulled=false;cl.renderOrder=1;scene.add(cl)}
 /* Bäume an den unteren Hängen: geben ein Gefühl für Fahrt und Höhe */
-{const N=coarse?2600:4400,tint=(g,c)=>{g=g.toNonIndexed();g.deleteAttribute('uv');g.computeBoundingBox();const q=g.attributes.position,y0=g.boundingBox.min.y,dy=g.boundingBox.max.y-y0||1,n=q.count,a=new Float32Array(n*3),k=new T.Color(c);
+{const N=Math.max(1,Math.round((coarse?2600:4400)*SC.firs)),tint=(g,c)=>{g=g.toNonIndexed();g.deleteAttribute('uv');g.computeBoundingBox();const q=g.attributes.position,y0=g.boundingBox.min.y,dy=g.boundingBox.max.y-y0||1,n=q.count,a=new Float32Array(n*3),k=new T.Color(c);
   for(let i=0;i<n;i++){const sh=.6+.4*(q.getY(i)-y0)/dy;a[i*3]=k.r*sh;a[i*3+1]=k.g*sh;a[i*3+2]=k.b*sh}g.setAttribute('color',new T.BufferAttribute(a,3));return g};
  /* mehrere Teile zu einer Geometrie zusammenfügen; jedes Teil bringt seine Farbe mit */
  const join=list=>{const out=new T.BufferGeometry(),gs=list.map(([g])=>g.toNonIndexed()),tot=gs.reduce((q,g)=>q+g.attributes.position.count,0),P=new Float32Array(tot*3),Nn=new Float32Array(tot*3),U=new Float32Array(tot*2),C=new Float32Array(tot*3);let o=0;
@@ -679,19 +732,20 @@ const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen
  const skirt=([y0,y1,r],j,a)=>{const g=new T.CylinderGeometry(j===a.length-1?0:r*.14,r,y1-y0,RS,1,true);g.rotateY(j*1.31);g.translate(0,(y0+y1)/2,0);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setX(i,uv.getX(i)*3+j*.37);return [g,[1,1,1],1]};
  const st=new T.CylinderGeometry(.03,.05,.16,5,1,true);st.translate(0,-.42,0);{const uv=st.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.6)}
  const trunk=join([[st,[1.5,1.05,.75],1],...TIERS.map(skirt)]);
- const mat=shaded(new T.MeshStandardMaterial({vertexColors:true,map:ft,alphaTest:.5,side:T.DoubleSide,roughness:1}));
- const leafMat=shaded(new T.MeshStandardMaterial({vertexColors:true,roughness:1}));
+ const Tree=T.MeshStandardMaterial,rough={roughness:1};
+ const mat=shaded(new Tree(Object.assign({vertexColors:true,map:ft,alphaTest:.5,side:T.DoubleSide},rough)));
+ const leafMat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
  const inst=new T.InstancedMesh(trunk,mat,N),d=new T.Object3D(),col=new T.Color();let n=0,tries=0;
  const qYaw=new T.Quaternion().setFromAxisAngle(new T.Vector3(0,1,0),Math.atan2(SUN.z,-SUN.x));
  /* weicher Schattenfleck unter jedem Baum, zur Sonne passend versetzt und an den Hang gelegt */
  const sc=document.createElement('canvas');sc.width=sc.height=64;const sx=sc.getContext('2d'),sg=sx.createRadialGradient(32,32,2,32,32,32);sg.addColorStop(0,'rgba(0,0,0,.55)');sg.addColorStop(.55,'rgba(0,0,0,.3)');sg.addColorStop(1,'rgba(0,0,0,0)');sx.fillStyle=sg;sx.fillRect(0,0,64,64);
  const bg=new T.PlaneGeometry(1,1);bg.rotateX(-Math.PI/2);
  const blob=new T.InstancedMesh(bg,new T.MeshBasicMaterial({map:new T.CanvasTexture(sc),transparent:true,opacity:.62,depthWrite:false,color:0x1c2a22,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}),N),up=new T.Vector3(0,1,0),nrm=new T.Vector3(),o2=new T.Object3D();
- while(n<N&&tries<110000){tries++;const x=(hash(tries,1.7)-.5)*7200,z=(hash(tries,9.3)-.5)*7200,h=ground(x,z);
-   if(h<3||h>360)continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<62)continue;
+ while(SC.firs&&n<N&&tries<110000){tries++;const x=(hash(tries,1.7)-.5)*7200,z=(hash(tries,9.3)-.5)*7200,h=ground(x,z);
+   if(h<SC.firH[0]||h>SC.firH[1])continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<62)continue;
    const s=22+hash(tries,4.4)*30;d.position.set(x,h+s*.5-1,z);d.scale.set(s*.6,s,s*.6);d.rotation.y=hash(tries,2.2)*6;d.updateMatrix();inst.setMatrixAt(n,d.matrix);
    {const bx=x-SUN.x*s*.42,bz=z-SUN.z*s*.42;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(s*1.45,1,s*.72);o2.updateMatrix();blob.setMatrixAt(n,o2.matrix)}
-   col.setHSL(.27+hash(tries,6.1)*.07,.36,.25+hash(tries,7.7)*.13).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));inst.setColorAt(n,col);n++;
+   col.setHSL(SC.firC[0]+hash(tries,6.1)*SC.firC[1],SC.firC[2],SC.firC[3]+hash(tries,7.7)*SC.firC[4]).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));inst.setColorAt(n,col);n++;
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.3])}
  /* Der Wald wird in Kacheln aufgeteilt: was nicht im Blickfeld liegt, wird gar nicht erst gezeichnet. Ferne Kacheln bekommen
     eine einfachere Fichte aus zwei Kränzen, ihre Schattenflecken fallen ganz weg; aus der Entfernung sieht man den Unterschied nicht. */
@@ -705,7 +759,7 @@ const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen
  const low=join([skirt([-.38,.1,.5],0,[0,0]),skirt([-.04,.5,.31],1,[0,0])]);
  split(inst,n,low);split(blob,n,null,true);
  /* Laubbäume stehen in Gruppen auf dem Talboden */
- {const NB=coarse?320:420,c1=new T.CylinderGeometry(.03,.05,.42,6,1,true);c1.translate(0,-.29,0);{const uv=c1.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5)}
+ {const NB=Math.round((coarse?320:420)*SC.leafy),c1=new T.CylinderGeometry(.03,.05,.42,6,1,true);c1.translate(0,-.29,0);{const uv=c1.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5)}
   const ball=(r,x,y,z,sd,rep,det)=>{const g=new T.IcosahedronGeometry(r,det===undefined?1:det),q=g.attributes.position,nn=g.attributes.normal,uv=g.attributes.uv;
    for(let i=0;i<q.count;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,k=r*(1+.24*(vnoise(ux*2.6+sd,uy*2.6+uz*2.1)-.5));q.setXYZ(i,ux*k,uy*k*.86,uz*k);nn.setXYZ(i,ux,uy,uz);uv.setXY(i,uv.getX(i)*rep*2,uv.getY(i)*rep)}
    g.translate(x,y,z);return g};
@@ -714,24 +768,32 @@ const HITTEXT={zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen
     for(const ox of [-128,0,128])for(const oy of [-128,0,128]){x.beginPath();x.ellipse(bx+ox,by+oy,r,r*.62,hash(i,19.1)*3.1,0,6.3);x.fill()}}
    const im=x.getImageData(0,0,128,128),dt=im.data;for(let i=0;i<16384;i++)dt[i*4+3]=dt[i*4+3]>110?255:0;x.putImageData(im,0,0);
    const t=new T.CanvasTexture(cv);t.wrapS=t.wrapT=T.RepeatWrapping;t.encoding=T.sRGBEncoding;t.anisotropy=coarse?2:4;return t})();
-  const shellMat=shaded(new T.MeshStandardMaterial({vertexColors:true,map:lt,alphaTest:.5,side:T.DoubleSide,roughness:1}));
+  const shellMat=shaded(new Tree(Object.assign({vertexColors:true,map:lt,alphaTest:.5,side:T.DoubleSide},rough)));
   const core=join([[c1,[.6,.47,.36],1],[ball(.27,0,.17,0,1,1,0),[.5,.52,.48],.6],[ball(.17,.2,.04,.08,5,1,0),[.46,.48,.44],.6]]);
   const leaf=join([[ball(.34,0,.17,0,1,2),[1,1,1],.55],[ball(.23,.2,.04,.08,5,2),[.93,.96,.9],.55]].concat(coarse?[]:[[ball(.21,-.17,.1,-.12,9,2),[.9,.94,.86],.55]]));
   const lc=new T.InstancedMesh(core,leafMat,NB);
   const li=new T.InstancedMesh(leaf,shellMat,NB),lb=new T.InstancedMesh(bg,blob.material,NB);let m=0,tr=0;
   while(m<NB&&tr<40000){tr++;const x=(hash(tr,12.7)-.5)*5200,z=(hash(tr,19.3)-.5)*6400,h=ground(x,z);
-   if(h<.8||h>34)continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<70||lakeD(x,z)<1.5)continue;if(vnoise(x/150+4,z/150+8)<.56)continue;
-   const s=17+hash(tr,4.4)*15;d.position.set(x,h+s*.5-1,z);d.scale.set(s*(.85+hash(tr,3.1)*.4),s,s*(.85+hash(tr,5.9)*.4));d.rotation.set(0,hash(tr,2.2)*6,0);d.updateMatrix();li.setMatrixAt(m,d.matrix);lc.setMatrixAt(m,d.matrix);
+   if(h<SC.leafH[0]||h>SC.leafH[1])continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<70||lakeD(x,z)<1.5)continue;if(vnoise(x/150+4,z/150+8)<SC.leafK)continue;
+   const s=SC.leafS[0]+hash(tr,4.4)*SC.leafS[1];d.position.set(x,h+s*.5-1,z);d.scale.set(s*(.85+hash(tr,3.1)*.4),s,s*(.85+hash(tr,5.9)*.4));d.rotation.set(0,hash(tr,2.2)*6,0);d.updateMatrix();li.setMatrixAt(m,d.matrix);lc.setMatrixAt(m,d.matrix);
    {const bx=x-SUN.x*s*.3,bz=z-SUN.z*s*.3;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(s*1.5,1,s*1.0);o2.updateMatrix();lb.setMatrixAt(m,o2.matrix)}
-   col.setHSL(.24+hash(tr,6.1)*.08,.42,.27+hash(tr,7.7)*.12).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));li.setColorAt(m,col);lc.setColorAt(m,col);m++;
+   col.setHSL(SC.leafC[0]+hash(tr,6.1)*SC.leafC[1],SC.leafC[2],SC.leafC[3]+hash(tr,7.7)*SC.leafC[4]).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));li.setColorAt(m,col);lc.setColorAt(m,col);m++;
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.36])}
   split(li,m);split(lc,m);split(lb,m)}
+ /* Kakteen in der Wüste: ein Stamm mit zwei Armen */
+ if(SC.cacti){const NK=SC.cacti(coarse),cyl=(r,h,x,y,z,rz)=>{const g=new T.CylinderGeometry(r*.9,r,h,7,1,false);if(rz)g.rotateZ(Math.PI/2);g.translate(x,y,z);return [g,[1,1,1],.72]};
+  const ki=new T.InstancedMesh(join([cyl(.085,1,0,0,0),cyl(.052,.2,.13,-.03,0,1),cyl(.052,.36,.24,.14,0),cyl(.048,.19,-.12,.11,0,1),cyl(.048,.27,-.22,.24,0)]),leafMat,NK);let m=0,tr=0;
+  while(m<NK&&tr<30000){tr++;const x=(hash(tr,61.7)-.5)*5600,z=(hash(tr,73.3)-.5)*5600,h=ground(x,z);if(h>90)continue;if(Math.abs(x)<200&&Math.abs(z)<680)continue;if(courseDist(x,z)<55)continue;
+   const s=15+hash(tr,4.4)*15;d.position.set(x,h+s*.5-.5,z);d.scale.set(s,s,s);d.rotation.set(0,hash(tr,2.2)*6,0);d.updateMatrix();ki.setMatrixAt(m,d.matrix);
+   col.setHSL(.26+hash(tr,6.1)*.05,.34,.27+hash(tr,7.7)*.08).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));ki.setColorAt(m,col);m++;
+   const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.1])}
+  split(ki,m)}
  /* Felsbrocken: weiter oben überall, weiter unten nur an steilen Stellen */
- {const NR=460,ri=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:0x8C867D,flatShading:true,roughness:1}),NR);let m=0,tr=0;
-  while(m<NR&&tr<30000){tr++;const x=(hash(tr,31.7)-.5)*7400,z=(hash(tr,47.3)-.5)*7600,h=ground(x,z);if(h<50||h>660)continue;if(courseDist(x,z)<45)continue;
-   const sl=Math.abs(ground(x+10,z)-ground(x-10,z))+Math.abs(ground(x,z+10)-ground(x,z-10));if(h<300&&sl<11)continue;
+ {const NR=460,ri=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:SID==='wueste'?0xffffff:0x8C867D,flatShading:true,roughness:1}),NR);let m=0,tr=0;
+  while(m<NR&&tr<30000){tr++;const x=(hash(tr,31.7)-.5)*7400,z=(hash(tr,47.3)-.5)*7600,h=ground(x,z);if(h<WATER+1||courseDist(x,z)<45||(Math.abs(x)<200&&Math.abs(z)<680))continue;
+   const sl=Math.abs(ground(x+10,z)-ground(x-10,z))+Math.abs(ground(x,z+10)-ground(x,z-10));if(!SC.rocks(h,sl))continue;
    const s=1.6+hash(tr,5.5)*hash(tr,8.8)*7;d.position.set(x,h+s*.22,z);d.scale.set(s*(.8+hash(tr,1.3)*.7),s*(.45+hash(tr,2.9)*.5),s*(.8+hash(tr,7.1)*.7));d.rotation.set(hash(tr,3.3)*6,hash(tr,4.4)*6,hash(tr,6.6)*6);d.updateMatrix();ri.setMatrixAt(m,d.matrix);
-   col.setHSL(.09,.05,.42+hash(tr,9.9)*.2);ri.setColorAt(m,col);m++}
+   col.setHSL(SC.rockC[0],SC.rockC[1],SC.rockC[2]+hash(tr,9.9)*.2);ri.setColorAt(m,col);m++}
   ri.count=m;scene.add(ri)}}
 
 /* ---------- Befeuerung: alle Lampen in einem Zeichenaufruf. Jede ist eine leuchtende Scheibe, die sich zur Kamera dreht und aus der Ferne
@@ -755,7 +817,7 @@ const LAMP={U:{uT:{value:0},uPx:{value:900}},col:null};
  g.setAttribute('aCol',new T.InstancedBufferAttribute(aC,3));g.setAttribute('aPar',new T.InstancedBufferAttribute(aP,4));g.setAttribute('aQ',new T.InstancedBufferAttribute(aQ,2));
  im.frustumCulled=false;im.renderOrder=3;scene.add(im);LAMP.col=g.attributes.aCol}
 
-/* Feste Kulisse zusammenfassen: Tore, Pfeiler, Pylonen, Zaunpfosten, Tische, Autos und Lampenkästen werden zu wenigen Netzen.
+/* Feste Kulisse zusammenfassen: Tore, Zaunpfosten, Tische, Autos und Lampenkästen werden zu wenigen Netzen.
    Das spart ein paar hundert Zeichenaufrufe in jedem Bild. Windsack und Pilot bewegen sich und bleiben einzeln. */
 {const skip=new Set(),groups=new Map();for(const r of [scene.userData.sock.pivot,scene.userData.pilot])r.traverse(o=>skip.add(o));scene.updateMatrixWorld(true);
  scene.traverse(o=>{if(!o.isMesh||o.isInstancedMesh||skip.has(o))return;const m=o.material;
@@ -768,7 +830,7 @@ const LAMP={U:{uT:{value:0},uPx:{value:900}},col:null};
    o.parent.remove(o);if(g!==o.geometry)g.dispose();o.geometry.dispose()});
   const g=new T.BufferGeometry(),q=key.split('|');g.setAttribute('position',new T.BufferAttribute(P,3));g.setAttribute('normal',new T.BufferAttribute(Nn,3));g.setAttribute('color',new T.BufferAttribute(C,3));
   const mat=new T.MeshStandardMaterial({vertexColors:true,roughness:+q[1],metalness:+q[2]});
-  /* Torpfosten und Pylonen sind aus der Ferne dünner als ein Pixel und würden flimmern: der Shader hält sie bei gut zwei Pixeln Breite */
+  /* Torpfosten sind aus der Ferne dünner als ein Pixel und würden flimmern: der Shader hält sie bei gut zwei Pixeln Breite */
   if(A){g.setAttribute('aAx',new T.BufferAttribute(A,3));mat.onBeforeCompile=sh=>{sh.uniforms.uPx=LAMP.U.uPx;
    sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nattribute vec3 aAx;uniform float uPx;').replace('#include <begin_vertex>','#include <begin_vertex>\n{float dist=length(cameraPosition-vec3(aAx.x,transformed.y,aAx.y));transformed.xz=aAx.xy+(transformed.xz-aAx.xy)*clamp(dist*1.2/(uPx*aAx.z),1.0,8.0);}')}}
   const mesh=new T.Mesh(g,mat);mesh.castShadow=q[0]==='1';if(A)mesh.frustumCulled=false;scene.add(mesh)}}
@@ -930,7 +992,11 @@ const inv=$('#c-inv');inv.checked=invert;
 const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Seitlich rollt das Modell.':'Runter ziehen hebt die Nase. Seitlich rollt das Modell.';$('#pad-r-p').className=invert?'pt':'pb';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
 inv.addEventListener('change',()=>{invert=inv.checked;pitchText();try{localStorage.setItem('lw-fliegen-invert',invert?'1':'0')}catch(e){}});pitchText();
 const card=$('#card');
-function start(){if(!LB.name){askName();return}view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
+/* Flugplatz: Knöpfe füllen; ein anderer Platz lädt die Seite mit dieser Landschaft neu */
+{const box=$('#places');for(const id in SCENES){const b=document.createElement('button'),sm=document.createElement('small');b.type='button';b.className='place';b.textContent=SCENES[id].name;sm.textContent=SCENES[id].sub;b.appendChild(sm);b.setAttribute('aria-pressed',id===SID);
+  b.addEventListener('click',()=>{if(id===SID)return;try{localStorage.setItem('lw-fliegen-platz',id)}catch(e){}$('#loadline').textContent='Flugplatz '+SCENES[id].name+' lädt …';location.search='?platz='+id});box.appendChild(b)}
+ $('#card-h').textContent=$('#menu-h').textContent='Flugplatz '+SC.name;document.title='Flugplatz '+SC.name+' | LayerWing Fliegen'}
+function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{view('help');$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
 $('#b-reset').addEventListener('click',()=>{reset('Zurück am Start');});
@@ -952,19 +1018,31 @@ window.addEventListener('keydown',e=>{
 window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false});
 window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
 /* Touch: zwei Knüppel wie am Sender (Mode 2). Links Gas (bleibt stehen) und Seitenruder, rechts Höhen- und Querruder.
-   Jeder Knüppel folgt dem Finger ab dem Punkt, an dem er aufsetzt; man muss also nicht die Mitte treffen. */
-{const TR=46,dead=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),expo=v=>.4*v+.6*v*v*v,   /* um die Mitte feinfühlig, am Rand voller Ausschlag */
+   Die ganze linke und die ganze rechte Bildschirmhälfte nehmen den Daumen an: der Knüppel springt dorthin, wo er aufsetzt,
+   und kehrt nach dem Loslassen in seine Ecke zurück. Der Gasknüppel erscheint so, dass der Daumen genau auf dem aktuellen Gas liegt. */
+{const TR=58,dead=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),expo=v=>.4*v+.6*v*v*v,   /* um die Mitte feinfühlig, am Rand voller Ausschlag */
  grab=(el,e)=>{try{el.setPointerCapture(e.pointerId)}catch(x){}};
- const padL=$('#pad-l'),kL=$('#pad-l-k'),padR=$('#pad-r'),kR=$('#pad-r-k');let l0=null,r0=null;
+ const padL=$('#pad-l'),kL=$('#pad-l-k'),padR=$('#pad-r'),kR=$('#pad-r-k'),zL=$('#zone-l'),zR=$('#zone-r');let l0=null,r0=null;
+ const put=(el,x,y)=>{el.style.transition='none';el.style.transform='';const r=el.getBoundingClientRect();el.style.transform=`translate(${Math.round(x-r.left-r.width/2)}px,${Math.round(y-r.top-r.height/2)}px)`;el.classList.add('used','live')},
+       home=el=>{el.style.transition='';el.style.transform='';el.classList.remove('live')};
  touch.draw=()=>{const t=touch.thr===null?S.thr:touch.thr;kL.style.transform=`translate(${touch.r*TR}px,${(1-2*t)*TR}px)`};
- padL.addEventListener('pointerdown',e=>{e.preventDefault();padL.classList.add('used');grab(padL,e);if(touch.thr===null)touch.thr=S.thr;l0={x:e.clientX,y:e.clientY,t:touch.thr};touch.ron=true});
- padL.addEventListener('pointermove',e=>{if(!l0)return;touch.r=expo(dead(clamp((e.clientX-l0.x)/TR,-1,1),.2));touch.thr=clamp(l0.t-(e.clientY-l0.y)/(2*TR),0,1);touch.draw()});
- const endL=()=>{l0=null;touch.r=0;touch.ron=false;touch.draw()};padL.addEventListener('pointerup',endL);padL.addEventListener('pointercancel',endL);
- padR.addEventListener('pointerdown',e=>{e.preventDefault();padR.classList.add('used');grab(padR,e);r0={x:e.clientX,y:e.clientY};touch.on=true});
- padR.addEventListener('pointermove',e=>{if(!r0)return;let dx=(e.clientX-r0.x)/TR,dy=(e.clientY-r0.y)/TR;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}
+ zL.addEventListener('pointerdown',e=>{if(l0)return;e.preventDefault();grab(zL,e);if(touch.thr===null)touch.thr=S.thr;l0={id:e.pointerId,x:e.clientX,y:e.clientY,t:touch.thr};touch.ron=true;
+   put(padL,e.clientX,e.clientY-(1-2*touch.thr)*TR);touch.draw()});
+ zL.addEventListener('pointermove',e=>{if(!l0||e.pointerId!==l0.id)return;touch.r=expo(dead(clamp((e.clientX-l0.x)/TR,-1,1),.16));touch.thr=clamp(l0.t-(e.clientY-l0.y)/(2*TR),0,1);touch.draw()});
+ const endL=e=>{if(!l0||e.pointerId!==l0.id)return;l0=null;touch.r=0;touch.ron=false;home(padL);touch.draw()};zL.addEventListener('pointerup',endL);zL.addEventListener('pointercancel',endL);
+ zR.addEventListener('pointerdown',e=>{if(r0)return;e.preventDefault();grab(zR,e);r0={id:e.pointerId,x:e.clientX,y:e.clientY};touch.on=true;put(padR,e.clientX,e.clientY)});
+ zR.addEventListener('pointermove',e=>{if(!r0||e.pointerId!==r0.id)return;let dx=(e.clientX-r0.x)/TR,dy=(e.clientY-r0.y)/TR;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}
    touch.x=expo(dead(dx,.07));touch.y=expo(dead(dy,.07));kR.style.transform=`translate(${dx*TR}px,${dy*TR}px)`});
- const endR=()=>{r0=null;touch.on=false;touch.x=touch.y=0;kR.style.transform=''};padR.addEventListener('pointerup',endR);padR.addEventListener('pointercancel',endR);
+ const endR=e=>{if(!r0||e.pointerId!==r0.id)return;r0=null;touch.on=false;touch.x=touch.y=0;kR.style.transform='';home(padR)};zR.addEventListener('pointerup',endR);zR.addEventListener('pointercancel',endR);
  touch.draw()}
+/* am Handy: Vollbild, damit keine Browserleiste Platz wegnimmt, und der Bildschirm bleibt beim Fliegen an */
+let wake=null;
+function immersive(){if(!coarse)return;
+  try{const el=document.documentElement,fs=el.requestFullscreen||el.webkitRequestFullscreen;if(fs&&!document.fullscreenElement&&!document.webkitFullscreenElement){const r=fs.call(el,{navigationUI:'hide'});if(r&&r.catch)r.catch(()=>{})}}catch(e){}
+  try{if(navigator.wakeLock&&!wake)navigator.wakeLock.request('screen').then(w=>{wake=w;w.addEventListener('release',()=>{wake=null})},()=>{})}catch(e){}}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&S.started&&card.hidden)try{if(navigator.wakeLock&&!wake)navigator.wakeLock.request('screen').then(w=>{wake=w;w.addEventListener('release',()=>{wake=null})},()=>{})}catch(e){}});
+/* kurzer Ruck im Gerät: beim Tor ein Tippen, beim Absturz ein Schlag (wo das Gerät es kann) */
+const buzz=p=>{if(coarse)try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 
 /* ---------- Flugmodell ----------
    Kräfte: Schub, Gewicht, Auftrieb und Widerstand aus Anstellwinkel und Staudruck, Seitenkraft aus dem Schiebewinkel.
@@ -1025,6 +1103,7 @@ function rockets(dt){
 function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
+  buzz([40,50,90]);
   if(S.ground){fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));S.vel.copy(fH).multiplyScalar(S.gs)}
   const sp=S.vel.length(),kick=clamp(sp/28,.3,1.7);
   if(!inAir)S.pos.y=ground(S.pos.x,S.pos.z)+P.gear;
@@ -1051,29 +1130,32 @@ function netCall(path,body){const c=new AbortController(),tm=setTimeout(()=>c.ab
 /* Liste holen: von jedem Namen die beste Zeit je Modell, schnellste zuerst */
 function netLoad(force){
   if(!netOn()||LB.busy||(!force&&LB.net&&Date.now()-LB.netAt<20000))return Promise.resolve(false);LB.busy=true;
-  return netCall('bestenliste?select=name,modell,zeit,datum&order=zeit.asc&limit=300').then(a=>{LB.busy=false;LB.err=false;LB.netAt=Date.now();
-    LB.net=(Array.isArray(a)?a:[]).filter(e=>e&&typeof e.name==='string'&&+e.zeit>0).map(e=>({n:e.name.slice(0,16),m:String(e.modell),t:+e.zeit,d:Date.parse(e.datum)||0}));return true},()=>{LB.busy=false;LB.err=true;return false})}
+  return netCall('bestenliste?select=name,modell,zeit,datum&platz=eq.'+SID+'&order=zeit.asc&limit=300').then(a=>{LB.busy=false;LB.err=false;LB.netAt=Date.now();
+    LB.net=(Array.isArray(a)?a:[]).filter(e=>e&&typeof e.name==='string'&&+e.zeit>0).map(e=>({n:e.name.slice(0,16),m:String(e.modell),t:+e.zeit,d:Date.parse(e.datum)||0,p:SID}));return true},()=>{LB.busy=false;LB.err=true;return false})}
 /* Zeit melden. Klappt es nicht (kein Netz), bleibt sie vorgemerkt und geht beim nächsten Mal mit */
 function netSend(e){
   if(!netOn())return;let q=[];try{q=JSON.parse(localStorage.getItem('lw-fliegen-offen')||'[]')}catch(err){}if(!Array.isArray(q))q=[];
-  if(e)q.push({n:e.n,m:e.m,t:e.t});q=q.slice(-20);if(!q.length)return;try{localStorage.setItem('lw-fliegen-offen',JSON.stringify(q))}catch(err){}
+  if(e)q.push({n:e.n,m:e.m,t:e.t,p:e.p});q=q.slice(-20);if(!q.length)return;try{localStorage.setItem('lw-fliegen-offen',JSON.stringify(q))}catch(err){}
   const next=()=>{const x=q[0];if(!x){netLoad(true).then(ok=>{if(ok&&!card.hidden&&!$('#v-board').hidden)openBoard()});return}
-    netCall('rpc/zeit_melden',{p_name:x.n,p_modell:x.m,p_zeit:x.t}).then(()=>{q.shift();try{localStorage.setItem('lw-fliegen-offen',JSON.stringify(q))}catch(err){}next()},()=>{LB.err=true})};
+    netCall('rpc/zeit_melden',{p_name:x.n,p_modell:x.m,p_zeit:x.t,p_platz:x.p||'alpen'}).then(()=>{q.shift();try{localStorage.setItem('lw-fliegen-offen',JSON.stringify(q))}catch(err){}next()},()=>{LB.err=true})};
   next()}
 function lbLoad(){
-  try{const a=JSON.parse(localStorage.getItem(LB.key)||'[]');LB.list=Array.isArray(a)?a.filter(e=>e&&typeof e.n==='string'&&typeof e.m==='string'&&e.t>0).slice(0,100):[]}catch(e){LB.list=[]}
+  try{const a=JSON.parse(localStorage.getItem(LB.key)||'[]');LB.list=Array.isArray(a)?a.filter(e=>e&&typeof e.n==='string'&&typeof e.m==='string'&&e.t>0).slice(0,300):[]}catch(e){LB.list=[]}
   try{LB.name=(localStorage.getItem('lw-fliegen-name')||'').slice(0,16)}catch(e){LB.name=''}
   /* alte Stände entfernen */
   try{localStorage.removeItem('lw-fliegen-bestzeiten');for(const pl of PLANES)localStorage.removeItem('lw-fliegen-runde-'+pl.id)}catch(e){}
   if(netOn()){netLoad();netSend()}
 }
-function lbBest(m){const e=LB.list.find(x=>x.m===m);return e?e.t:null}
+/* jede Zeit gehört zu einem Flugplatz; Zeiten aus der Zeit vor der Auswahl zählen zum Alpental */
+const here=e=>(e.p||'alpen')===SID;
+function lbBest(m){const e=LB.list.find(x=>x.m===m&&here(x));return e?e.t:null}
 function lbAdd(t){
-  const e={n:LB.name||'Pilot',t:Math.round(t*100)/100,m:P.def.id,d:Date.now()};
-  LB.list.push(e);LB.list.sort((a,b)=>a.t-b.t);LB.list=LB.list.slice(0,100);LB.fresh=e;
+  const e={n:LB.name||'Pilot',t:Math.round(t*100)/100,m:P.def.id,d:Date.now(),p:SID};
+  LB.list.push(e);LB.list.sort((a,b)=>a.t-b.t);LB.list=LB.list.slice(0,300);LB.fresh=e;
   try{localStorage.setItem(LB.key,JSON.stringify(LB.list))}catch(err){}
-  if(!netOn())return LB.list.indexOf(e)+1;
-  if(!LB.net){netSend(e);return LB.list.indexOf(e)+1}
+  const local=LB.list.filter(here).indexOf(e)+1;
+  if(!netOn())return local;
+  if(!LB.net){netSend(e);return local}
   /* in der gemeinsamen Liste zählt von jedem Piloten nur die beste Runde je Modell: die neue Zeit ersetzt die alte, wenn sie schneller ist */
   const k=e.n.toLowerCase(),old=LB.net.find(x=>x.m===e.m&&x.n.toLowerCase()===k);
   if(!old||e.t<old.t){if(old)LB.net.splice(LB.net.indexOf(old),1);LB.net.push(e);LB.net.sort((a,b)=>a.t-b.t)}
@@ -1091,7 +1173,7 @@ function openBoard(){
   if(!LB.name){askName();return}
   const tabs=$('#board-tabs');tabs.textContent='';
   for(const [id,name] of [['all','Alle']].concat(PLANES.map(q=>[q.id,q.name]))){const b=document.createElement('button');b.type='button';b.className='tab';b.textContent=name;b.setAttribute('aria-pressed',LB.filter===id?'true':'false');b.addEventListener('click',()=>{LB.filter=id;openBoard()});tabs.appendChild(b)}
-  const shared=netOn()&&!!LB.net,rows=$('#board-rows'),list=(shared?LB.net:LB.list).filter(e=>LB.filter==='all'||e.m===LB.filter);rows.textContent='';
+  const shared=netOn()&&!!LB.net,rows=$('#board-rows'),list=(shared?LB.net:LB.list).filter(e=>here(e)&&(LB.filter==='all'||e.m===LB.filter));rows.textContent='';$('#board-h').textContent='Bestentabelle '+SC.name;
   list.slice(0,shared?50:25).forEach((e,i)=>{const tr=document.createElement('tr'),pl=PLANES.find(q=>q.id===e.m),cell=(t,c)=>{const td=document.createElement('td');td.textContent=t;if(c)td.className=c;tr.appendChild(td)};
     if(e.n.toLowerCase()===LB.name.toLowerCase())tr.classList.add('me');if(LB.fresh&&(e===LB.fresh||(e.m===LB.fresh.m&&e.t===LB.fresh.t&&e.n===LB.fresh.n)))tr.classList.add('new');
     cell(i+1+'.');cell(e.n);cell(pl?pl.name:e.m);cell(fmtH(e.t),'num t');cell(e.d?new Date(e.d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'}):'','num');rows.appendChild(tr)});
@@ -1106,7 +1188,7 @@ function passGate(i){
   const n=COL.gates.length;
   if(i!==S.next){if(i!==(S.next+n-1)%n)say('Das war Tor '+(i+1)+'. Als Nächstes kommt Tor '+(S.next+1));return}
   if(i===0)S.lap0=S.clock;
-  S.next++;
+  S.next++;buzz(14);
   if(S.next<n){say('Tor '+(i+1)+' von '+n,true);return}
   /* letztes Tor: Uhr stoppen und die Runde in die Bestentabelle eintragen */
   const t=S.clock-S.lap0,rank=lbAdd(t);S.last=t;S.rank=rank;S.best=lbBest(P.def.id);S.next=0;S.lap0=null;
@@ -1133,7 +1215,7 @@ function rolling(dt){
   /* gelenkt wird mit dem Seitenruder; Seitenwind dreht die Nase etwas in den Wind */
   S.psi+=(-inY*1.15*clamp(S.gs/3+d.wash*S.pw*.5,0,1)*clamp(S.gs/1.2,0,1)/(1+S.gs/22)+.03*cw*clamp(S.gs/8,0,1)+d.tq*S.pw*.26*clamp(S.gs/3,0,1)*(1-clamp(ua/(1.6*d.vS),0,1)))*dt;      /* der Propellerstrahl bläst das Seitenruder schon bei wenig Fahrt an */
   const h0=ground(S.pos.x,S.pos.z);S.pos.addScaledVector(fH,S.gs*dt);const h1=ground(S.pos.x,S.pos.z);S.pos.y=h1+low(S.pitchG);S.gt+=dt;
-  if(h1<LAKE.y-.4){crash('Ins Wasser gerollt.');return}
+  if(h1<WATER-.4){crash('Ins Wasser gerollt.');return}
   if((h1-h0)/Math.max(S.gs*dt,.01)>.3&&S.gs>6){crash('Das Gelände war zu steil.');return}
   {const o=hit(S.pos.x,S.pos.y,S.pos.z,P.span*.3);if(o){crash(HITTEXT[o]);return}}
   S.Q.setFromEuler(eul.set(S.pitchG,S.psi,0,'YXZ'));
@@ -1216,7 +1298,7 @@ function flying(dt){
   if(st>.5&&agl>4&&S.air>1.5&&WIND.t-S.warn>4){S.warn=WIND.t;say('Strömungsabriss: Nase runter und Gas rein')}
   /* Bodenberührung */
   const h=ground(S.pos.x,S.pos.z);
-  if(h<LAKE.y&&S.pos.y-P.gear<=LAKE.y){S.pos.y=LAKE.y+P.gear;crash('Im See gelandet.',true);return}
+  if(h<WATER&&S.pos.y-P.gear<=WATER){S.pos.y=WATER+P.gear;crash(SC.sea?'Im Meer gelandet.':'Im See gelandet.',true);return}
   fwd.set(0,0,-1).applyQuaternion(S.Q);const lowP=low(Math.asin(clamp(fwd.y,-1,1)));
   upv.set(0,1,0).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);
   if(S.pos.y-lowP<=h&&S.pos.y-P.gear>h+.04&&fwd.y>.05&&upv.y>.8&&S.vel.y>-3.9){
@@ -1497,7 +1579,7 @@ try{const q=new URLSearchParams(location.search).get('modell');if(PLANES.some(p=
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
 /* Handy: Stoppuhr und die zwei wichtigsten Knöpfe wandern in die oberste Zeile, Modellwahl und Schalter ins Menü, Raketen und Heckklappe über den rechten Knüppel */
 if(coarse){const top=document.querySelector('.top'),tl=document.createElement('div');tl.className='tl';tl.appendChild($('#clock'));tl.appendChild($('#mini'));top.appendChild(tl);for(const id of ['b-reset','b-menu'])top.appendChild($('#'+id));
-  $('#menu-models').appendChild($('#models'));for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
+  $('#menu-places').appendChild($('#places'));$('#menu-models').appendChild($('#models'));for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
   $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
 $('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'Weiterfliegen':'Losfliegen';view('menu')});
 $('#b-go2').addEventListener('click',start);
