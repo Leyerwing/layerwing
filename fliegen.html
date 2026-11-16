@@ -925,7 +925,7 @@ async function build(def){
     if(g.userData.lines&&!def.MAT[name])mesh.add(new T.LineSegments(g.userData.lines,lineMat));
     /* gedruckte Räder durch saubere ersetzen */
     if(def.wheels&&def.wheels.test(name)){mesh.visible=false;const b=g.boundingBox,R=(b.max.z-b.min.z)/2,wd=b.max.y-b.min.y;if(/^Rad/.test(name)){const w=makeWheel(R,wd);outer.add(w);wheels.push({w,R:R*K})}}
-    parts.push({outer,c,v:new T.Vector3(),w:new T.Vector3()});
+    parts.push({name,outer,c,bb:g.boundingBox,v:new T.Vector3(),w:new T.Vector3()});
   }
   const props=def.props.map(a=>{const p=makeProp(...a);const o=new T.Group();p.g.position.set(0,0,0);o.position.set(a[1],a[2],a[3]);o.add(p.g);fit.add(o);parts.push({outer:o,c:new T.Vector3(a[1],a[2],a[3]),v:new T.Vector3(),w:new T.Vector3()});return p});
   /* wie tief reicht das Modell unter den Schwerpunkt, wenn die Nase um a angehoben ist? Tabelle in 3-Grad-Schritten aus den Eckpunkten */
@@ -943,7 +943,16 @@ async function build(def){
   const aero={b:bm,c:cm,h:.04*cm,y:[-.34*bm,-.12*bm,.12*bm,.34*bm],s:[.22,.28,.28,.22],lt:Math.max(.22,(box.max.x-def.pivot[0])*K*.08),hv:.06*bm,
     at:3.4,st:.2,av:2.8,sv:.075,kR2:(.17*bm)*(.17*bm),kP2:(.2*lm)*(.2*lm),da:def.roll*bm/(5.08*def.vS),dr:.2*def.yaw,dih:.025*def.dih,wo:def.wo||0};
   aero.tv=aero.at*aero.st*aero.lt;aero.kY2=aero.kR2+aero.kP2;
-  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,low:lowAt,aTail,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
+  /* Randbogen: wie hoch liegt die Flächenspitze über dem Drehpunkt? Daraus ergibt sich, bei welcher Schräglage sie den Boden berührt */
+  let tipZ=1e9;{const yc=(box.max.y+box.min.y)/2,hy=(box.max.y-box.min.y)/2;for(const [,g] of list){const q=g.attributes.position;for(let i=0;i<q.count;i+=3)if(Math.abs(q.getY(i)-yc)>hy*.93&&q.getZ(i)<tipZ)tipZ=q.getZ(i)}}
+  /* Fahrwerk: der Bügel aus Federstahl biegt sich unter Last auf, die Räder wandern dabei nach außen und oben und kippen leicht.
+     Am Modell ist der Bügel ein Teil; gebogen wird er, indem er um seine Befestigung in die Breite gezogen und in der Höhe gestaucht wird. */
+  const yMid=(box.max.y+box.min.y)/2,bow=parts.find(q=>q.name==='Fahrwerksbuegel'),legs=parts.filter(q=>def.wheels&&def.wheels.test(q.name)).map(q=>({q,side:Math.sign(q.c.y-yMid)||1}));
+  const track=legs.length?Math.max(...legs.map(l=>Math.abs(l.q.c.y-yMid)))*K:(box.max.y-box.min.y)*K*.05;
+  const flex=cmp=>{if(!legs.length)return;const dz=cmp/K,dy=dz*.75;
+    for(const l of legs){l.q.outer.position.set(l.q.c.x,l.q.c.y+l.side*dy,l.q.c.z+dz);l.q.outer.rotation.x=-l.side*cmp*.3}
+    if(bow){const b=bow.bb,h=b.max.z-b.min.z,w=(b.max.y-b.min.y)/2,sz=Math.max(.5,1-dz/h);bow.outer.scale.set(1,1+dy/w,sz);bow.outer.position.z=bow.c.z+h/2*(1-sz)}};
+  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,low:lowAt,aTail,tipUp:(tipZ-def.pivot[1])*K,track,flex,sprung:legs.length>0,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
   return cache[def.id]=M;
 }
 
@@ -967,10 +976,10 @@ const camPos=new T.Vector3(0,8,400),camLook=new T.Vector3();let camMode=0,camYaw
 const touch={x:0,y:0,r:0,on:false,ron:false,thr:null,draw:()=>{}};
 function reset(msg){
   S.pos.set(START.x,P?P.gear:1,START.z);S.vel.set(0,0,0);S.w.set(0,0,0);S.Q.identity();
-  S.st.fill(0);Object.assign(S,{ramp:0,rampA:0,thr:0,pw:0,bob:0,bobV:0,tc:0,upw:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
+  S.st.fill(0);Object.assign(S,{ramp:0,rampA:0,thr:0,pw:0,bob:0,bobV:0,tc:0,upw:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,bankG:0,bankV:0,cmp:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
   if(touch.thr!==null)touch.thr=0;
   if(P){S.Q.setFromEuler(eul.set(S.pitchG,0,0,'YXZ'));S.pos.y=ground(START.x,START.z)+P.low(S.pitchG)}      /* Spornradmodelle stehen von Anfang an mit dem Heck am Boden */
-  if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0)});S.best=lbBest(P.def.id);S.last=null}
+  if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0);p.outer.scale.set(1,1,1)});S.best=lbBest(P.def.id);S.last=null}
   camYaw=Math.PI;camPos.set(S.pos.x,S.pos.y+6,S.pos.z+30);if(msg)say(msg);
   if(P){S.rk=P.mounts.length;P.mounts.forEach(m=>{m.rocket.visible=true});RK.pool.forEach(r=>{r.on=false;r.g.visible=false});$('#b-fire').hidden=!S.rk;$('#b-fire').disabled=false;$('#i-r').textContent=S.rk;$('#b-ramp').hidden=!P.def.ramp;$('#b-ramp').setAttribute('aria-pressed','false')}      /* am Start wird nachgeladen */
 }
@@ -1210,18 +1219,35 @@ function rolling(dt){
   let a=d.aT0*S.pw*Math.max(0,1-ua/d.vP)-Math.max(qd,0)*CD;
   if(S.gs<.05&&a<fr){a=0;S.gs=0}else a-=fr;                        /* erst wenn der Schub die Reibung überwindet, setzt sich das Modell in Bewegung */
   S.gs=Math.max(0,S.gs+a*dt);
-  /* Fahrwerk federt, auf der Wiese rumpelt es */
-  S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-190*S.bob-13*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.22,.22);
+  /* Fahrwerk federt, auf der Wiese rumpelt es. Der Federstahlbügel gibt weit nach und schwingt aus, ein Rumpf auf dem Bauch sitzt hart auf */
+  if(P.sprung){S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-72*(S.bob+.11*wow)-6.2*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.5,.2)}      /* unter dem Gewicht steht der Bügel etwas gespreizt; trägt die Fläche, streckt er sich */
+  else{S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-260*S.bob-20*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.13,.09)}
   /* gelenkt wird mit dem Seitenruder; Seitenwind dreht die Nase etwas in den Wind */
+  const psi0=S.psi;
   S.psi+=(-inY*1.15*clamp(S.gs/3+d.wash*S.pw*.5,0,1)*clamp(S.gs/1.2,0,1)/(1+S.gs/22)+.03*cw*clamp(S.gs/8,0,1)+d.tq*S.pw*.26*clamp(S.gs/3,0,1)*(1-clamp(ua/(1.6*d.vS),0,1)))*dt;      /* der Propellerstrahl bläst das Seitenruder schon bei wenig Fahrt an */
+  const yawRate=(S.psi-psi0)/dt;
+  /* Querneigung am Boden: Querruder und Seitenwind heben eine Fläche, in der Kurve drängt das Modell nach außen. Das Fahrwerk richtet es wieder auf,
+     aber nur so stark, wie noch Gewicht auf den Rädern liegt. Kurz vor dem Abheben genügt deshalb wenig, um eine Fläche in den Boden zu drücken. */
+  {const qh=clamp(ua*Math.abs(ua)/(d.vS*d.vS),0,1.4),stiff=(P.sprung?80:42)*(.12+.88*wow);
+   S.bankV+=(inR*d.roll*3.1*qh+cw*ua/(d.vS*d.vS)*6*(.5+d.dih)+yawRate*S.gs*(P.sprung?.34:.24)-stiff*S.bankG-(P.sprung?7.5:9)*S.bankV)*dt;S.bankG+=S.bankV*dt}
   const h0=ground(S.pos.x,S.pos.z);S.pos.addScaledVector(fH,S.gs*dt);const h1=ground(S.pos.x,S.pos.z);S.pos.y=h1+low(S.pitchG);S.gt+=dt;
   if(h1<WATER-.4){crash('Ins Wasser gerollt.');return}
   if((h1-h0)/Math.max(S.gs*dt,.01)>.3&&S.gs>6){crash('Das Gelände war zu steil.');return}
   {const o=hit(S.pos.x,S.pos.y,S.pos.z,P.span*.3);if(o){crash(HITTEXT[o]);return}}
-  S.Q.setFromEuler(eul.set(S.pitchG,S.psi,0,'YXZ'));
+  S.Q.setFromEuler(eul.set(S.pitchG,S.psi,-S.bankG,'YXZ'));
+  /* berührt eine Flächenspitze den Boden? Aus dem Rollen heraus ist die Landung damit misslungen; im Stand legt sich die Fläche nur ab */
+  {const tip=tipDip(h1);if(tip){if(S.gs>3.5){if(S.landed){S.landings=Math.max(0,S.landings-1);S.landed=false}crash('Die Fläche hat den Boden berührt: die Landung ist nicht gelungen.');return}
+    S.bankG-=Math.sign(S.bankG)*Math.min(Math.abs(S.bankG),tip/(P.span*.5));S.bankV=0;S.gs*=1-2*dt}}
+  if(S.gs<.4)S.landed=false;
   S.va=S.gs>.5?Math.max(0,ua):0;S.alpha=S.pitchG;S.stalled=0;S.shake=0;
-  if(qd*CL>G*1.03){S.ground=false;S.air=0;S.bounces=0;S.px=S.pos.x;S.pz=S.pos.z;S.vel.copy(fH).multiplyScalar(S.gs);S.vel.y=.4;S.w.set(0,0,0);if(S.gt>1)say('Abgehoben');S.gt=0;S.tc=0}
+  if(qd*CL>G*1.03){S.ground=false;S.air=0;S.bounces=0;S.landed=false;S.px=S.pos.x;S.pz=S.pos.z;S.vel.copy(fH).multiplyScalar(S.gs);S.vel.y=.4;S.w.set(S.bankV,0,0);S.bankG=S.bankV=0;if(S.gt>1)say('Abgehoben');S.gt=0;S.tc=0}
 }
+/* Wie tief steckt die tiefere Flächenspitze im Boden? 0, solange beide frei sind. Geprüft wird die Unterkante des Randbogens. */
+const tipV=new T.Vector3();
+function tipDip(flat){      /* beim Rollen zählt die Höhe unter dem Rumpf: eine Wiese, die zur Seite leicht ansteigt, soll keine Fläche fangen */
+  rgt.set(1,0,0).applyQuaternion(S.Q);upv.set(0,1,0).applyQuaternion(S.Q);let worst=0;
+  for(const sgn of [-1,1]){tipV.copy(S.pos).addScaledVector(rgt,sgn*P.span*.5).addScaledVector(upv,P.tipUp);const dip=(flat!==undefined?flat:Math.max(ground(tipV.x,tipV.z),WATER))-tipV.y;if(dip>worst)worst=dip}
+  return worst}
 const CQ=6,CY=4;      /* zusätzliche Nick- und Gierdämpfung von Rumpf und Fläche */
 function flying(dt){
   const d=P.def;S.air+=dt;
@@ -1311,19 +1337,24 @@ function flying(dt){
     S.pos.y=h+lowP;
     if(slope>=2.2){crash('In den Hang geflogen.');return}
     if(upv.y<0){crash('Auf dem Rücken aufgeschlagen.');return}
-    if(upv.y<.95&&Math.abs(rgt.y)>.25){crash('Mit hängender Fläche aufgesetzt.');return}
+    const bank=Math.atan2(-rgt.y,upv.y);
+    if(Math.abs(bank)>.4){crash('Mit hängender Fläche aufgesetzt.');return}
     if(nose<-.26){crash('Mit der Nase voran aufgesetzt.');return}
     if(sink>(P.def.belly?4.3:4.6)){crash('Zu hart aufgesetzt.');return}      /* ein gefedertes Fahrwerk verzeiht etwas mehr */
     if(side>5){crash('Quer zur Flugrichtung aufgesetzt.');return}
-    if(sink>1.9&&S.bounces<3){S.vel.y=sink*.38;S.bounces++;S.w.set(0,0,0);touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
-    S.ground=true;S.bobV=-Math.min(sink,4)*1.3;if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
+    /* zu schnell gesunken: das Fahrwerk wirft das Modell zurück in die Luft. Der Federbügel federt stärker als ein Rumpf, der auf dem Bauch aufschlägt */
+    if(sink>1.9&&S.bounces<3){S.vel.y=sink*(P.sprung?.44:.3);S.bounces++;S.w.set(-bank*2.5,0,0);S.cmp=clamp(sink*.09,0,.34);touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
+    /* aufgesetzt: Schräglage und Drehung bleiben erhalten, das Fahrwerk muss sie abfangen. Wer schiebend aufsetzt, bekommt einen Ruck zur Seite */
+    S.bankG=bank;S.bankV=clamp(S.w.x,-2,2)+clamp(S.vel.dot(rgt),-5,5)*.2;
+    S.ground=true;S.bobV=-Math.min(sink,4.5)*(P.sprung?1.6:1.2);if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
     S.gs=Math.max(0,S.vel.dot(fH));S.pitchG=clamp(nose,0,.25);S.w.set(0,0,0);
     if(S.air>4){
-      if(onRunway(S.pos.x,S.pos.z)){S.landings++;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
+      if(onRunway(S.pos.x,S.pos.z)){S.landings++;S.landed=true;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
       else say(coarse?'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder neu starten':'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder R drücken',true);
     }
     return;
   }
+  if(S.pos.y-P.gear-h<P.span*.55&&tipDip()>.05){crash('Mit der Fläche den Boden berührt.',true);return}
   {const o=hit(S.pos.x,S.pos.y,S.pos.z,P.span*.3);if(o){crash(HITTEXT[o],true);return}}
   for(let i=0;i<COL.gates.length;i++){const g=COL.gates[i],a=(S.px-g.x)*g.nx+(S.pz-g.z)*g.nz,b=(S.pos.x-g.x)*g.nx+(S.pos.z-g.z)*g.nz;
     if(a<0&&b>=0&&Math.abs((S.pos.x-g.x)*g.tx+(S.pos.z-g.z)*g.tz)<g.hw&&S.pos.y<g.y1)passGate(i)}
@@ -1501,7 +1532,8 @@ function frame(dt,still){
   updateWind(dt);
   if(!still&&P&&S.started&&card.hidden){const n=Math.max(1,Math.ceil(dt*120));for(let i=0;i<n;i++)step(dt/n)}
   if(P){
-    craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.3*clamp(1.5-cam.position.distanceTo(S.pos)/(P.span*7),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob;
+    craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.3*clamp(1.5-cam.position.distanceTo(S.pos)/(P.span*7),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
+    if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,.5):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);p.disc.material.opacity=S.crashed?0:.04+S.pw*.14});
     if(S.ground&&!S.crashed)P.wheels.forEach(q=>{q.w.rotation.y+=S.gs/q.R*dt});
     P.mounts.forEach(m=>{m.g.visible=!S.crashed});
@@ -1571,7 +1603,7 @@ let last=0,raf=0;
 function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),ground,get plane(){return P},
+window.__flug={tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
