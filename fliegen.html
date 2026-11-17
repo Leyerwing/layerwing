@@ -2026,8 +2026,8 @@ function frame(dt,still){
       if(P.retract){const hg=ground(S.pos.x,S.pos.z),a0=S.pos.y-P.gear-(WATER>hg?WATER:hg),vS=P.def.vS,hl=SC.ship?620:RW.len/2,hw=SC.ship?140:RW.wid/2,
           ex=clamp(S.pos.x,-hw,hw)-S.pos.x,ez=clamp(S.pos.z,-hl,hl)-S.pos.z,dA=Math.hypot(ex,ez),hR=S.pos.y-P.gear,vy=S.vel.y,
           to=dA<80||S.vel.x*ex+S.vel.z*ez>.25*dA*Math.hypot(S.vel.x,S.vel.z);
-        const land=(to&&dA<380&&hR>-20&&hR<90&&S.va<1.6*vS&&vy<1.2)||(dA<80&&hR>-5&&hR<3&&vy<-.2)||(a0<10&&!(hg<WATER-.5)&&S.va<1.25*vS&&S.thr<.15&&vy<-.2);
-        if(S.ground||land)S.grT=0;else if(S.air>1.2&&a0>12&&!(to&&dA<450&&hR>-30&&hR<110&&S.va<1.7*vS&&vy<2.5))S.grT=1;
+        const land=(to&&dA<600&&hR>-20&&hR<130&&S.va<1.85*vS&&vy<1.2)||(dA<80&&hR>-5&&hR<3&&vy<-.2)||(a0<10&&!(hg<WATER-.5)&&S.va<1.25*vS&&S.thr<.15&&vy<-.2);
+        if(S.ground||land)S.grT=0;else if(S.air>1.2&&a0>12&&!(to&&dA<680&&hR>-30&&hR<150&&S.va<1.95*vS&&vy<2.5))S.grT=1;
         if(S.ground)S.gr=0;else S.gr=S.grT>S.gr?Math.min(S.grT,S.gr+dt/1.5):Math.max(S.grT,S.gr-dt/1.0);P.setGear(S.gr)}else P.setGear(0)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);const run=S.crashed?0:sstep(.06,.3,S.pw);p.bl.visible=run<.98;p.disc.material.opacity=run*(.45+.3*S.pw);p.disc.rotation.z=spin*.031*(i%2?-1:1)});
     if(P.lamps){P.lamps.g.visible=!S.crashed;const k=WIND.t%1.4;P.lamps.strobe.material.opacity=k<.06||(k>.18&&k<.24)?1:0}
