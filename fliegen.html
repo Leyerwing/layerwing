@@ -65,6 +65,15 @@ dl{margin:0}
 .acts{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom));display:flex;gap:6px}
 .act{border:1px solid var(--panel-line);background:var(--panel);border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;min-height:44px;}
 .act kbd{font:inherit;font-weight:400;color:var(--muted);margin-left:6px}
+.act kbd.pb,.padhint kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;box-sizing:border-box;padding:0 5px;border-radius:999px;font:inherit;font-size:11.5px;font-weight:700;line-height:1;color:#12110F;background:#D9D5CB;margin-left:6px;vertical-align:-4px}
+.act kbd.pb-a{background:#7CC75B}.act kbd.pb-b{background:#EF5F50}.act kbd.pb-x{background:#5AA6F2}.act kbd.pb-y{background:#F1C741}
+.act[aria-pressed="true"] kbd.pb{color:#12110F}
+kbd.pb svg{width:12px;height:12px;display:block;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+/* nur mit Controller: eine Zeile über den Knöpfen zeigt, was Sticks und Trigger tun */
+.padhint{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(max(16px,env(safe-area-inset-bottom)) + 52px);display:none;gap:6px;pointer-events:none}
+.pad-on .padhint{display:flex}
+.padhint span{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--panel-line);border-radius:999px;padding:5px 13px 5px 6px;font-size:13px;font-weight:600}
+.padhint kbd{margin-left:0}
 .ic{display:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .mrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .card .act{background:transparent;}
@@ -177,6 +186,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   .card .ic{display:none}
   .top .act .lb{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
   .acts{display:none}
+  .pad-on .padhint{display:none}
   .act kbd{display:none}
   .card .act{min-height:44px;padding:9px 16px;font-size:14px}
   .card .chip{min-height:44px;padding:9px 16px}
@@ -257,6 +267,8 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   <button class="act" id="b-help" type="button">Hilfe<kbd>H</kbd></button>
 </div>
 
+<div class="padhint" aria-label="Steuerung mit dem Controller"><span><kbd>LT</kbd>weniger Gas</span><span><kbd>RT</kbd>mehr Gas</span><span><kbd>L</kbd>Seitenruder</span><span><kbd>R</kbd>Quer und Höhe</span></div>
+
 <p class="note" id="note" role="status" aria-live="polite"></p>
 
 <div class="spec" id="spec"></div>
@@ -290,8 +302,8 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <div><dt>Rechter Stick</dt><dd id="p-pitch">Quer- und Höhenruder: seitlich rollt das Modell, ziehen hebt die Nase</dd></div>
       <div><dt>Linker Stick</dt><dd>Seitenruder: dreht die Nase, am Boden lenkst du damit</dd></div>
       <div><dt>RT und LT</dt><dd>Mehr Gas und weniger Gas. Das Gas bleibt stehen wie der Schieber am Sender, das Steuerkreuz hoch und runter geht auch.</dd></div>
-      <div><dt>A, B, Y</dt><dd>Rauch, Raketen oder Heckklappe, Kamera wechseln</dd></div>
-      <div><dt>Ansicht, Menü</dt><dd>Neu starten, diese Hilfe öffnen und schließen</dd></div>
+      <div><dt>A, B, X, Y</dt><dd>Rauch, Raketen oder Heckklappe, Ton, Kamera wechseln</dd></div>
+      <div><dt>LB, Ansicht, Menü</dt><dd>Bestzeiten, neu starten, diese Hilfe öffnen und schließen</dd></div>
     </dl>
     <p id="pad-tip">Mit Controller fliegen: anschließen und eine Taste drücken.</p>
     <div class="go">
@@ -1517,6 +1529,9 @@ function detonate(r,air){
   if(!S.crashed&&r.pos.distanceTo(S.pos)<5)crash('Zu nah an der eigenen Rakete.',!S.ground);
 }
 function rockets(dt){
+  /* nachladen: steht das Modell nach der Landung auf dem Asphalt (oder auf dem Deck), kommt alle 0,7 s eine Rakete zurück an ihren Träger */
+  if(P.mounts.length&&S.rk<P.mounts.length&&S.ground&&!S.crashed&&S.gs<1.5&&onRunway(S.pos.x,S.pos.z)&&S.clock-RK.last>1){S.rkT=(S.rkT||0)+dt;
+    if(S.rkT>=.7){S.rkT=0;S.rk++;P.mounts[P.mounts.length-S.rk].rocket.visible=true;$('#i-r').textContent=S.rk;$('#b-fire').disabled=false;clack();if(S.rk===P.mounts.length)say('Alle Raketen nachgeladen',true)}}else S.rkT=0;
   for(const r of RK.pool)if(r.on){r.t+=dt;const burn=r.t<1.1;
     if(burn)r.vel.addScaledVector(r.dir,95*dt);                    /* der Treibsatz brennt gut eine Sekunde */
     r.vel.y-=G*(burn?.15:.7)*dt;r.vel.multiplyScalar(1-.05*dt);r.pos.addScaledVector(r.vel,dt);r.dir.copy(r.vel).normalize();
@@ -1793,23 +1808,30 @@ function flying(dt){
 }
 /* Controller (Xbox und alle mit Standardbelegung): rechter Stick Quer- und Höhenruder, linker Stick Seitenruder.
    RT gibt Gas, LT nimmt es zurück: je weiter gedrückt, desto schneller, und das Gas bleibt stehen wie der Schieber am Sender.
-   Das Steuerkreuz hoch und runter stellt das Gas genauso. A Rauch, B Raketen oder Heckklappe, Y Kamera, Ansicht-Taste neu starten, Menü-Taste Hilfe.
+   Das Steuerkreuz hoch und runter stellt das Gas genauso. A Rauch, B Raketen oder Heckklappe, Y Kamera, X Ton, LB Bestzeiten, Ansicht-Taste neu starten, Menü-Taste Hilfe.
+   Solange der Controller steuert, zeigt die Leiste unten seine Knöpfe statt der Tasten.
    Wer danach wieder Tasten oder die Knüppel am Bildschirm nimmt, steuert sofort wieder damit. */
-const pad={act:false,seen:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[],poll:()=>{},rumble:()=>{}};
+const pad={act:false,seen:false,ui:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[],poll:()=>{},rumble:()=>{}};
 {const dz=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),ex=v=>.5*v+.5*v*v*v,bv=(g,i)=>{const b=i>=0&&g.buttons[i];return b?(b.value||(b.pressed?1:0)):0};
  const get=()=>{let l;try{l=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return null}let best=null;
    for(const g of l){if(!g||!g.connected||g.axes.length<4)continue;if(g.index===pad.idx)return g;if(!best||(g.mapping==='standard'&&best.mapping!=='standard'))best=g}return best};
- pad.poll=dt=>{const g=get();if(!g){if(pad.act||pad.dev){pad.act=false;pad.dev=null;pad.x=pad.y=pad.r=pad.g=0}return}
+ const PADK={'b-fire':'B','b-ramp':'B','b-smoke':'A','b-snd':'X','b-cam':'Y','b-reset':'Ansicht','b-board':'LB','b-help':'Menü'},
+  ICON={Ansicht:'<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1.2" y="1.5" width="6.6" height="5.4" rx="1"/><path d="M4.4 9.9h5.4a1 1 0 0 0 1-1V5.2"/></svg>',Menü:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 3.2h8M2 6h8M2 8.8h8"/></svg>'};
+ const padUI=on=>{if(pad.ui===on)return;pad.ui=on;document.body.classList.toggle('pad-on',on);
+   for(const id in PADK){const k=$('#'+id+' kbd'),v=PADK[id];if(k.dataset.key===undefined)k.dataset.key=k.textContent;
+     if(on){k.className='pb pb-'+v.toLowerCase();if(ICON[v]){k.innerHTML=ICON[v];k.title=v+'-Taste'}else k.textContent=v}else{k.className='';k.removeAttribute('title');k.textContent=k.dataset.key}}};
+ const poll0=dt=>{const g=get();if(!g){if(pad.act||pad.dev){pad.act=false;pad.dev=null;pad.x=pad.y=pad.r=pad.g=0}return}
    /* ohne Standardbelegung (manche Browser unter Linux): rechter Stick auf Achse 3 und 4, die Trigger als Achsen 2 und 5 */
    const ax=g.axes,std=g.mapping==='standard'||ax.length<6,B=std?{view:8,menu:9,du:12,dd:13}:{view:6,menu:7,du:-1,dd:-1};
    const x=ex(dz((std?ax[2]:ax[3])||0,.12)),y=ex(dz((std?ax[3]:ax[4])||0,.12)),r=ex(dz(ax[0]||0,.14));
    const up=std?bv(g,7):((ax[5]||-1)+1)/2,dn=std?bv(g,6):((ax[2]||-1)+1)/2,gas=clamp(dz(up,.06)-dz(dn,.06)+((bv(g,B.du)>.5?1:0)-(bv(g,B.dd)>.5?1:0))*.6,-1,1);
-   const hit=i=>{if(i<0)return false;const v=bv(g,i)>.5,was=pad.prev[i];pad.prev[i]=v;return v&&!was},hA=hit(0),hB=hit(1),hY=hit(3),hV=hit(B.view),hM=hit(B.menu);
-   if(x||y||r||gas||hA||hB||hY||hV||hM){pad.act=true;pad.idx=g.index;
+   const hit=i=>{if(i<0)return false;const v=bv(g,i)>.5,was=pad.prev[i];pad.prev[i]=v;return v&&!was},hA=hit(0),hB=hit(1),hX=hit(2),hY=hit(3),hL=hit(4),hV=hit(B.view),hM=hit(B.menu);
+   if(x||y||r||gas||hA||hB||hX||hY||hL||hV||hM){pad.act=true;pad.idx=g.index;
      if(!pad.seen){pad.seen=true;$('#pad-keys').hidden=false;$('#pad-tip').hidden=true;if(card.hidden)say('Controller erkannt: rechter Stick Quer und Höhe, linker Stick Seite, RT mehr Gas, LT weniger')}}
    pad.dev=g;pad.x=x;pad.y=y;pad.r=r;pad.g=gas;
    if(!card.hidden){if((hA||hM)&&$('#v-who').hidden)start();return}
-   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else fire()}if(hY)$('#b-cam').click();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
+   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else fire()}if(hY)$('#b-cam').click();if(hX)toggleSound();if(hL)openBoard();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
+ pad.poll=dt=>{poll0(dt);padUI(pad.act)};
  pad.rumble=(strong,weak,ms)=>{if(!pad.act||!pad.dev)return;try{const a=pad.dev.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:strong,weakMagnitude:weak}).catch(()=>{})}catch(e){}};
  window.addEventListener('gamepaddisconnected',()=>{pad.act=false;pad.dev=null;pad.idx=-1;pad.x=pad.y=pad.r=pad.g=0})}
 const ramp=(c,t,dt)=>{const rate=(Math.abs(t)>Math.abs(c)||t*c<0)?1.6:7,d=t-c;return Math.abs(d)<=rate*dt?t:c+Math.sign(d)*rate*dt};
@@ -1922,6 +1944,8 @@ function chirp(k,scrape){
   n.connect(f);f.connect(g);g.connect(SND.master);n.start(t,Math.random());n.stop(t+.5);
 }
 /* Glockenton am Tor: zwei helle Töne nacheinander, am ersten Tor höher, am letzten ein Dreiklang */
+/* kurzes Klacken, wenn eine Rakete einrastet */
+function clack(){if(!SND.on||!SND.ctx)return;try{const c=SND.ctx,t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type='square';o.frequency.setValueAtTime(190,t);o.frequency.exponentialRampToValueAtTime(70,t+.06);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.09,t+.008);g.gain.exponentialRampToValueAtTime(.0001,t+.09);o.connect(g);g.connect(SND.master);o.start(t);o.stop(t+.1)}catch(e){}}
 function chime(k){
   const c=SND.ctx;if(!c||!SND.on)return;const t=c.currentTime+.01,seq=k===2?[[1318.5,0],[1760,.11],[2637,.22]]:k===1?[[1760,0],[2349.3,.1]]:[[1568,0],[2093,.09]],len=k===2?1:.55;
   for(const [f,dl] of seq)for(const [mul,gn] of [[1,.16],[2.01,.04],[3.02,.012]]){const o=c.createOscillator(),g=c.createGain();o.type='sine';o.frequency.value=f*mul;
@@ -1996,9 +2020,14 @@ function frame(dt,still){
   if(P){
     craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.5*clamp(1.6-cam.position.distanceTo(S.pos)/(P.span*9),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
     if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,P.trv):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp);
-      /* Einziehfahrwerk: nach dem Abheben mit Fahrt und etwas Höhe fährt es ein; langsam und tief oder kurz vor dem Aufsetzen fährt es wieder aus */
-      if(P.retract){const hg=ground(S.pos.x,S.pos.z),a0=S.pos.y-P.gear-(WATER>hg?WATER:hg),vS=P.def.vS;
-        if(S.ground||a0<4||(S.vel.y<-.3&&a0/-S.vel.y<3)||(a0<90&&S.va<1.45*vS))S.grT=0;else if(S.air>1.2&&((a0>22&&S.va>1.6*vS)||a0>120))S.grT=1;
+      /* Einziehfahrwerk: nach dem Abheben fährt es ein und bleibt drin, auch im Tiefflug über Feldern oder Wasser.
+         Ausgefahren wird nur im Landeanflug: nah am Platz, tief, langsam, nicht steigend und mit Kurs auf die Bahn (oder schon über ihr).
+         Wer woanders mit Leerlauf ganz langsam auf festen Boden sinkt, landet außen: auch dann kommt es noch heraus. */
+      if(P.retract){const hg=ground(S.pos.x,S.pos.z),a0=S.pos.y-P.gear-(WATER>hg?WATER:hg),vS=P.def.vS,hl=SC.ship?620:RW.len/2,hw=SC.ship?140:RW.wid/2,
+          ex=clamp(S.pos.x,-hw,hw)-S.pos.x,ez=clamp(S.pos.z,-hl,hl)-S.pos.z,dA=Math.hypot(ex,ez),hR=S.pos.y-P.gear,vy=S.vel.y,
+          to=dA<80||S.vel.x*ex+S.vel.z*ez>.25*dA*Math.hypot(S.vel.x,S.vel.z);
+        const land=(to&&dA<380&&hR>-20&&hR<90&&S.va<1.6*vS&&vy<1.2)||(dA<80&&hR>-5&&hR<3&&vy<-.2)||(a0<10&&!(hg<WATER-.5)&&S.va<1.25*vS&&S.thr<.15&&vy<-.2);
+        if(S.ground||land)S.grT=0;else if(S.air>1.2&&a0>12&&!(to&&dA<450&&hR>-30&&hR<110&&S.va<1.7*vS&&vy<2.5))S.grT=1;
         if(S.ground)S.gr=0;else S.gr=S.grT>S.gr?Math.min(S.grT,S.gr+dt/1.5):Math.max(S.grT,S.gr-dt/1.0);P.setGear(S.gr)}else P.setGear(0)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);const run=S.crashed?0:sstep(.06,.3,S.pw);p.bl.visible=run<.98;p.disc.material.opacity=run*(.45+.3*S.pw);p.disc.rotation.z=spin*.031*(i%2?-1:1)});
     if(P.lamps){P.lamps.g.visible=!S.crashed;const k=WIND.t%1.4;P.lamps.strobe.material.opacity=k<.06||(k>.18&&k<.24)?1:0}
