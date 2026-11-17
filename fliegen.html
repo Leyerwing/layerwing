@@ -286,6 +286,14 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <div><dt>Landen</dt><dd>Gas raus, kurz vor dem Boden leicht ziehen. Lampen an der Bahn: zwei rot, zwei weiß passt.</dd></div>
     </dl>
     <p class="only-touch">Starten: Gas ganz hoch, geradeaus halten, bei genug Fahrt rechts leicht ziehen. Landen: gegen den Wind anfliegen (Windsack), Gas raus, kurz vor dem Boden abfangen. Quer gehalten siehst du mehr.</p>
+    <dl class="keys" id="pad-keys" hidden>
+      <div><dt>Rechter Stick</dt><dd id="p-pitch">Quer- und Höhenruder: seitlich rollt das Modell, ziehen hebt die Nase</dd></div>
+      <div><dt>Linker Stick</dt><dd>Seitenruder: dreht die Nase, am Boden lenkst du damit</dd></div>
+      <div><dt>RT und LT</dt><dd>Mehr Gas und weniger Gas. Das Gas bleibt stehen wie der Schieber am Sender, das Steuerkreuz hoch und runter geht auch.</dd></div>
+      <div><dt>A, B, Y</dt><dd>Rauch, Raketen oder Heckklappe, Kamera wechseln</dd></div>
+      <div><dt>Ansicht, Menü</dt><dd>Neu starten, diese Hilfe öffnen und schließen</dd></div>
+    </dl>
+    <p id="pad-tip">Mit Controller fliegen: anschließen und eine Taste drücken.</p>
     <div class="go">
       <button class="btn btn-primary" id="b-go" type="button">Losfliegen</button>
       <a class="btn" href="/" style="text-decoration:none;color:inherit;display:inline-flex;align-items:center">Zurück zum Shop</a>
@@ -1392,7 +1400,7 @@ try{SND.on=localStorage.getItem('lw-fliegen-ton')!=='0'}catch(e){}
 const keys={};let invert=false;
 try{invert=localStorage.getItem('lw-fliegen-invert')==='1'}catch(e){}
 const inv=$('#c-inv');inv.checked=invert;
-const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Seitlich rollt das Modell.':'Runter ziehen hebt die Nase. Seitlich rollt das Modell.';$('#pad-r-p').className=invert?'pt':'pb';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑'};
+const pitchText=()=>{$('#t-pitch').textContent=invert?'Hoch schieben hebt die Nase. Seitlich rollt das Modell.':'Runter ziehen hebt die Nase. Seitlich rollt das Modell.';$('#pad-r-p').className=invert?'pt':'pb';$('#k-pitch').textContent=invert?'Höhenruder: Nase hoch und Nase runter':'Höhenruder: ziehen (Nase hoch) und drücken, wie am Sender';const k=$('#k-pitch').previousElementSibling.children;k[0].textContent=invert?'↑':'↓';k[1].textContent=invert?'↓':'↑';$('#p-pitch').textContent='Quer- und Höhenruder: seitlich rollt das Modell, '+(invert?'nach vorn drücken':'ziehen')+' hebt die Nase'};
 inv.addEventListener('change',()=>{invert=inv.checked;pitchText();try{localStorage.setItem('lw-fliegen-invert',invert?'1':'0')}catch(e){}});pitchText();
 const card=$('#card');
 /* Flugplatz: Knöpfe füllen; ein anderer Platz lädt die Seite mit dieser Landschaft neu */
@@ -1402,7 +1410,7 @@ const card=$('#card');
 /* Licht: Abend oder Tag; auch das lädt die Seite neu, weil Schatten und Himmel vorab gerechnet werden */
 {const box=$('#lights');for(const [id,nm,sb] of [['abend','Abendlicht','tiefe Sonne'],['tag','Tageslicht','blauer Himmel']]){const b=document.createElement('button'),sm=document.createElement('small');b.type='button';b.className='place';b.textContent=nm;sm.textContent=sb;b.appendChild(sm);b.setAttribute('aria-pressed',id===LID);
   b.addEventListener('click',()=>{if(id===LID)return;try{localStorage.setItem('lw-fliegen-licht',id)}catch(e){}$('#loadline').textContent=nm+' lädt …';location.search='?platz='+SID+'&licht='+id});box.appendChild(b)}}
-function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
+function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(pad.act?'RT für Vollgas, mit dem linken Stick geradeaus halten, dann rechts leicht ziehen':coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{view('help');$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
 $('#b-reset').addEventListener('click',()=>{reset('Zurück am Start');});
@@ -1417,7 +1425,7 @@ window.addEventListener('keydown',e=>{
   if(e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.length===1?e.key.toLowerCase():e.key;
   if(!card.hidden){if(k==='Escape'&&S.started)start();return}
   if(STEER.includes(k))e.preventDefault();
-  keys[k]=true;if(e.repeat)return;
+  keys[k]=true;if(STEER.includes(k))pad.act=false;if(e.repeat)return;
   if(k==='r')reset('Zurück am Start');else if(k==='c')$('#b-cam').click();else if(k==='h')$('#b-help').click();else if(k===' ')toggleSmoke();else if(k==='m')toggleSound();else if(k==='f'){if(P&&P.def.ramp)toggleRamp();else fire()}else if(k==='b')openBoard();
   else if((k==='a'||k==='d')&&P&&!P.def.yaw&&!S.ground)say('Die F2 hat kein Seitenruder: Kurven fliegst du mit Quer und Höhe');
 });
@@ -1432,11 +1440,11 @@ window.addEventListener('blur',()=>{for(const k in keys)keys[k]=false});
  const put=(el,x,y)=>{el.style.transition='none';el.style.transform='';const r=el.getBoundingClientRect();el.style.transform=`translate(${Math.round(x-r.left-r.width/2)}px,${Math.round(y-r.top-r.height/2)}px)`;el.classList.add('used','live')},
        home=el=>{el.style.transition='';el.style.transform='';el.classList.remove('live')};
  touch.draw=()=>{const t=touch.thr===null?S.thr:touch.thr;kL.style.transform=`translate(${touch.r*TR}px,${(1-2*t)*TR}px)`};
- zL.addEventListener('pointerdown',e=>{if(l0)return;e.preventDefault();grab(zL,e);if(touch.thr===null)touch.thr=S.thr;l0={id:e.pointerId,x:e.clientX,y:e.clientY,t:touch.thr};touch.ron=true;
+ zL.addEventListener('pointerdown',e=>{if(l0)return;e.preventDefault();grab(zL,e);pad.act=false;if(touch.thr===null)touch.thr=S.thr;l0={id:e.pointerId,x:e.clientX,y:e.clientY,t:touch.thr};touch.ron=true;
    put(padL,e.clientX,e.clientY-(1-2*touch.thr)*TR);touch.draw()});
  zL.addEventListener('pointermove',e=>{if(!l0||e.pointerId!==l0.id)return;touch.r=expo(dead(clamp((e.clientX-l0.x)/TR,-1,1),.16));touch.thr=clamp(l0.t-(e.clientY-l0.y)/(2*TR),0,1);touch.draw()});
  const endL=e=>{if(!l0||e.pointerId!==l0.id)return;l0=null;touch.r=0;touch.ron=false;home(padL);touch.draw()};zL.addEventListener('pointerup',endL);zL.addEventListener('pointercancel',endL);
- zR.addEventListener('pointerdown',e=>{if(r0)return;e.preventDefault();grab(zR,e);r0={id:e.pointerId,x:e.clientX,y:e.clientY};touch.on=true;put(padR,e.clientX,e.clientY)});
+ zR.addEventListener('pointerdown',e=>{if(r0)return;e.preventDefault();grab(zR,e);pad.act=false;r0={id:e.pointerId,x:e.clientX,y:e.clientY};touch.on=true;put(padR,e.clientX,e.clientY)});
  zR.addEventListener('pointermove',e=>{if(!r0||e.pointerId!==r0.id)return;let dx=(e.clientX-r0.x)/TR,dy=(e.clientY-r0.y)/TR;const l=Math.hypot(dx,dy);if(l>1){dx/=l;dy/=l}
    touch.x=expo(dead(dx,.07));touch.y=expo(dead(dy,.07));kR.style.transform=`translate(${dx*TR}px,${dy*TR}px)`});
  const endR=e=>{if(!r0||e.pointerId!==r0.id)return;r0=null;touch.on=false;touch.x=touch.y=0;kR.style.transform='';home(padR)};zR.addEventListener('pointerup',endR);zR.addEventListener('pointercancel',endR);
@@ -1522,10 +1530,10 @@ function rockets(dt){
     else if(r.t>5||Math.hypot(r.pos.x,r.pos.z)>5600)detonate(r,true)}
 }
 /* Aufsetzen: Reifen quietschen und qualmen kurz auf Asphalt, auf der Wiese staubt es; Rumpflander schaben */
-function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);
+function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);pad.rumble(clamp(sink*.22,.12,.9),.35,150);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
-  buzz([40,50,90]);
+  buzz([40,50,90]);pad.rumble(1,.8,480);
   if(S.ground){fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));S.vel.copy(fH).multiplyScalar(S.gs)}
   const sp=S.vel.length(),kick=clamp(sp/28,.3,1.7);
   if(!inAir)S.pos.y=ground(S.pos.x,S.pos.z)+P.gear;
@@ -1783,19 +1791,41 @@ function flying(dt){
   S.px=S.pos.x;S.pz=S.pos.z;
   if(Math.hypot(S.pos.x,S.pos.z)>4300)reset('Zu weit draußen. Zurück am Platz');
 }
+/* Controller (Xbox und alle mit Standardbelegung): rechter Stick Quer- und Höhenruder, linker Stick Seitenruder.
+   RT gibt Gas, LT nimmt es zurück: je weiter gedrückt, desto schneller, und das Gas bleibt stehen wie der Schieber am Sender.
+   Das Steuerkreuz hoch und runter stellt das Gas genauso. A Rauch, B Raketen oder Heckklappe, Y Kamera, Ansicht-Taste neu starten, Menü-Taste Hilfe.
+   Wer danach wieder Tasten oder die Knüppel am Bildschirm nimmt, steuert sofort wieder damit. */
+const pad={act:false,seen:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[],poll:()=>{},rumble:()=>{}};
+{const dz=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),ex=v=>.5*v+.5*v*v*v,bv=(g,i)=>{const b=i>=0&&g.buttons[i];return b?(b.value||(b.pressed?1:0)):0};
+ const get=()=>{let l;try{l=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return null}let best=null;
+   for(const g of l){if(!g||!g.connected||g.axes.length<4)continue;if(g.index===pad.idx)return g;if(!best||(g.mapping==='standard'&&best.mapping!=='standard'))best=g}return best};
+ pad.poll=dt=>{const g=get();if(!g){if(pad.act||pad.dev){pad.act=false;pad.dev=null;pad.x=pad.y=pad.r=pad.g=0}return}
+   /* ohne Standardbelegung (manche Browser unter Linux): rechter Stick auf Achse 3 und 4, die Trigger als Achsen 2 und 5 */
+   const ax=g.axes,std=g.mapping==='standard'||ax.length<6,B=std?{view:8,menu:9,du:12,dd:13}:{view:6,menu:7,du:-1,dd:-1};
+   const x=ex(dz((std?ax[2]:ax[3])||0,.12)),y=ex(dz((std?ax[3]:ax[4])||0,.12)),r=ex(dz(ax[0]||0,.14));
+   const up=std?bv(g,7):((ax[5]||-1)+1)/2,dn=std?bv(g,6):((ax[2]||-1)+1)/2,gas=clamp(dz(up,.06)-dz(dn,.06)+((bv(g,B.du)>.5?1:0)-(bv(g,B.dd)>.5?1:0))*.6,-1,1);
+   const hit=i=>{if(i<0)return false;const v=bv(g,i)>.5,was=pad.prev[i];pad.prev[i]=v;return v&&!was},hA=hit(0),hB=hit(1),hY=hit(3),hV=hit(B.view),hM=hit(B.menu);
+   if(x||y||r||gas||hA||hB||hY||hV||hM){pad.act=true;pad.idx=g.index;
+     if(!pad.seen){pad.seen=true;$('#pad-keys').hidden=false;$('#pad-tip').hidden=true;if(card.hidden)say('Controller erkannt: rechter Stick Quer und Höhe, linker Stick Seite, RT mehr Gas, LT weniger')}}
+   pad.dev=g;pad.x=x;pad.y=y;pad.r=r;pad.g=gas;
+   if(!card.hidden){if((hA||hM)&&$('#v-who').hidden)start();return}
+   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else fire()}if(hY)$('#b-cam').click();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
+ pad.rumble=(strong,weak,ms)=>{if(!pad.act||!pad.dev)return;try{const a=pad.dev.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:strong,weakMagnitude:weak}).catch(()=>{})}catch(e){}};
+ window.addEventListener('gamepaddisconnected',()=>{pad.act=false;pad.dev=null;pad.idx=-1;pad.x=pad.y=pad.r=pad.g=0})}
 const ramp=(c,t,dt)=>{const rate=(Math.abs(t)>Math.abs(c)||t*c<0)?1.6:7,d=t-c;return Math.abs(d)<=rate*dt?t:c+Math.sign(d)*rate*dt};
 function step(dt){
   const d=P.def;
   /* Eingaben glätten: Quer (Pfeile links/rechts), Höhe (Pfeile hoch/runter), Seite (A/D) */
   let r=(keys.ArrowRight?1:0)-(keys.ArrowLeft?1:0),p=(keys.ArrowDown?1:0)-(keys.ArrowUp?1:0),y=(keys.d?1:0)-(keys.a?1:0);if(invert)p=-p;
+  if(pad.act){r=pad.x;p=invert?-pad.y:pad.y;y=pad.r}
   if(touch.on){r=touch.x;p=invert?-touch.y:touch.y}
   if(touch.ron)y=touch.r;
   /* Tasten kennen nur an und aus: der Ausschlag wächst, solange die Taste gehalten wird, und geht beim Loslassen schnell zurück.
      Kurz tippen gibt kleine Korrekturen, halten den vollen Ausschlag. Die Knüppel am Handy wirken direkt. */
   const kt=1-Math.exp(-14*dt);
-  if(touch.on){inR=lerp(inR,r,kt);inP=lerp(inP,p,kt)}else{inR=ramp(inR,r,dt);inP=ramp(inP,p,dt)}
-  inY=touch.ron?lerp(inY,y,kt):ramp(inY,y,dt);
-  if(touch.thr!==null)S.thr=touch.thr;else S.thr=clamp(S.thr+((keys.w?1:0)-(keys.s?1:0))*.75*dt,0,1);
+  if(touch.on||pad.act){inR=lerp(inR,r,kt);inP=lerp(inP,p,kt)}else{inR=ramp(inR,r,dt);inP=ramp(inP,p,dt)}
+  inY=touch.ron||pad.act?lerp(inY,y,kt):ramp(inY,y,dt);
+  if(touch.thr!==null){if(pad.g)touch.thr=clamp(touch.thr+pad.g*.75*dt,0,1);S.thr=touch.thr}else S.thr=clamp(S.thr+((keys.w?1:0)-(keys.s?1:0)+pad.g)*.75*dt,0,1);
   S.pw=lerp(S.pw,S.crashed?0:S.thr,1-Math.exp(-dt/(S.thr>S.pw?.32:.55)));      /* der Motor braucht einen Moment, bis er hochgedreht hat oder ausläuft */
   rockets(dt);
   if(S.crashed){S.crashed+=dt;
@@ -2148,10 +2178,10 @@ const QL={base:renderer.getPixelRatio(),lv:0,floor:0,n:0,ema:1/60,slow:0,fast:0,
    if(now-QL.upAt<7)QL.floor=QL.lv+1;QL.before=QL.ema;if(QL.lv<QL.steps.length-1)QL.set(QL.lv+1);else QL.slow=0}
   else if(QL.fast>9&&QL.lv>QL.floor){QL.upAt=now;QL.before=0;QL.vain=0;QL.set(QL.lv-1)}}};
 let last=0,raf=0;
-function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
+function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;pad.poll(dt);if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
+window.__flug={pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
