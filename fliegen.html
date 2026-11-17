@@ -382,24 +382,24 @@ const SCENES={
  traeger:{name:'Flugzeugträger',sub:'Start und Landung auf dem Deck, mitten im Meer',L:{abend:{sun:[-.94,.2,-.28],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x5A5650,.38],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x4E6272,fog:[1400,8600],tint:[1.05,1,.9]},
    tag:{sun:[-.55,.7,.45],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x70767A,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x3E6690,fog:[1700,9000],tint:[1,1,1]}},water:-58,sea:true,ship:true,
   pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[-28,20,340,480],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.2,.3,0],beach:[-900,-901],
-  mow:['#3A3E42','#3A3E42'],firs:.16,firH:[-36,300],firC:[.24,.06,.34,.22,.11],leafy:.3,leafH:[-50,20],leafS:[13,13],leafK:.5,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>-54&&h<400&&sl>9,rockC:[.09,.06,.44],clouds:1,
+  mow:['#3A3E42','#3A3E42'],firs:.16,firH:[-36,300],firC:[.29,.06,.4,.17,.1],leafy:.3,leafH:[-50,20],leafS:[13,13],leafK:.5,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>-54&&h<400&&sl>9,rockC:[.09,.06,.44],clouds:1,
   course:[[0,-800],[-210,-1180],[-600,-1500],[-1100,-1520],[-1500,-1120],[-1560,-520],[-1300,-20],[-1000,460],[-900,960],[-560,1260],[-220,1120],[-60,720]]},
  felder:{name:'Felder',sub:'Raps, Wiesen und Hecken',L:{abend:{sun:[-.81,.2,-.55],sunC:0xFFB272,sunI:2.7,hemi:[0x8FA5CC,0x5A4A34,.34],gold:{t:0xF7CE9C,g:0xFFAE62,s:0xE2D2C6,a:0xAEBDD2},hor:0xE2D2C6,mid:0x8CAAD0,top:0x3A64A2,envG:0x5E6A3C,fog:[1500,8600],tint:[1.05,1,.9]},
    tag:{sun:[-.46,.72,-.52],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6F7A4C,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x6E8A34,fog:[1500,8600],tint:[1,1,1]}},water:-2.4,fields:true,
   pal:[0x3A6626,0x58852F,0x6C8A38,0x2A4722,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[78,150,9000,9001],lv:[9000,9001,9000,9001],rockS:[.4,.55],snow:[9000,9001],mix:[.5,0,.24,0],beach:[1.5,-1.5],
-  mow:['#76A04C','#699544'],firs:.22,firH:[90,420],firC:[.27,.07,.36,.22,.12],leafy:1.7,leafH:[-1,330],leafS:[15,13],leafK:.5,leafC:[.25,.07,.42,.21,.1],rocks:()=>false,rockC:[.09,.05,.42],clouds:.45,
+  mow:['#76A04C','#699544'],firs:.22,firH:[90,420],firC:[.3,.06,.42,.17,.1],leafy:1.7,leafH:[-1,330],leafS:[15,13],leafK:.5,leafC:[.25,.07,.42,.21,.1],rocks:()=>false,rockC:[.09,.05,.42],clouds:.45,
   course:[[0,-600],[-170,-1080],[-520,-1440],[-1020,-1460],[-1400,-1100],[-1470,-540],[-1250,-20],[-960,440],[-820,960],[-470,1260],[-150,1100],[-60,700]]},
  alpen:{name:'Alpental',sub:'Tal mit See, Wald und Fels',L:{abend:{sun:[.087,.24,.996],sunC:0xFFB679,sunI:2.5,hemi:[0x8EA6D0,0x5E4A36,.36],gold:{t:0xF3CFA4,g:0xFFB873,s:0xE3D5C8,a:0xB4C3D6},hor:0xE3D5C8,mid:0x8FB1D8,top:0x3C6BAD,envG:0x6E7350,fog:[900,6800],tint:[1.05,1,.9]},tag:{sun:[-.52,.7,.49],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6A7550,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x5E7D3A,fog:[1300,7600],tint:[1,1,1]}},water:-2.4,
   pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
-  mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.27,.07,.36,.25,.13],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
+  mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.3,.06,.42,.18,.1],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
   course:[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]]},
  kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',L:{abend:{sun:[-.966,.213,-.259],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x665640,.36],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x77795A,fog:[1000,7800],tint:[1.05,1,.9]},tag:{sun:[-.6,.68,.42],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x80785C,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x6F8048,fog:[1400,8600],tint:[1,1,1]}},water:-2.4,sea:true,
   pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[70,150,380,520],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.3,.3,1],beach:[4.2,1.2],
-  mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.24,.06,.34,.22,.11],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
+  mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.29,.06,.4,.17,.1],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
   course:[[0,-600],[-250,-1060],[-620,-1430],[-1120,-1500],[-1520,-1120],[-1560,-560],[-1290,-60],[-960,420],[-900,960],[-560,1260],[-220,1120],[-60,700]]},
  wueste:{name:'Wüste',sub:'Tafelberge, Sand und Kakteen',L:{abend:{sun:[.342,.268,.94],sunC:0xFFB577,sunI:2.15,hemi:[0x98AACF,0x7A5C40,.44],gold:{t:0xF6CD9C,g:0xFFAA62,s:0xEAD3BF,a:0xC0C9D8},hor:0xEAD3BF,mid:0x98B6D8,top:0x426DAB,envG:0xA88460,fog:[1100,8200],tint:[1.05,1,.9]},tag:{sun:[.4,.74,.54],sunC:0xFFF4DE,sunI:1.05,hemi:[0xC0D4F0,0xA98660,.42],gold:{t:0xE6E6E0,g:0xFFF0D0,s:0xD9DFE4,a:0xC3D6E8},hor:0xD9DFE4,mid:0x6AA8E2,top:0x2265BE,envG:0xB08E62,fog:[1500,8800],tint:[1,1,1]}},water:-1e6,
   pal:[0xB48A5C,0xC9A574,0xA6744A,0x8E7C50,0xAE7850,0xB5673F,0x86472E,0xE8D9BC,0xE4D6B8],belt:[-50,-40,9000,9001],lv:[45,170,9000,9001],rockS:[.15,.25],snow:[9000,9001],mix:[.16,0,.62,0],beach:[-900,-901],
-  mow:['#C8AE80','#BFA476'],firs:0,firH:[0,0],firC:[.27,.07,.36,.25,.13],leafy:.75,leafH:[-30,70],leafS:[6,7],leafK:.47,leafC:[.17,.05,.24,.3,.1],rocks:(h,sl)=>h<120&&(sl>7||hash(h*7.3,sl*3.1)<.4),rockC:[.055,.34,.4],clouds:.55,cacti:coarse=>coarse?170:260,
+  mow:['#C8AE80','#BFA476'],firs:0,firH:[0,0],firC:[.3,.06,.42,.18,.1],leafy:.75,leafH:[-30,70],leafS:[6,7],leafK:.47,leafC:[.17,.05,.24,.3,.1],rocks:(h,sl)=>h<120&&(sl>7||hash(h*7.3,sl*3.1)<.4),rockC:[.055,.34,.4],clouds:.55,cacti:coarse=>coarse?170:260,
   course:[[0,-600],[170,-1100],[540,-1500],[1000,-1380],[1280,-880],[1180,-320],[1360,240],[1060,760],[620,1080],[260,1240],[-40,1040],[-60,700]]}};
 /* Neu ist der Platz Felder: wer das Spiel schon kennt, landet einmal dort, danach gilt wieder der zuletzt geflogene Platz */
 let SID='felder';try{const sv=localStorage.getItem('lw-fliegen-platz');if(SCENES[sv]&&localStorage.getItem('lw-fliegen-neu')==='felder')SID=sv;localStorage.setItem('lw-fliegen-neu','felder')}catch(e){}
@@ -723,7 +723,7 @@ const LIGHT={at:()=>1};
 
 /* ---------- Modellflugplatz: gemähte Fläche, Bahn 18/36, Sicherheitslinie, Fangzaun, Pilotenstand, Vorbereitung, Vereinsheim, Windsack ---------- */
 const FIELD={pilot:new T.Vector3(31,0,262),eye:9.9};
-const COL={box:[],cyl:[],sph:[],gates:[],bars:[]},PAPI=[],LAMPS=[],FOREST=[];      /* LAMPS: x, y, z, Farbe, Größe, Mindestgröße in Pixeln, Blickrichtung x/z, gerichtet?, Blitzfolge */        /* alles, woran ein Modell zerschellen kann */
+const COL={box:[],cyl:[],sph:[],gates:[],bars:[],rails:[]},PAPI=[],LAMPS=[],FOREST=[];      /* LAMPS: x, y, z, Farbe, Größe, Mindestgröße in Pixeln, Blickrichtung x/z, gerichtet?, Blitzfolge */        /* alles, woran ein Modell zerschellen kann */
 const TREE=new Map();                             /* Bäume in einem Raster, damit die Kollisionsprüfung billig bleibt */
 {const std=(c,r)=>new T.MeshStandardMaterial({color:c,roughness:r===undefined?.85:r});
  const box=(w,h,d,m,x,y,z,hit)=>{const b=new T.Mesh(new T.BoxGeometry(w,h,d),m);b.position.set(x,y,z);scene.add(b);if(hit)COL.box.push({x0:x-w/2,x1:x+w/2,y0:y-h/2,y1:y+h/2,z0:z-d/2,z1:z+d/2,name:hit});return b};
@@ -834,10 +834,14 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
   const sh=new T.Shape();DECK.forEach(([x,z],i)=>i?sh.lineTo(x,-z):sh.moveTo(x,-z));sh.closePath();const dg=new T.ShapeGeometry(sh);dg.rotateX(-Math.PI/2);{const uv=dg.attributes.uv,q=dg.attributes.position;for(let i=0;i<uv.count;i++)uv.setXY(i,q.getX(i)/24,q.getZ(i)/24)}
   const dk=new T.Mesh(dg,deckM);dk.position.y=-.04;scene.add(dk);
   /* Wände aus Ringen: jeder Ring ist der Deckumriss, zur Wasserlinie hin immer weiter eingezogen und am Bug zurückgenommen */
-  const loft=(ring0,y0,ring1,y1,mat)=>{const P=[];for(let i=0;i<ring0.length;i++){const a=ring0[i],b=ring0[(i+1)%ring0.length],c=ring1[i],d2=ring1[(i+1)%ring0.length];P.push(a[0],y0,a[1],c[0],y1,c[1],b[0],y0,b[1], b[0],y0,b[1],c[0],y1,c[1],d2[0],y1,d2[1])}
+  const loft=(ring0,y0,ring1,y1,mat)=>{const P=[];for(let i=0;i<ring0.length;i++){const a=ring0[i],b=ring0[(i+1)%ring0.length],c=ring1[i],d2=ring1[(i+1)%ring0.length];P.push(a[0],y0,a[1],b[0],y0,b[1],c[0],y1,c[1], b[0],y0,b[1],d2[0],y1,d2[1],c[0],y1,c[1])}
     const g=new T.BufferGeometry();g.setAttribute('position',new T.BufferAttribute(new Float32Array(P),3));g.computeVertexNormals();const m=new T.Mesh(g,mat);scene.add(m);return m};
   const ring=(kx,kz,bow)=>DECK.map(([x,z])=>[-8+(x+8)*kx,z*kz+(z<-500?bow:0)]),r1=ring(.93,.99,2),r2=ring(.74,.975,10),r3=ring(.6,.955,24),r4=ring(.56,.95,30),r5=ring(.46,.93,34);
-  loft(DECK,-.04,DECK,-5,darkM);loft(DECK,-5,r1,-5,darkM);loft(r1,-5,r2,-22,hull2);loft(r2,-22,r3,WATER+16,hullM);loft(r3,WATER+16,r4,WATER+3,hullM);loft(r4,WATER+3,r4,WATER-1.5,darkM);loft(r4,WATER-1.5,r5,WATER-18,redM);
+  /* alle Rumpfflächen sind von beiden Seiten sichtbar: auch im Tiefflug unter dem Überhang bleibt das Schiff dicht */
+  const two=(c,r)=>{const m=std(c,r);m.side=T.DoubleSide;return m},dk2=two(0x1E2226,.6),hA=two(0x67717A,.75),hB=two(grey,.72),hR=two(0x7C2C26,.8);
+  loft(DECK,-.04,DECK,-5,dk2);loft(r1,-5,r2,-22,hA);loft(r2,-22,r3,WATER+16,hB);loft(r3,WATER+16,r4,WATER+3,hB);loft(r4,WATER+3,r4,WATER-1.5,dk2);loft(r4,WATER-1.5,r5,WATER-18,hR);
+  {const under=new T.Mesh(dg,dk2);under.position.y=-5;scene.add(under);                                                   /* Unterseite des Flugdecks */
+   const ks=new T.Shape();r5.forEach(([x,z],i)=>i?ks.lineTo(x,-z):ks.moveTo(x,-z));ks.closePath();const kg=new T.ShapeGeometry(ks);kg.rotateX(-Math.PI/2);const keel=new T.Mesh(kg,hR);keel.position.y=WATER-18;scene.add(keel)}
   COL.box.push({x0:-100,x1:92,y0:WATER-18,y1:-5,z0:-600,z1:585,name:'rumpf'});
   /* Insel an Steuerbord: drei Stockwerke mit Fensterbändern, Schornstein, Hauptmast mit Rahen und drehendem Radar, Radarkuppel, hinterer Mast */
   const ix=104;
@@ -914,6 +918,7 @@ function hit(px,py,pz,pr){
   for(const c of COL.cyl)if(py>c.y0-pr&&py<c.y1+pr){const dx=px-c.x,dz=pz-c.z,rr=c.r+pr;if(dx*dx+dz*dz<rr*rr)return c.name}
   for(const q of COL.sph){const dx=px-q.x,dy=py-q.y,dz=pz-q.z,rr=q.r+pr;if(dx*dx+dy*dy+dz*dz<rr*rr)return q.name}
   for(const b of COL.bars)if(py>b.y0-pr&&py<b.y1+pr){const dx=px-b.x,dz=pz-b.z;if(Math.abs(dx*b.tx+dz*b.tz)<b.hw+pr&&Math.abs(dx*b.nx+dz*b.nz)<.7+pr)return 'tor'}
+  for(const b of COL.rails)if(py>b.y0-pr&&py<b.y1+pr){const dx=px-b.x,dz=pz-b.z;if(Math.abs(dx*b.tx+dz*b.tz)<b.hw+pr&&Math.abs(dx*b.nx+dz*b.nz)<.6+pr)return 'weidezaun'}
   const cx=Math.floor(px/120),cz=Math.floor(pz/120);
   for(let i=-1;i<=1;i++)for(let j=-1;j<=1;j++){const a=TREE.get((cx+i+64)*256+cz+j+64);if(!a)continue;
     for(const t of a){const k=(py-t[2])/t[3];if(k<0||k>1)continue;const dx=px-t[0],dz=pz-t[1],rr=t[4]*(1-k)+pr*.5;if(dx*dx+dz*dz<rr*rr)return t[5]||'baum'}}
@@ -989,14 +994,21 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
    P.set(g.attributes.position.array,o*3);Nn.set(g.attributes.normal.array,o*3);U.set(g.attributes.uv.array,o*2);
    for(let i=0;i<n;i++){const sh=lerp(lo,1,(g.attributes.position.getY(i)-y0)/dy);C[(o+i)*3]=c[0]*sh;C[(o+i)*3+1]=c[1]*sh;C[(o+i)*3+2]=c[2]*sh}o+=n});
   out.setAttribute('position',new T.BufferAttribute(P,3));out.setAttribute('normal',new T.BufferAttribute(Nn,3));out.setAttribute('uv',new T.BufferAttribute(U,2));out.setAttribute('color',new T.BufferAttribute(C,3));return out};
- const RS=coarse?8:12,TIERS=coarse?[[-.37,.0,.5],[-.1,.3,.36],[.18,.5,.22]]:[[-.38,-.06,.5],[-.17,.16,.41],[.04,.35,.3],[.23,.5,.19]];
+ const RS=coarse?8:12,TIERS=coarse?[[-.38,-.08,.5],[-.2,.1,.4],[-.02,.28,.3],[.16,.5,.19]]:[[-.4,-.14,.5],[-.25,.02,.44],[-.11,.15,.37],[.03,.28,.29],[.16,.4,.21],[.28,.5,.13]];
  /* Fichte in klarer Form: gestufte, glatte Kegel, jeder oben etwas heller als unten */
- const skirt=([y0,y1,r],j,a)=>{const g=new T.CylinderGeometry(j===a.length-1?0:r*.2,r,y1-y0,RS,1,false);g.rotateY(j*1.31);g.translate(0,(y0+y1)/2,0);return [g,[.86+.05*j,.9+.04*j,.84+.05*j],.6]};
+ /* Astkranz: ein Kegelmantel, dessen Saum unregelmäßig ausfranst und leicht hängt; am Saum heller, zum Stamm hin dunkler, weil der Kranz darüber Schatten wirft */
+ const skirt=([y0,y1,r],j,a)=>{const g=new T.CylinderGeometry(j===a.length-1?0:r*.16,r,y1-y0,RS,1,false),q=g.attributes.position,hh=(y1-y0)/2;
+   for(let i=0;i<q.count;i++)if(q.getY(i)<-hh+1e-4){const x=q.getX(i),z=q.getZ(i),rr=Math.hypot(x,z);if(rr>1e-4){const an=Math.atan2(z,x),f=1+.14*Math.sin(an*5+j*1.7)+.08*Math.sin(an*9+j*3.1);q.setXYZ(i,x*f,q.getY(i)-(f-1)*r*.22,z*f)}}
+   g.computeVertexNormals();g.rotateY(j*1.31);g.translate(0,(y0+y1)/2,0);return [g,[.5+.045*j,.56+.04*j,.5+.045*j],2.1]};
  const st=new T.CylinderGeometry(.03,.05,.16,5,1,true);st.translate(0,-.42,0);{const uv=st.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.6)}
  const trunk=join([[st,[1.5,1.05,.75],1],...TIERS.map(skirt)]);
  const Tree=T.MeshStandardMaterial,rough={roughness:1};
- const mat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
- const leafMat=shaded(new Tree(Object.assign({vertexColors:true},rough)));
+ /* Laub und Nadeln: feine Flecken aus hellen und dunklen Blattgruppen, an der Lage im Raum festgemacht, und etwas Licht, das von hinten durchscheint */
+ const foliage=m=>{const base=m.onBeforeCompile;m.onBeforeCompile=sh=>{base(sh);sh.uniforms.uNz={value:NOISE};sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nuniform sampler2D uNz;')
+    .replace('#include <color_fragment>','#include <color_fragment>\n{vec2 fq=vec2(vWp.x+vWp.y*0.7,vWp.z-vWp.y*0.6);float dp=smoothstep(0.32,0.68,texture2D(uNz,fq/9.0,0.3).g),fn=texture2D(uNz,fq/2.6,0.3).a;diffuseColor.rgb*=mix(vec3(0.66,0.7,0.66),vec3(1.2,1.22,0.92),dp)*(0.86+0.28*fn);}')
+    .replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n#if NUM_DIR_LIGHTS > 0\n{float bk=max(dot(-geometry.normal,directionalLights[0].direction),0.0);reflectedLight.directDiffuse+=directionalLights[0].color*material.diffuseColor*bk*0.22;}\n#endif')};return m};
+ const mat=foliage(shaded(new Tree(Object.assign({vertexColors:true},rough))));
+ const leafMat=foliage(shaded(new Tree(Object.assign({vertexColors:true},rough))));
  const inst=new T.InstancedMesh(trunk,mat,N),d=new T.Object3D(),col=new T.Color();let n=0,tries=0;
  /* tief stehende Sonne: die Schatten werden lang. Länge aus dem Sonnenstand, für einen kegelförmigen Baum etwas kürzer als für einen Mast */
  const SHH=Math.hypot(SUN.x,SUN.z),SUX=SUN.x/SHH,SUZ=SUN.z/SHH,SHL=Math.min(3.2,SHH/SUN.y)*.78;
@@ -1023,13 +1035,21 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
  const low=join([skirt([-.38,.1,.5],0,[0,0]),skirt([-.04,.5,.31],1,[0,0])]);
  split(inst,n,low);split(blob,n,null,true);
  /* Laubbäume stehen in Gruppen auf dem Talboden */
- {const NB=Math.round((coarse?320:420)*SC.leafy),c1=new T.CylinderGeometry(.03,.05,.42,6,1,true);c1.translate(0,-.29,0);{const uv=c1.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5)}
-  const ball=(r,x,y,z,sd,rep,det)=>{const g=new T.IcosahedronGeometry(r,det===undefined?1:det),q=g.attributes.position,nn=g.attributes.normal,uv=g.attributes.uv;
-   for(let i=0;i<q.count;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,k=r*(1+.2*(vnoise(ux*2.1+sd,uy*2.1+uz*1.7)-.5));q.setXYZ(i,ux*k,uy*k*.86,uz*k);nn.setXYZ(i,ux,uy,uz);uv.setXY(i,uv.getX(i)*rep*2,uv.getY(i)*rep)}
+ {const NB=Math.round((coarse?320:420)*SC.leafy),c1=new T.CylinderGeometry(.03,.058,.46,7,1,true);c1.translate(0,-.29,0);{const uv=c1.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5)}
+  /* ein Laubballen: eine Kugel, die in großen Buckeln und vielen kleinen Büscheln ausbeult. Die Beleuchtung folgt diesen Büscheln
+     (gemittelte Flächennormalen, halb mit der Kugel gemischt), dadurch wirkt die Krone wie Laubmassen und nicht wie ein glatter Ball. */
+  const ball=(r,x,y,z,sd,rep,det)=>{const g=new T.IcosahedronGeometry(r,det===undefined?1:det),q=g.attributes.position,nn=g.attributes.normal,uv=g.attributes.uv,n=q.count,key=new Uint32Array(n),ids=new Map(),U=new Float32Array(n*3);
+   for(let i=0;i<n;i++){const l=Math.hypot(q.getX(i),q.getY(i),q.getZ(i)),ux=q.getX(i)/l,uy=q.getY(i)/l,uz=q.getZ(i)/l,kk=Math.round(ux*900)+','+Math.round(uy*900)+','+Math.round(uz*900);let id=ids.get(kk);if(id===undefined){id=ids.size;ids.set(kk,id)}key[i]=id;U[i*3]=ux;U[i*3+1]=uy;U[i*3+2]=uz;
+     const k=r*(1+.3*(vnoise(ux*2.1+sd,uy*2.1+uz*1.7)-.5)+.2*(vnoise(ux*4.7+sd*2,uy*4.9+uz*4.3)-.5)+.13*(vnoise(ux*10.3+sd*3,uy*9.7+uz*9.1)-.5));q.setXYZ(i,ux*k,uy*k*.86,uz*k);uv.setXY(i,uv.getX(i)*rep*2,uv.getY(i)*rep)}
+   {const N=new Float32Array(ids.size*3);for(let i=0;i<n;i+=3){const ax=q.getX(i),ay=q.getY(i),az=q.getZ(i),bx=q.getX(i+1)-ax,by=q.getY(i+1)-ay,bz=q.getZ(i+1)-az,cx=q.getX(i+2)-ax,cy=q.getY(i+2)-ay,cz=q.getZ(i+2)-az,nx=by*cz-bz*cy,ny=bz*cx-bx*cz,nz=bx*cy-by*cx;
+      for(let k=0;k<3;k++){const o=key[i+k]*3;N[o]+=nx;N[o+1]+=ny;N[o+2]+=nz}}
+    for(let i=0;i<n;i++){const o=key[i]*3,l=Math.hypot(N[o],N[o+1],N[o+2])||1,mx=N[o]/l*.55+U[i*3]*.45,my=N[o+1]/l*.55+U[i*3+1]*.45,mz=N[o+2]/l*.55+U[i*3+2]*.45,ml=Math.hypot(mx,my,mz)||1;nn.setXYZ(i,mx/ml,my/ml,mz/ml)}}
    g.translate(x,y,z);return g};
   const shellMat=leafMat;      /* Laub als glatte, runde Körper: klare Formen, die zur ruhigen Landschaft passen */
-  const core=join([[c1,[.62,.47,.34],1]]);
-  const BD=coarse?1:2,leaf=join([[ball(.33,0,.17,0,1,1,BD),[1,1,1],.5],[ball(.23,.21,.05,.08,5,1,BD),[.94,.97,.9],.5],[ball(.21,-.18,.09,-.12,9,1,BD),[.9,.95,.86],.5],[ball(.19,.02,.36,.05,13,1,BD),[1.06,1.07,1],.62]]);
+  const twig=(rz,x,y)=>{const g=new T.CylinderGeometry(.012,.022,.24,5,1,true);g.rotateZ(rz);g.translate(x,y,0);const uv=g.attributes.uv;for(let i=0;i<uv.count;i++)uv.setXY(i,.5,.5);return [g,[1.1,.58,.62],1]};
+  const core=join([[c1,[1.2,.62,.68],.8],twig(-.75,.085,-.08),twig(.8,-.085,-.1)]);      /* Stamm mit zwei Astgabeln */
+  const crown=(B1,B2,few)=>join([[ball(.3,0,.16,0,1,1,B1),[1,1,1],.48],[ball(.22,.2,.04,.09,5,1,B1),[.93,.97,.9],.48],[ball(.2,-.19,.08,-.11,9,1,B1),[.9,.95,.86],.48],[ball(.19,.03,.35,.05,13,1,B2),[1.07,1.08,1],.6],[ball(.17,-.04,.12,.21,17,1,B2),[.96,1,.92],.5]].concat(few?[]:[[ball(.16,.1,.24,-.17,21,1,B2),[1.02,1.04,.96],.55],[ball(.14,-.15,.27,.1,25,1,B2),[1.04,1.05,.98],.6]]));
+  const leaf=crown(coarse?2:3,coarse?1:2,coarse),leafLow=crown(1,1,true);
   const lc=new T.InstancedMesh(core,leafMat,NB);
   const li=new T.InstancedMesh(leaf,shellMat,NB),lb=new T.InstancedMesh(bg,blob.material,NB);let m=0,tr=0;
   while(m<NB&&tr<(FLD.on?90000:40000)){tr++;let x=(hash(tr,12.7)-.5)*(FLD.on?6400:5200),z=(hash(tr,19.3)-.5)*6400,sk=1;if(FLD.on){const q=FLD.snap(x,z,tr);if(!q)continue;x=q[0];z=q[1];sk=q[2]}const h=ground(x,z);
@@ -1038,7 +1058,7 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
    {const ln=s*SHL*.55,bx=x-SUX*ln*.45,bz=z-SUZ*ln*.45;nrm.set(ground(bx-6,bz)-ground(bx+6,bz),12,ground(bx,bz-6)-ground(bx,bz+6)).normalize();o2.position.set(bx,ground(bx,bz)+.5,bz);o2.quaternion.setFromUnitVectors(up,nrm).multiply(qYaw);o2.scale.set(ln+s*.9,1,s*.95);o2.updateMatrix();lb.setMatrixAt(m,o2.matrix)}
    col.setHSL(SC.leafC[0]+hash(tr,6.1)*SC.leafC[1],SC.leafC[2],SC.leafC[3]+hash(tr,7.7)*SC.leafC[4]).multiplyScalar(lerp(.5,1,LIGHT.at(x,z)));li.setColorAt(m,col);lc.setColorAt(m,col);m++;
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.36])}
-  split(li,m);split(lc,m);split(lb,m);
+  split(li,m,leafLow);split(lc,m);split(lb,m);
   /* Tiere auf der Weide: Kühe und Schafe in kleinen Herden, manche grasen, manche stehen. Jede Art ist ein Zeichenaufruf je Haltung. */
   {const bx=(w,h,dp,x,y,z,c,lo)=>{const g=new T.BoxGeometry(w,h,dp);g.translate(x,y,z);return [g,c,lo===undefined?.8:lo]},W=[.93,.9,.84],B=[.09,.08,.08],PK=[.82,.6,.56];
    const el=(rx,ry,rz,x,y,z,c,lo)=>{const g=new T.IcosahedronGeometry(1,1);g.scale(rx,ry,rz);g.translate(x,y,z);return [g,c,lo===undefined?.72:lo]};
@@ -1056,14 +1076,29 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
    const spots=[],cand=[];if(SID!=='wueste'&&!SC.ship)for(let k=0;k<5000&&cand.length<160;k++){const x=(hash(k,81.3)-.5)*3400,z=(hash(k,83.9)-.5)*3800;if(ok(x,z)&&ok(x+40,z+25)&&ok(x-35,z-30))cand.push([x,z])}
    /* die Herden stehen so nah am Platz wie möglich, aber mit Abstand zueinander */
    cand.sort((p,q)=>Math.hypot(p[0],p[1])-Math.hypot(q[0],q[1]));for(const [x,z] of cand){if(spots.length<6&&spots.every(q=>Math.hypot(q[0]-x,q[1]-z)>380))spots.push([x,z])}
-   const herd=(geos,list,sz,nm)=>{geos.forEach((geo,gi)=>{const a=list.filter((q,i)=>(i%5<3?0:1)===gi);if(!a.length)return;const im=new T.InstancedMesh(geo,leafMat,a.length),sh=new T.InstancedMesh(bg,blob.material,a.length);
+   const furMat=shaded(new Tree({vertexColors:true,roughness:.88}));
+   const herd=(geos,list,sz,nm)=>{geos.forEach((geo,gi)=>{const a=list.filter((q,i)=>(i%5<3?0:1)===gi);if(!a.length)return;const im=new T.InstancedMesh(geo,furMat,a.length),sh=new T.InstancedMesh(bg,blob.material,a.length);
       a.forEach(([x,z,ry,sc,tint],i)=>{const h=ground(x,z);d.position.set(x,h-.1,z);d.scale.setScalar(sc);d.rotation.set(0,ry,0);d.updateMatrix();im.setMatrixAt(i,d.matrix);col.setRGB(tint[0],tint[1],tint[2]).multiplyScalar(lerp(.55,1,LIGHT.at(x,z)));im.setColorAt(i,col);
         const ln=sz[1]*sc*SHL*.5,sx=x-SUX*ln*.45,sz2=z-SUZ*ln*.45;o2.position.set(sx,ground(sx,sz2)+.35,sz2);o2.quaternion.copy(qYaw);o2.scale.set(ln+sz[0]*sc,1,sz[0]*sc*.7);o2.updateMatrix();sh.setMatrixAt(i,o2.matrix);
         const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,sz[1]*sc*1.15,sz[0]*sc*.42,nm])});
       split(im,a.length);split(sh,a.length)})};
-   const cows=[],shp=[];spots.forEach(([cx,cz],si)=>{const isCow=si%2===0,n=isCow?9+Math.floor(hash(si,5.1)*4):12+Math.floor(hash(si,5.1)*6),R=isCow?75:52,arr=isCow?cows:shp;
-     for(let k=0,t=0;k<n&&t<400;t++){const a=hash(si*97+t,1.7)*6.283,r=Math.sqrt(hash(si*97+t,2.9))*R,x=cx+Math.cos(a)*r,z=cz+Math.sin(a)*r;if(!ok(x,z)||arr.some(q=>Math.hypot(q[0]-x,q[1]-z)<(isCow?16:8)))continue;
+   /* Jede Herde steht auf einer eingezäunten Koppel: ein Rechteck, in der Feldflur an den Feldrändern ausgerichtet. Es wird so weit verkleinert,
+      bis es ganz auf der Wiese liegt. Pfosten und Riegel folgen dem Gelände. */
+   const ok2=(x,z)=>{const h=ground(x,z);if(h<WATER+3||courseDist(x,z)<50||lakeD(x,z)<1.9||(Math.abs(x)<300&&Math.abs(z)<740))return false;if(FLD.on){const l=landuse(x,z);if(l[0]!==0||l[1]<5)return false}return true};
+   const cows=[],shp=[],posts=[],rails=[];spots.forEach(([cx,cz],si)=>{const isCow=si%2===0,n=isCow?9+Math.floor(hash(si,5.1)*4):12+Math.floor(hash(si,5.1)*6),arr=isCow?cows:shp;
+     const an=FLD.on?Math.atan2(FLD.s,FLD.c):hash(si,7.9)*3.1,ux=Math.cos(an),uz=Math.sin(an);let hx=isCow?105:78,hz=isCow?84:62;
+     const at=(u,v)=>[cx+ux*u*hx-uz*v*hz,cz+uz*u*hx+ux*v*hz],fits=()=>[[-1,-1],[0,-1],[1,-1],[1,0],[1,1],[0,1],[-1,1],[-1,0],[-.5,-1],[.5,-1],[-.5,1],[.5,1]].every(([u,v])=>ok2(...at(u,v)));
+     for(let k=0;k<14&&!fits();k++){hx*=.9;hz*=.9}if(!fits())return;
+     /* Zaun: vier Seiten, alle 13 Einheiten ein Pfosten, dazwischen drei Riegel */
+     [[-1,-1,1,-1],[1,-1,1,1],[1,1,-1,1],[-1,1,-1,-1]].forEach(([u0,v0,u1,v1])=>{const A=at(u0,v0),B=at(u1,v1),len=Math.hypot(B[0]-A[0],B[1]-A[1]),m=Math.max(2,Math.round(len/13));let y0=1e9,y1=-1e9,prev=null;
+       for(let k=0;k<=m;k++){const x=A[0]+(B[0]-A[0])*k/m,z=A[1]+(B[1]-A[1])*k/m,h=ground(x,z);y0=Math.min(y0,h);y1=Math.max(y1,h);if(k<m)posts.push([x,h,z]);if(prev)rails.push([prev,[x,h,z]]);prev=[x,h,z]}
+       COL.rails.push({x:(A[0]+B[0])/2,z:(A[1]+B[1])/2,tx:(B[0]-A[0])/len,tz:(B[1]-A[1])/len,nx:-(B[1]-A[1])/len,nz:(B[0]-A[0])/len,hw:len/2,y0:y0-1,y1:y1+8.6})});
+     for(let k=0,t=0;k<n&&t<500;t++){const [x,z]=at((hash(si*97+t,1.7)*2-1)*(1-11/hx),(hash(si*97+t,2.9)*2-1)*(1-11/hz));if(!ok2(x,z)||arr.some(q=>Math.hypot(q[0]-x,q[1]-z)<(isCow?16:8)))continue;
        const u=hash(si*97+t,4.3);arr.push([x,z,hash(si*97+t,3.7)*6.283,isCow?.9+u*.25:.85+u*.35,isCow?(u<.3?[.62,.4,.26]:u<.42?[.3,.24,.2]:[1,1,1]):(u<.12?[.42,.36,.32]:[1,1,1])]);k++}});
+   if(posts.length){const wood=shaded(new Tree({color:0x3A2E24,roughness:.92})),pm=new T.InstancedMesh(new T.BoxGeometry(1.1,8.4,1.1),wood,posts.length),rm=new T.InstancedMesh(new T.BoxGeometry(.45,1,1),wood,rails.length*3),tg=new T.Vector3();
+     posts.forEach(([x,h,z],i)=>{d.position.set(x,h+3.9,z);d.scale.set(1,1,1);d.rotation.set(0,hash(i,2.2)*.3,0);d.updateMatrix();pm.setMatrixAt(i,d.matrix)});
+     rails.forEach(([p0,p1],i)=>{const len=Math.hypot(p1[0]-p0[0],p1[1]-p0[1],p1[2]-p0[2]);[2.4,4.8,7.1].forEach((wy,k)=>{d.position.set((p0[0]+p1[0])/2,(p0[1]+p1[1])/2+wy,(p0[2]+p1[2])/2);tg.set(p1[0],p1[1]+wy,p1[2]);d.lookAt(tg);d.scale.set(1,1,len);d.updateMatrix();rm.setMatrixAt(i*3+k,d.matrix)})});
+     d.rotation.set(0,0,0);d.scale.set(1,1,1);split(pm,posts.length);split(rm,rails.length*3)}
    herd([cow(true),cow(false)],cows,[13,9],'kuh');herd([sheep(true),sheep(false)],shp,[6.4,5],'schaf')}
   /* Hecken: niedrige, dichte Wälle aus Laub entlang mancher Feldwege, an den Wegkreuzungen offen */
   if(FLD.on){const hg0=new T.IcosahedronGeometry(.5,coarse?2:3),q=hg0.attributes.position,nn=hg0.attributes.normal,uv=hg0.attributes.uv;
@@ -1565,8 +1600,8 @@ function rolling(dt){
   if(S.gs<.05&&a<fr){a=0;S.gs=0}else a-=fr;                        /* erst wenn der Schub die Reibung überwindet, setzt sich das Modell in Bewegung */
   S.gs=Math.max(0,S.gs+a*dt);
   /* Fahrwerk federt, auf der Wiese rumpelt es. Der Federstahlbügel gibt weit nach und schwingt aus, ein Rumpf auf dem Bauch sitzt hart auf */
-  if(P.sprung){S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-72*(S.bob+.11*wow)-6.2*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.5,.2)}      /* unter dem Gewicht steht der Bügel etwas gespreizt; trägt die Fläche, streckt er sich */
-  else{S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-260*S.bob-20*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.13,.09)}
+  if(P.sprung){S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-44*(S.bob+.2*wow)-4.2*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.8,.25)}      /* unter dem Gewicht steht der Bügel etwas gespreizt; trägt die Fläche, streckt er sich */
+  else{S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-190*S.bob-15*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.2,.1)}
   /* gelenkt wird mit dem Seitenruder; Seitenwind dreht die Nase etwas in den Wind */
   const psi0=S.psi;
   S.psi+=(-inY*1.15*clamp(S.gs/3+d.wash*S.pw*.5,0,1)*clamp(S.gs/1.2,0,1)/(1+S.gs/22)+.03*cw*clamp(S.gs/8,0,1)+d.tq*S.pw*.26*clamp(S.gs/3,0,1)*(1-clamp(ua/(1.6*d.vS),0,1)))*dt;      /* der Propellerstrahl bläst das Seitenruder schon bei wenig Fahrt an */
@@ -1699,7 +1734,7 @@ function flying(dt){
     if(sink>1.9&&S.bounces<3){S.vel.y=sink*(P.sprung?.44:.3);S.bounces++;S.w.set(-bank*2.5,0,0);S.cmp=clamp(sink*.09,0,.34);touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
     /* aufgesetzt: Schräglage und Drehung bleiben erhalten, das Fahrwerk muss sie abfangen. Wer schiebend aufsetzt, bekommt einen Ruck zur Seite */
     S.bankG=bank;S.bankV=clamp(S.w.x,-2,2)+clamp(S.vel.dot(rgt),-5,5)*.2;
-    S.ground=true;S.bobV=-Math.min(sink,4.5)*(P.sprung?1.6:1.2);if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
+    S.ground=true;S.bobV=-Math.min(sink,4.5)*(P.sprung?2:1.35);if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
     S.gs=Math.max(0,S.vel.dot(fH));S.pitchG=clamp(nose,0,.25);S.w.set(0,0,0);
     if(S.air>4){
       if(onRunway(S.pos.x,S.pos.z)){S.landings++;S.landed=true;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
@@ -1896,7 +1931,7 @@ function frame(dt,still){
   if(!still&&P&&S.started&&card.hidden){const n=Math.max(1,Math.ceil(dt*120));for(let i=0;i<n;i++)step(dt/n)}
   if(P){
     craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.5*clamp(1.6-cam.position.distanceTo(S.pos)/(P.span*9),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
-    if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,.5):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp)}
+    if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,.8):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);const run=S.crashed?0:sstep(.06,.3,S.pw);p.bl.visible=run<.98;p.disc.material.opacity=run*(.45+.3*S.pw);p.disc.rotation.z=spin*.031*(i%2?-1:1)});
     if(P.lamps){P.lamps.g.visible=!S.crashed;const k=WIND.t%1.4;P.lamps.strobe.material.opacity=k<.06||(k>.18&&k<.24)?1:0}
     if(S.ground&&!S.crashed)P.wheels.forEach(q=>{q.w.rotation.y+=S.gs/q.R*dt});
