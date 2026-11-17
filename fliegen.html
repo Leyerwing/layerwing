@@ -342,7 +342,8 @@ const K=.01;                       /* Maßstab: eine Einheit in der Welt sind 10
 
 /* Modelle: Schwerpunkt (x, z in mm), Ruderachsen und Luftschrauben wie in der 3D-Ansicht der Startseite, dazu Flugwerte: Abreißgeschwindigkeit, Höchstfahrt, Schub zu Gewicht, Roll- und Gierrate, Drehmoment der Luftschraube, Eigenstabilität um die Längsachse */
 const PLANES=[
- {id:'bf1',name:'BF1',pivot:[153,35],vS:16,vMax:68,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.008,wash:1,belly:true,
+ {id:'bf1',name:'BF1',pivot:[153,35],vS:16,vMax:68,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.008,wash:1,
+  gear:{trv:.16,sag:.05,legs:[{t:'oleo',a:[42,0,-27],b:[38,0,-84],R:18,w:11,fork:1},{t:'bow',a:[186,20,-29],b:[190,100,-80],R:22,w:13,mir:1}]},
   HINGE:{Querruder_rechts:[[212,125-3.5*S5,30+3.5*C5],[0,C5,S5]],Querruder_links:[[212,-(125-3.5*S5),30+3.5*C5],[0,-C5,S5]],Ruder_rechts:[[480,10.95,14.54],[0,.819,.574]],Ruder_links:[[480,-10.95,14.54],[0,-.819,.574]]},
   CTL:/^(Querruder|Ruder)_/,MAT:{Motor_A2212:'dark',Haube:'glass'},props:[[80,-37,0,0,2,true]],
   snd:{f0:56,f1:188,motors:1,detune:1,whine:4.02},
@@ -352,18 +353,21 @@ const PLANES=[
   CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Rad_R:'dark',Rad_L:'dark',Sporn:'dark'},wheels:/^(Rad|Felge)_/,props:[[152,-17,0,0,2,false]],
   snd:{f0:40,f1:132,motors:1,detune:1,whine:3.01},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
- {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:24.5,vMax:118,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,ar:2.4,wo:0,wash:0,belly:true,
+ {id:'f2',name:'F2',rockets:[[765,377,-15],[765,-377,-15],[700,285,-20],[700,-285,-20],[680,215,-21],[680,-215,-21]],pivot:[610,0],vS:24.5,vMax:118,twr:.9,roll:4.8,yaw:0,tq:.08,dih:.06,ar:2.4,wo:0,wash:0,
+  gear:{retract:1,trv:.26,sag:.09,legs:[{t:'oleo',a:[214,0,-32],b:[208,0,-108],R:22,w:12,fork:1,fold:['y',1.5]},{t:'oleo',a:[676,100,-8],b:[678,112,-102],R:28,w:14,fold:['x',1.5],mir:1}]},
   HINGE:{QR_R:[[765.13,160,-.83],[.1574,.9875,-.009]],QR_L:[[765.13,-160,-.83],[-.1574,.9875,.009]],HR_R:[[993.74,52,-6],[.4838,.8752,0]],HR_L:[[993.74,-52,-6],[-.4838,.8752,0]]},
   CTL:/^(QR|HR)_/,MAT:{Motor:'dark',Spinner:'dark',Schiene_R:'dark',Schiene_L:'dark',Haube_Glas_Druck:'glass'},props:[[101.6,1124,0,0,2,false]],
   snd:{f0:72,f1:262,motors:1,detune:1,whine:5.03},
   controls:(set,r)=>{set('QR_R',-r.da);set('QR_L',r.da);set('HR_R',-r.de);set('HR_L',-r.de)}},
- {id:'c160',name:'C-160',ramp:'Heckklappe',open:/^(Rumpf_[345]|Heckklappe)$/,pivot:[461,35],vS:20,vMax:75,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,ar:9,wo:.012,wash:.5,belly:true,
+ {id:'c160',name:'C-160',ramp:'Heckklappe',open:/^(Rumpf_[345]|Heckklappe)$/,pivot:[461,35],vS:20,vMax:75,twr:.66,roll:2.3,yaw:.9,tq:0,dih:.25,ar:9,wo:.012,wash:.5,
+  gear:{retract:1,trv:.14,sag:.05,legs:[{t:'oleo',a:[112,0,-62],b:[112,0,-86],R:18,w:9,twin:9,fold:['y',1.5]},{t:'oleo',a:[440,74,-66],b:[440,74,-82],R:22,w:13,lift:30,mir:1},{t:'oleo',a:[512,74,-66],b:[512,74,-82],R:22,w:13,lift:30,mir:1}]},
   HINGE:{Heckklappe:[[706.67,0,-35.33],[0,1,0]],Hoehenruder_L:[[981.33,-60,42.67],[0,1,0]],Hoehenruder_R:[[981.33,60,42.67],[0,1,0]],Querruder_L:[[535,-488,81.3],[.0022,.99954,-.0303]],Querruder_R:[[535,488,81.3],[.0022,.99954,.0303]],Seitenruder:[[985.07,0,56.67],[.3098,0,.9508]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder|Riegel)/,MAT:{Motor_R:'dark',Motor_L:'dark',Regler_R:'dark',Servo_Quer_R:'dark',Regler_L:'dark',Servo_Quer_L:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Heckklappe:'dark',Empfaenger:'dark',Akku:'dark'},
   props:[[101.6,299.5,180,45,2,false],[101.6,299.5,-180,45,2,false]],
   snd:{f0:46,f1:150,motors:2,detune:1.034,whine:3.02},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
- {id:'vl3',name:'VL3',pivot:[324,-18],vS:15,vMax:80,twr:.85,roll:3.4,yaw:1,tq:.2,dih:.22,ar:7.4,wo:.012,wash:1,belly:true,
+ {id:'vl3',name:'VL3',pivot:[324,-18],vS:15,vMax:80,twr:.85,roll:3.4,yaw:1,tq:.2,dih:.22,ar:7.4,wo:.012,wash:1,
+  gear:{retract:1,trv:.2,sag:.07,legs:[{t:'oleo',a:[104,0,-48],b:[98,0,-104],R:24,w:13,fork:1,fold:['y',-1.5]},{t:'oleo',a:[372,125,-50],b:[374,150,-98],R:30,w:15,fold:['x',1.5],mir:1}]},
   HINGE:{Querruder_R:[[393.35,484.07,-18.05],[-0.0563,0.9967,0.058]],Querruder_L:[[393.35,-484.07,-18.05],[0.0563,0.9967,-0.058]],Hoehenruder_R:[[836.0,105.0,5.41],[0.0,1.0,-0.0047]],Hoehenruder_L:[[836.0,-105.0,5.41],[-0.0,1.0,0.0047]],Seitenruder:[[831.67,-4.43,100.75],[0.3465,0.0183,0.9379]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Spinner:'dark',Haube:'glass',Akku:'dark',Regler:'dark',Empfaenger:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Quer_R:'dark',Servo_Quer_L:'dark'},props:[[114.3,30,0,0,2,false]],
   snd:{f0:48,f1:160,motors:1,detune:1,whine:3.52},
@@ -1204,7 +1208,8 @@ function creased(pos,idx,cosA){
 }
 /* Rakete: 15 cm lang, Achse entlang x, Spitze nach vorn */
 const matRk=new T.MeshStandardMaterial({color:0xE4E1D9,roughness:.45,envMap:ENV,envMapIntensity:.3}),matRkTip=new T.MeshStandardMaterial({color:0xD8472F,roughness:.5});
-[matDark,matGlass,matTyre,matHub,matRk,matRkTip].forEach(m=>keepSharp(m));
+const matStrut=new T.MeshStandardMaterial({color:0x9DA1A6,roughness:.42,metalness:.7,envMap:ENV,envMapIntensity:.6});
+[matDark,matGlass,matTyre,matHub,matRk,matRkTip,matStrut].forEach(m=>keepSharp(m));
 function makeRocket(){
   const g=new T.Group(),b=new T.CylinderGeometry(6,6,120,14),n=new T.ConeGeometry(6,30,14);b.rotateZ(Math.PI/2);b.translate(15,0,0);n.rotateZ(Math.PI/2);n.translate(-60,0,0);
   const f1=new T.BoxGeometry(26,1.2,30),f2=new T.BoxGeometry(26,30,1.2);f1.translate(62,0,0);f2.translate(62,0,0);
@@ -1287,8 +1292,31 @@ async function build(def){
     parts.push({name,outer,c,bb:g.boundingBox,v:new T.Vector3(),w:new T.Vector3()});
   }
   const props=def.props.map(a=>{const p=makeProp(...a);const o=new T.Group();p.g.position.set(0,0,0);o.position.set(a[1],a[2],a[3]);o.add(p.g);fit.add(o);parts.push({outer:o,c:new T.Vector3(a[1],a[2],a[3]),v:new T.Vector3(),w:new T.Vector3()});return p});
+  /* Fahrwerk wie am großen Vorbild: Bugrad und Hauptfahrwerk. Federbeine tauchen beim Aufsetzen ein (der Kolben schiebt sich in die Hülse),
+     ein Bügel aus Federstahl spreizt sich. Bei Modellen mit Einziehfahrwerk klappen die Beine nach dem Abheben weg. */
+  const gearLegs=[],gZ=new T.Vector3(0,0,1),gD=new T.Vector3(),gO=new T.Vector3(),gT=new T.Vector3();
+  const aim=(m,from,to,sx,sy)=>{gD.copy(to).sub(from);const L=gD.length()||1;m.position.copy(from);m.scale.set(sx,sy,L);m.quaternion.setFromUnitVectors(gZ,gD.multiplyScalar(1/L))};
+  if(def.gear){const cyl=new T.CylinderGeometry(1,1,1,14);cyl.rotateX(Math.PI/2);cyl.translate(0,0,.5);const bx=new T.BoxGeometry(1,1,1);bx.translate(0,0,.5);
+    const mk=(geo,m,par)=>{const o=new T.Mesh(geo,m);o.castShadow=o.receiveShadow=true;par.add(o);return o},specs=[];
+    for(const q of def.gear.legs){specs.push(q);if(q.mir)specs.push(Object.assign({},q,{a:[q.a[0],-q.a[1],q.a[2]],b:[q.b[0],-q.b[1],q.b[2]]}))}
+    for(const q of specs){const A=new T.Vector3(...q.a),B=new T.Vector3(...q.b),side=Math.sign(B.y),outer=new T.Group(),sw=new T.Group(),lo=new T.Group(),R=q.R,w=q.w,rs=Math.max(2.6,R*.17),off=new T.Vector3(),rel=B.clone().sub(A);
+      outer.position.copy(A);outer.add(sw);sw.add(lo);fit.add(outer);
+      const wheel=y=>{const wh=makeWheel(R,w);wh.position.set(0,y,0);lo.add(wh);wheels.push({w:wh,R:R*K})};
+      if(q.twin){const y=(q.twin+w)/2;wheel(-y);wheel(y);aim(mk(cyl,matHub,lo),new T.Vector3(0,-y,0),new T.Vector3(0,y,0),rs*.55,rs*.55)}                               /* Zwillingsräder auf einer Achse */
+      else if(q.fork){wheel(0);off.set(0,0,R+4);mk(new T.BoxGeometry(rs*2.4,w+9,4),matStrut,lo).position.set(0,0,R+4);                                                       /* Gabel über dem Bugrad */
+        for(const k of [-1,1])mk(new T.BoxGeometry(rs*1.8,2.2,R+5),matStrut,lo).position.set(0,k*(w/2+3.4),(R+5)/2);
+        aim(mk(cyl,matDark,lo),new T.Vector3(0,-(w/2+4.6),0),new T.Vector3(0,w/2+4.6,0),1.6,1.6)}
+      else{wheel(0);off.set(0,-side*(w/2+(q.t==='bow'?2.5:rs+1.5)),0);aim(mk(cyl,matHub,lo),off,new T.Vector3(0,side*(w/2+1),0),rs*.5,rs*.5)}                                 /* Rad außen am Bein */
+      const strut=mk(q.t==='bow'?bx:cyl,q.t==='bow'?matStrut:matHub,sw);
+      if(q.t!=='bow')aim(mk(cyl,matStrut,sw),gO,rel.clone().add(off).multiplyScalar(.56),rs,rs);
+      gearLegs.push({sw,lo,rel,off,side,strut,bow:q.t==='bow',rs,fold:q.fold?[q.fold[0],q.fold[0]==='x'?-side*q.fold[1]:q.fold[1]]:null,lift:q.lift||0,max:Math.abs(rel.z)*.9,y:B.y});
+      parts.push({name:'Fahrwerk',outer,c:A.clone(),v:new T.Vector3(),w:new T.Vector3()});box.expandByPoint(gT.set(B.x,B.y,B.z-R))}}
+  const gearFlex=cmp=>{for(const l of gearLegs){const dz=Math.min(cmp/K,l.max);gT.copy(l.rel);gT.z+=dz;if(l.bow){gT.y+=l.side*dz*.7;l.lo.rotation.x=-l.side*dz*.004}l.lo.position.copy(gT);gT.add(l.off);l.bow?aim(l.strut,gO,gT,15,3):aim(l.strut,gO,gT,l.rs*.62,l.rs*.62)}};
+  const setGear=r=>{const e=r*r*(3-2*r);for(const l of gearLegs){if(l.fold)l.sw.rotation[l.fold[0]]=l.fold[1]*e;if(l.lift)l.sw.position.z=l.lift*e;l.sw.visible=r<.985}};
+  gearFlex(0);
   /* wie tief reicht das Modell unter den Schwerpunkt, wenn die Nase um a angehoben ist? Tabelle in 3-Grad-Schritten aus den Eckpunkten */
   const lowT=new Float32Array(61).fill(-1e9);
+  if(def.gear)for(const q of def.gear.legs)for(let k=0;k<61;k++){const a=(k-30)*.05236;for(let f=-1.2;f<=1.2;f+=.2){const dx=q.b[0]+q.R*Math.sin(f)-def.pivot[0],dz=q.b[2]-q.R*Math.cos(f)-def.pivot[1],v=dx*Math.sin(a)-dz*Math.cos(a);if(v>lowT[k])lowT[k]=v}}
   for(const [,g] of list){const q=g.attributes.position;for(let i=0;i<q.count;i+=5){const dx=q.getX(i)-def.pivot[0],dz=q.getZ(i)-def.pivot[1];
     for(let k=0;k<61;k++){const a=(k-30)*.05236,v=dx*Math.sin(a)-dz*Math.cos(a);if(v>lowT[k])lowT[k]=v}}}
   const lowAt=a=>{const f=clamp(a/.05236+30,0,60),i=Math.min(59,Math.floor(f));return (lowT[i]+(lowT[i+1]-lowT[i])*(f-i))*K+.02};
@@ -1307,8 +1335,9 @@ async function build(def){
   /* Fahrwerk: der Bügel aus Federstahl biegt sich unter Last auf, die Räder wandern dabei nach außen und oben und kippen leicht.
      Am Modell ist der Bügel ein Teil; gebogen wird er, indem er um seine Befestigung in die Breite gezogen und in der Höhe gestaucht wird. */
   const yMid=(box.max.y+box.min.y)/2,bow=parts.find(q=>q.name==='Fahrwerksbuegel'),legs=parts.filter(q=>def.wheels&&def.wheels.test(q.name)).map(q=>({q,side:Math.sign(q.c.y-yMid)||1}));
-  const track=legs.length?Math.max(...legs.map(l=>Math.abs(l.q.c.y-yMid)))*K:(box.max.y-box.min.y)*K*.05;
-  const flex=cmp=>{if(!legs.length)return;const dz=cmp/K,dy=dz*.75;
+  const track=legs.length?Math.max(...legs.map(l=>Math.abs(l.q.c.y-yMid)))*K:gearLegs.length?Math.max(...gearLegs.map(l=>Math.abs(l.y-yMid)))*K:(box.max.y-box.min.y)*K*.05;
+  const G0=def.gear||{trv:.8,sag:.2},kS=44*.2/G0.sag,cS=4.2*Math.sqrt(kS/44)*(def.gear?1.35:1);
+  const flex=cmp=>{gearFlex(cmp);if(!legs.length)return;const dz=cmp/K,dy=dz*.75;
     for(const l of legs){l.q.outer.position.set(l.q.c.x,l.q.c.y+l.side*dy,l.q.c.z+dz);l.q.outer.rotation.x=-l.side*cmp*.3}
     if(bow){const b=bow.bb,h=b.max.z-b.min.z,w=(b.max.y-b.min.y)/2,sz=Math.max(.5,1-dz/h);bow.outer.scale.set(1,1+dy/w,sz);bow.outer.position.z=bow.c.z+h/2*(1-sz)}};
   const lamps={g:new T.Group(),strobe:null};
@@ -1317,7 +1346,7 @@ async function build(def){
    const sp=(c,x,y,z,sz)=>{const m=new T.Sprite(new T.SpriteMaterial({map:glowTex,color:c,transparent:true,blending:T.AdditiveBlending,depthWrite:false,fog:false}));m.position.set(x,y,z);m.scale.set(sz,sz,1);lamps.g.add(m);return m},sz=Math.max(46,hy*.11);
    if(tipL[3])sp(0xFF3A22,tipL[0]/tipL[3],box.min.y-3,tipL[2]/tipL[3],sz);if(tipR[3])sp(0x38FF6A,tipR[0]/tipR[3],box.max.y+3,tipR[2]/tipR[3],sz);
    lamps.strobe=sp(0xFFFFFF,tail[0]+2,tail[1],tail[2],sz*1.5);fit.add(lamps.g)}
-  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,lamps,low:lowAt,aTail,tipUp:(tipZ-def.pivot[1])*K,track,flex,sprung:legs.length>0,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
+  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,lamps,low:lowAt,aTail,tipUp:(tipZ-def.pivot[1])*K,track,flex,setGear,retract:!!(def.gear&&def.gear.retract),trv:G0.trv,sag:G0.sag,kS,cS,imp:def.gear?Math.sqrt(kS/44)*G0.trv/.5:1,sprung:legs.length>0||gearLegs.length>0,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
   return cache[def.id]=M;
 }
 
@@ -1341,7 +1370,7 @@ const camPos=new T.Vector3(0,8,400),camLook=new T.Vector3();let camMode=0,camYaw
 const touch={x:0,y:0,r:0,on:false,ron:false,thr:null,draw:()=>{}};
 function reset(msg){
   S.pos.set(START.x,P?P.gear:1,START.z);S.vel.set(0,0,0);S.w.set(0,0,0);S.Q.identity();
-  S.st.fill(0);Object.assign(S,{ramp:0,rampA:0,thr:0,pw:0,bob:0,bobV:0,tc:0,upw:0,th:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,bankG:0,bankV:0,cmp:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
+  S.st.fill(0);Object.assign(S,{ramp:0,rampA:0,thr:0,pw:0,bob:0,bobV:0,tc:0,upw:0,th:0,gr:0,grT:0,ground:true,gs:0,psi:0,pitchG:P&&P.def.tail?P.aTail*.8:0,bankG:0,bankV:0,cmp:0,crashed:0,air:0,stalled:0,va:0,bounces:0,px:START.x,pz:START.z,gt:9,next:0,lap0:null});
   if(touch.thr!==null)touch.thr=0;
   if(P){S.Q.setFromEuler(eul.set(S.pitchG,0,0,'YXZ'));S.pos.y=ground(START.x,START.z)+P.low(S.pitchG)}      /* Spornradmodelle stehen von Anfang an mit dem Heck am Boden */
   if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0);p.outer.scale.set(1,1,1)});S.best=lbBest(P.def.id);S.last=null}
@@ -1605,7 +1634,7 @@ function rolling(dt){
   if(S.gs<.05&&a<fr){a=0;S.gs=0}else a-=fr;                        /* erst wenn der Schub die Reibung überwindet, setzt sich das Modell in Bewegung */
   S.gs=Math.max(0,S.gs+a*dt);
   /* Fahrwerk federt, auf der Wiese rumpelt es. Der Federstahlbügel gibt weit nach und schwingt aus, ein Rumpf auf dem Bauch sitzt hart auf */
-  if(P.sprung){S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-44*(S.bob+.2*wow)-4.2*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.8,.25)}      /* unter dem Gewicht steht der Bügel etwas gespreizt; trägt die Fläche, streckt er sich */
+  if(P.sprung){S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow*Math.sqrt(P.sag/.2)+(-P.kS*(S.bob+P.sag*wow)-P.cS*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-P.trv,P.trv*.3)}      /* unter dem Gewicht steht der Bügel etwas gespreizt; trägt die Fläche, streckt er sich */
   else{S.bobV+=(Math.random()-.5)*S.gs*(rw?.012:.11)*wow+(-190*S.bob-15*S.bobV)*dt;S.bob=clamp(S.bob+S.bobV*dt,-.2,.1)}
   /* gelenkt wird mit dem Seitenruder; Seitenwind dreht die Nase etwas in den Wind */
   const psi0=S.psi;
@@ -1736,10 +1765,10 @@ function flying(dt){
     if(sink>(P.def.belly?4.3:4.6)){crash('Zu hart aufgesetzt.');return}      /* ein gefedertes Fahrwerk verzeiht etwas mehr */
     if(side>5){crash('Quer zur Flugrichtung aufgesetzt.');return}
     /* zu schnell gesunken: das Fahrwerk wirft das Modell zurück in die Luft. Der Federbügel federt stärker als ein Rumpf, der auf dem Bauch aufschlägt */
-    if(sink>1.9&&S.bounces<3){S.vel.y=sink*(P.sprung?.44:.3);S.bounces++;S.w.set(-bank*2.5,0,0);S.cmp=clamp(sink*.09,0,.34);touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
+    if(sink>1.9&&S.bounces<3){S.vel.y=sink*(P.sprung?.44:.3);S.bounces++;S.w.set(-bank*2.5,0,0);S.cmp=clamp(sink*.09,0,Math.min(.34,P.trv));touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
     /* aufgesetzt: Schräglage und Drehung bleiben erhalten, das Fahrwerk muss sie abfangen. Wer schiebend aufsetzt, bekommt einen Ruck zur Seite */
     S.bankG=bank;S.bankV=clamp(S.w.x,-2,2)+clamp(S.vel.dot(rgt),-5,5)*.2;
-    S.ground=true;S.bobV=-Math.min(sink,4.5)*(P.sprung?2:1.35);if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
+    S.ground=true;S.bobV=-Math.min(sink,4.5)*(P.sprung?2:1.35)*P.imp;if(S.air>.6)touchdown(sink);S.psi=Math.atan2(-fwd.x,-fwd.z);fH.set(-Math.sin(S.psi),0,-Math.cos(S.psi));
     S.gs=Math.max(0,S.vel.dot(fH));S.pitchG=clamp(nose,0,.25);S.w.set(0,0,0);
     if(S.air>4){
       if(onRunway(S.pos.x,S.pos.z)){S.landings++;S.landed=true;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
@@ -1936,7 +1965,11 @@ function frame(dt,still){
   if(!still&&P&&S.started&&card.hidden){const n=Math.max(1,Math.ceil(dt*120));for(let i=0;i<n;i++)step(dt/n)}
   if(P){
     craft.position.copy(S.pos);craft.quaternion.copy(S.Q);P.lineMat.opacity=.5*clamp(1.6-cam.position.distanceTo(S.pos)/(P.span*9),0,1);P.lineMat.visible=P.lineMat.opacity>.02;if(S.ground&&!S.crashed)craft.position.y+=S.bob+Math.abs(Math.sin(S.bankG))*P.track;
-    if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,.8):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp)}
+    if(!S.crashed){S.cmp=S.ground?clamp(-S.bob,0,P.trv):lerp(S.cmp,0,1-Math.exp(-9*dt));P.flex(S.cmp);
+      /* Einziehfahrwerk: nach dem Abheben mit Fahrt und etwas Höhe fährt es ein; langsam und tief oder kurz vor dem Aufsetzen fährt es wieder aus */
+      if(P.retract){const hg=ground(S.pos.x,S.pos.z),a0=S.pos.y-P.gear-(WATER>hg?WATER:hg),vS=P.def.vS;
+        if(S.ground||a0<4||(S.vel.y<-.3&&a0/-S.vel.y<3)||(a0<90&&S.va<1.45*vS))S.grT=0;else if(S.air>1.2&&((a0>22&&S.va>1.6*vS)||a0>120))S.grT=1;
+        if(S.ground)S.gr=0;else S.gr=S.grT>S.gr?Math.min(S.grT,S.gr+dt/1.5):Math.max(S.grT,S.gr-dt/1.0);P.setGear(S.gr)}else P.setGear(0)}
     spin+=(S.crashed?0:4+S.pw*70+S.va*.25)*dt;P.props.forEach((p,i)=>{p.prop.rotation.x=spin*(i%2?-1:1);const run=S.crashed?0:sstep(.06,.3,S.pw);p.bl.visible=run<.98;p.disc.material.opacity=run*(.45+.3*S.pw);p.disc.rotation.z=spin*.031*(i%2?-1:1)});
     if(P.lamps){P.lamps.g.visible=!S.crashed;const k=WIND.t%1.4;P.lamps.strobe.material.opacity=k<.06||(k>.18&&k<.24)?1:0}
     if(S.ground&&!S.crashed)P.wheels.forEach(q=>{q.w.rotation.y+=S.gs/q.R*dt});
