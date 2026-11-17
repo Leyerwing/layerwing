@@ -364,7 +364,7 @@ const K=.01;                       /* Maßstab: eine Einheit in der Welt sind 10
 const PLANES=[
  {id:'bf1',name:'BF1',pivot:[153,35],vS:16,vMax:68,twr:.85,roll:3.6,yaw:1.1,tq:.22,dih:.3,ar:7.5,wo:.008,wash:1,
   gear:{trv:.16,sag:.05,legs:[{t:'oleo',a:[42,0,-27],b:[38,0,-84],R:18,w:11,fork:1},{t:'bow',a:[186,20,-29],b:[190,100,-80],R:22,w:13,mir:1}]},
-  HINGE:{Querruder_rechts:[[212,125-3.5*S5,30+3.5*C5],[0,C5,S5]],Querruder_links:[[212,-(125-3.5*S5),30+3.5*C5],[0,-C5,S5]],Ruder_rechts:[[480,10.95,14.54],[0,.819,.574]],Ruder_links:[[480,-10.95,14.54],[0,-.819,.574]]},
+  HINGE:{Querruder_rechts:[[209.8,125-7*S5,30+7*C5],[0,C5,S5]],Querruder_links:[[209.8,-(125-7*S5),30+7*C5],[0,-C5,S5]],Ruder_rechts:[[477.3,10.95,20.66],[0,.8192,.5736]],Ruder_links:[[477.3,-10.95,20.66],[0,-.8192,.5736]]},
   CTL:/^(Querruder|Ruder)_/,MAT:{Motor_A2212:'dark',Haube:'glass'},props:[[80,-37,0,0,2,true]],
   snd:{f0:56,f1:188,motors:1,detune:1,whine:4.02},
   controls:(set,r)=>{set('Querruder_rechts',-r.da);set('Querruder_links',-r.da);set('Ruder_rechts',-(r.de+r.dr));set('Ruder_links',r.de-r.dr)}},
