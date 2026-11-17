@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" id="vp" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Fliegen: die LayerWing-Modelle im Browser steuern | LayerWing</title>
-<meta name="description" content="Flugsimulator für Modellflieger: Starte mit BF1, Buschflugzeug, F2 oder C-160 zwischen Rapsfeldern, im Alpental, an der Küste, in der Wüste oder vom Flugzeugträger. Läuft direkt im Browser.">
+<meta name="description" content="Flugsimulator für Modellflieger: Starte mit BF1, Buschflugzeug, F2, C-160 oder VL3 zwischen Rapsfeldern, im Alpental, an der Küste, in der Wüste oder vom Flugzeugträger. Läuft direkt im Browser.">
 <link rel="canonical" href="https://www.layerwing.de/fliegen.html">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="de_DE">
@@ -362,6 +362,11 @@ const PLANES=[
   CTL:/^(Querruder|Hoehenruder|Seitenruder|Riegel)/,MAT:{Motor_R:'dark',Motor_L:'dark',Regler_R:'dark',Servo_Quer_R:'dark',Regler_L:'dark',Servo_Quer_L:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Heckklappe:'dark',Empfaenger:'dark',Akku:'dark'},
   props:[[101.6,299.5,180,45,2,false],[101.6,299.5,-180,45,2,false]],
   snd:{f0:46,f1:150,motors:2,detune:1.034,whine:3.02},
+  controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
+ {id:'vl3',name:'VL3',pivot:[324,-18],vS:15,vMax:80,twr:.85,roll:3.4,yaw:1,tq:.2,dih:.22,ar:7.4,wo:.012,wash:1,belly:true,
+  HINGE:{Querruder_R:[[393.35,484.07,-18.05],[-0.0563,0.9967,0.058]],Querruder_L:[[393.35,-484.07,-18.05],[0.0563,0.9967,-0.058]],Hoehenruder_R:[[836.0,105.0,5.41],[0.0,1.0,-0.0047]],Hoehenruder_L:[[836.0,-105.0,5.41],[-0.0,1.0,0.0047]],Seitenruder:[[831.67,-4.43,100.75],[0.3465,0.0183,0.9379]]},
+  CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Spinner:'dark',Haube:'glass',Akku:'dark',Regler:'dark',Empfaenger:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Quer_R:'dark',Servo_Quer_L:'dark'},props:[[114.3,30,0,0,2,false]],
+  snd:{f0:48,f1:160,motors:1,detune:1,whine:3.52},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}}
 ];
 
