@@ -45,7 +45,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .inst{position:fixed;left:max(18px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:10px;pointer-events:none}
 .inst svg{width:132px;height:132px;display:block;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)) drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 .inst #g-w{width:100px;height:100px}
-@media (max-width:1250px) and (pointer:fine){.inst{gap:7px}.inst svg{width:104px;height:104px}.inst #g-w{width:80px;height:80px}}      /* schmale Fenster: kleinere Instrumente, damit sie nicht unter die Knöpfe geraten */
+@media (max-width:1250px) and (pointer:fine){.inst{gap:7px}.inst svg{width:104px;height:104px}.inst #g-w{width:80px;height:80px}}
+@media (max-width:1120px) and (pointer:fine){.inst{gap:5px}.inst svg{width:88px;height:88px}.inst #g-w{width:68px;height:68px}}
+@media (max-width:1560px) and (pointer:fine){.inst{bottom:calc(max(16px,env(safe-area-inset-bottom)) + 54px)}}      /* nicht breit genug für Instrumente und Knöpfe in einer Reihe: Instrumente stehen über der Knopfleiste */      /* schmale Fenster: kleinere Instrumente, damit sie nicht unter die Knöpfe geraten */
 .gM{stroke:#F2EEE5;stroke-width:1.45;stroke-linecap:round}
 .gm{stroke:rgba(236,232,223,.5);stroke-width:.75}
 .gt{fill:#F2EEE5;font-size:7.6px;font-weight:600;text-anchor:middle;dominant-baseline:central}
@@ -248,6 +250,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 
 <div class="inst" aria-label="Instrumente">
   <svg id="g-v" viewBox="0 0 100 100" role="img" aria-label="Fahrtmesser"></svg>
+  <svg id="g-a" viewBox="0 0 100 100" role="img" aria-label="Künstlicher Horizont"></svg>
   <svg id="g-h" viewBox="0 0 100 100" role="img" aria-label="Höhenmesser"></svg>
   <svg id="g-n" viewBox="0 0 100 100" role="img" aria-label="Drehzahlmesser"></svg>
   <svg id="g-w" viewBox="0 0 100 100" role="img" aria-label="Wind"></svg>
@@ -2005,6 +2008,37 @@ function windDial(svg){const id=svg.id;let h=dialCase(id)+'<g transform="transla
    <text x="50" y="62" class="gv" style="font-size:19px" id="i-w">0</text><text x="50" y="72.5" class="gu" style="font-size:7.4px">km/h Wind</text>
    <g id="i-wa"><path d="M50 79.5l7.2 12.6h-14.4z" fill="#F4C61F" stroke="#0A0908" stroke-width="1"/></g></g>`+dialGlass(id);
   svg.innerHTML=h}
+/* Künstlicher Horizont: Himmel und Erde liegen auf einer Scheibe, die sich mit der Querlage dreht und mit der Längsneigung wandert.
+   Außen ein Ring mit der Querlageskala (10, 20, 30, 45, 60 Grad), oben die feste gelbe Marke. Das gelbe Flugzeugsymbol steht fest im Gehäuse.
+   Wie im Original: Der Ring dreht mit dem Horizont, die Marke oben zeigt die Querlage an. */
+function attitudeDial(svg){const id=svg.id,SKY='#4F86C2',SKY2='#3A6EA8',GND='#7B5636',GND2='#5E3F26';
+  const at=(a,r)=>[(50+r*Math.sin(a*Math.PI/180)).toFixed(2),(50-r*Math.cos(a*Math.PI/180)).toFixed(2)];
+  let h=dialCase(id)+`<defs><clipPath id="${id}-o"><circle cx="50" cy="50" r="42.2"/></clipPath><clipPath id="${id}-i"><circle cx="50" cy="50" r="30.5"/></clipPath>
+    <linearGradient id="${id}-sk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${SKY2}"/><stop offset="1" stop-color="${SKY}"/></linearGradient>
+    <linearGradient id="${id}-gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${GND}"/><stop offset="1" stop-color="${GND2}"/></linearGradient>
+    <radialGradient id="${id}-sh" cx=".5" cy=".5" r=".5"><stop offset=".72" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".55"/></radialGradient></defs>`;
+  /* äußerer Ring: Himmel oben, Erde unten, Querlagemarken; dreht mit */
+  h+=`<g clip-path="url(#${id}-o)"><g data-r><rect x="0" y="0" width="100" height="50" fill="${SKY2}"/><rect x="0" y="50" width="100" height="50" fill="${GND2}"/>`;
+  for(const a of [-60,-45,-30,-20,-10,10,20,30,45,60]){const L=Math.abs(a)===30||Math.abs(a)===60,p=at(a,42.2),q=at(a,L?34.2:37.6);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" stroke="#F2EEE5" stroke-width="${L?2:1.4}" stroke-linecap="round"/>`}
+  h+=`<path d="M50 34.6L46.4 42.2H53.6Z" fill="#F2EEE5"/></g>`;
+  /* innere Scheibe: Himmel, Erde, Horizontlinie und Leiter für die Längsneigung; dreht und wandert */
+  h+=`<g clip-path="url(#${id}-i)"><g data-p><rect x="-60" y="-160" width="220" height="210" fill="url(#${id}-sk)"/><rect x="-60" y="50" width="220" height="210" fill="url(#${id}-gd)"/>
+    <line x1="-60" y1="50" x2="160" y2="50" stroke="#F2EEE5" stroke-width="1.1"/>`;
+  for(const d of [-20,-15,-10,-5,5,10,15,20]){const y=50-d*1.05,w=d%10?4.5:(Math.abs(d)===20?11:8);h+=`<line x1="${50-w}" y1="${y}" x2="${50+w}" y2="${y}" stroke="#F2EEE5" stroke-width="${d%10?.7:.95}"/>`;
+    if(!(d%10))h+=`<text x="${50-w-4.2}" y="${y}" class="gt" style="font-size:5.2px">${Math.abs(d)}</text><text x="${50+w+4.2}" y="${y}" class="gt" style="font-size:5.2px">${Math.abs(d)}</text>`}
+  h+=`</g></g><circle cx="50" cy="50" r="30.5" fill="none" stroke="#0A0908" stroke-width="1.2"/><circle cx="50" cy="50" r="42.2" fill="url(#${id}-sh)"/>`;
+  /* feste Teile: Marke oben, Sockel unten, Flugzeugsymbol */
+  h+=`<path d="M50 9.6L46.6 3.6H53.4Z" fill="#F4C61F" stroke="#0A0908" stroke-width=".6" transform="translate(0 6.2)"/>
+   <path d="M43.6 92.2L46.6 64H53.4L56.4 92.2Z" fill="#141312"/><path d="M46.6 64H53.4" stroke="#2C2A26" stroke-width=".8"/>
+   <g transform="translate(.5 .8)" opacity=".55"><path d="M27 49.2H41.6L45.2 54.4H43.4L40.8 50.8H27Z M73 49.2H58.4L54.8 54.4H56.6L59.2 50.8H73Z" fill="#000"/><line x1="50" y1="54" x2="50" y2="64" stroke="#000" stroke-width="1.4"/></g>
+   <path d="M45.2 54.4Q50 59.2 54.8 54.4" fill="none" stroke="#141312" stroke-width="1.6"/><line x1="50" y1="57" x2="50" y2="64.5" stroke="#141312" stroke-width="1.6"/>
+   <path d="M27 49.2H41.6L45.2 54.4H43.4L40.8 50.8H27Z M73 49.2H58.4L54.8 54.4H56.6L59.2 50.8H73Z" fill="#F4C61F" stroke="#3A2E05" stroke-width=".35"/>
+   <circle cx="50" cy="50" r="1.5" fill="#E0533D" stroke="#3A1208" stroke-width=".35"/>`+dialGlass(id);
+  svg.innerHTML=h;
+  const rg=svg.querySelector('[data-r]'),pg=svg.querySelector('[data-p]');
+  return {set:(roll,pitch)=>{const r=(-roll).toFixed(1),y=(clamp(pitch,-40,40)*1.05).toFixed(2);rg.setAttribute('transform','rotate('+r+' 50 50)');pg.setAttribute('transform','rotate('+r+' 50 50) translate(0 '+y+')')}};
+}
+const AI={f:new T.Vector3(),r:new T.Vector3(),u:new T.Vector3()};
 const GA={id:null};
 function gauges(d){
   const top=d.vMax*3.6,mj=top>300?100:40,mx=Math.ceil(top*1.06/mj)*mj,vs=d.vS*3.6,rm=d.snd.f1*.06,nx=Math.ceil(rm*1.14/2)*2;
@@ -2012,6 +2046,7 @@ function gauges(d){
   GA.h=dial($('#g-h'),{max:1000,major:100,minor:20,full:true,unit:'m',fmt:v=>v/100});
   GA.n=dial($('#g-n'),{max:nx,major:2,minor:.5,unit:'× 1000 U/min',bug:true,arcs:[[rm*1.02,nx,'#E0533D']]});
   if(!GA.w){windDial($('#g-w'));GA.w=$('#i-w');GA.wa=$('#i-wa')}
+  if(!GA.a)GA.a=attitudeDial($('#g-a'));
   GA.id=d.id;GA.rpm0=d.snd.f0*.06;GA.rpm1=rm;
 }
 function frame(dt,still){
@@ -2082,6 +2117,9 @@ function frame(dt,still){
      hudT+=dt;
      if(coarse){if(hudT>.1){MI.v.textContent=Math.round(kmh);MI.h.textContent=Math.round(alt);const low=!S.ground&&!S.crashed&&S.va<P.def.vS*1.22;if(low!==MI.low){MI.low=low;MI.v.parentNode.classList.toggle('low',low)}}}
      else{GA.v.set(kmh);GA.h.set(alt);GA.h.small(alt*.036);GA.n.set(rpm);GA.n.bug(GA.rpm0+(GA.rpm1-GA.rpm0)*S.thr);
+      /* künstlicher Horizont: Querlage und Längsneigung aus der Lage des Modells */
+      {const f=AI.f.set(0,0,-1).applyQuaternion(S.Q),r=AI.r.set(1,0,0).applyQuaternion(S.Q),u=AI.u.set(0,1,0).applyQuaternion(S.Q);
+       GA.a.set(Math.atan2(-r.y,u.y)*180/Math.PI,Math.asin(clamp(f.y,-1,1))*180/Math.PI)}
       if(hudT>.1){GA.v.v.textContent=Math.round(kmh);GA.h.v.textContent=Math.round(alt);GA.n.v.textContent=(Math.round(rpm*10)/10).toFixed(1).replace('.',',')}}}
     if(hudT>.1){hudT=0;touch.draw();
       /* Stoppuhr: läuft ab Tor 1, bleibt nach dem letzten Tor auf der Rundenzeit stehen */
