@@ -37,6 +37,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .home svg{width:26px;height:auto}
 .home span{font-weight:400;color:var(--muted);font-size:14px;letter-spacing:0}
 .models{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.models[hidden]{display:none}
 .chip{border:1px solid var(--panel-line);background:var(--panel);border-radius:999px;padding:8px 14px;font-size:14px;font-weight:600;min-height:40px}
 .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
 
@@ -83,12 +84,18 @@ kbd.pb svg{width:12px;height:12px;display:block;fill:none;stroke:currentColor;st
 .card .models{margin:16px 0 0;justify-content:flex-start}
 .card .chip:not([aria-pressed="true"]){background:transparent}
 /* Flugplatz wählen: Kacheln mit Bild, Name und einer kurzen Zeile. Ein Klick fliegt dort los */
-.places{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin:12px 0 4px}
+.places{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;margin:8px 0 4px}
 .place{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0 0 7px;border:1px solid var(--panel-line);border-radius:12px;overflow:hidden;background:transparent;color:var(--ink);font:inherit;font-size:13px;font-weight:600;line-height:1.25;text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
 .place img{display:block;width:100%;aspect-ratio:16/9;height:auto;object-fit:cover;background:#2a2f36}
 .place b{display:block;padding:6px 9px 0;font-weight:600}
 .place small{display:block;padding:1px 9px 0;font-size:11px;font-weight:400;color:var(--muted);line-height:1.3}
 .place:hover{border-color:var(--accent)}
+/* Flugzeug wählen: jedes Modell steht am Rollhalt, der Propeller dreht im Leerlauf */
+.card .pick-h{margin:16px 0 0;font-size:13px;font-weight:600;letter-spacing:0;line-height:1.3;color:var(--ink)}
+@media (min-width:900px) and (min-height:640px){#v-help{width:min(860px,100%)}#v-help .planes{grid-template-columns:repeat(6,minmax(0,1fr))}#v-help .places{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.planes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0 0}
+.planes .place{padding-bottom:6px}
+.planes .place b{padding-top:5px}
 .place:active{transform:scale(.98)}
 .place[aria-pressed="true"]{border-color:var(--accent);background:rgba(244,198,31,.12)}
 .place[aria-pressed="true"] small{color:var(--ink)}
@@ -286,8 +293,11 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 <div class="card" id="card">
   <div class="card-in" id="v-help" role="dialog" aria-modal="true" aria-labelledby="card-h">
     <h1 id="card-h">Flugplatz</h1>
-    <p>Ein Klick auf einen Platz, und du fliegst dort los. Das Modell wählst du oben.</p>
-    <div class="places" id="places" role="group" aria-label="Flugplatz wählen"></div>
+    <p>Such dir ein Flugzeug aus. Dann ein Klick auf den Platz, und du fliegst dort los.</p>
+    <h2 class="pick-h" id="planes-h">Flugzeug</h2>
+    <div class="planes" id="planes" role="group" aria-labelledby="planes-h"></div>
+    <h2 class="pick-h" id="places-h">Flugplatz</h2>
+    <div class="places" id="places" role="group" aria-labelledby="places-h"></div>
     <div class="go">
       <button class="btn btn-primary" id="b-go" type="button">Losfliegen</button>
       <a class="btn" href="/" style="text-decoration:none;color:inherit;display:inline-flex;align-items:center">Zurück zum Shop</a>
@@ -322,8 +332,10 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
   <div class="card-in one" id="v-menu" role="dialog" aria-modal="true" aria-labelledby="menu-h" hidden>
     <h2 id="menu-h">Flugplatz</h2>
     <p>Tipp auf einen Platz, und du fliegst dort los.</p>
-    <div id="menu-places"></div>
+    <h3 class="pick-h">Flugzeug</h3>
     <div id="menu-models"></div>
+    <h3 class="pick-h">Flugplatz</h3>
+    <div id="menu-places"></div>
     <div class="go"><button class="btn btn-primary" id="b-go2" type="button">Losfliegen</button></div>
     <div class="mrow" id="menu-acts"></div>
     <a class="mlink" href="/">Zurück zum Shop</a>
@@ -1479,12 +1491,17 @@ function reset(msg){
 }
 async function choose(id){
   const def=PLANES.find(p=>p.id===id);
-  document.querySelectorAll('#models .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
+  document.querySelectorAll('#models .chip,#planes .place').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
   $('#loadline').textContent='Modell lädt …';
   try{const M=await build(def);if(P)craft.remove(P.fit);P=M;craft.add(M.fit);reset();if(def.rockets&&S.started)say('Die F2 trägt sechs Raketen: Feuer mit '+(coarse?'dem Knopf Raketen':'F'));if(def.ramp&&S.started)say('Die C-160 öffnet ihre Heckklappe mit '+(coarse?'dem Knopf Heckklappe':'F'));if(def.tank&&S.started)say('Wasser schöpfen: mit Fahrt auf dem See aufsetzen. Abwerfen mit '+(coarse?'dem Knopf Wasser':'F'));if(FIRE.on&&!def.tank&&S.started)say('Löschen kann nur die CL-215T');$('#loadline').textContent='';try{localStorage.setItem('lw-fliegen-modell',id)}catch(e){}}
   catch(e){$('#loadline').textContent='Das Modell konnte nicht geladen werden. Lade die Seite neu.';say('Das Modell konnte nicht geladen werden.',false,true)}
 }
-PLANES.forEach(p=>{const b=document.createElement('button');b.className='chip';b.type='button';b.dataset.id=p.id;b.textContent=p.name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{choose(p.id);b.blur()});$('#models').appendChild(b)});
+PLANES.forEach(p=>{const b=document.createElement('button');b.className='chip';b.type='button';b.dataset.id=p.id;b.textContent=p.name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{choose(p.id);b.blur()});$('#models').appendChild(b);
+  /* dazu eine Kachel auf der Startkarte: das Modell am Rollhalt, bei reduzierter Bewegung als Standbild */
+  const t=document.createElement('button'),pc=document.createElement('picture'),so=document.createElement('source'),im=new Image(),nm=document.createElement('b');
+  t.type='button';t.className='place';t.dataset.id=p.id;t.setAttribute('aria-pressed','false');so.media='(prefers-reduced-motion: reduce)';so.srcset='/images/modelle-spiel/'+p.id+'-still.webp';
+  im.src='/images/modelle-spiel/'+p.id+'.webp';im.alt='';im.width=320;im.height=180;im.decoding='async';pc.append(so,im);nm.textContent=p.name;t.append(pc,nm);
+  t.addEventListener('click',()=>{choose(p.id)});$('#planes').appendChild(t)});
 
 /* ---------- Eingaben ---------- */
 const SND={ctx:null,on:true,rpm:0};
@@ -2491,7 +2508,7 @@ try{const q=new URLSearchParams(location.search).get('modell');if(PLANES.some(p=
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
 /* Handy: Stoppuhr und die zwei wichtigsten Knöpfe wandern in die oberste Zeile, Modellwahl und Schalter ins Menü, Raketen und Heckklappe über den rechten Knüppel */
 if(coarse){const top=document.querySelector('.top'),tl=document.createElement('div');tl.className='tl';tl.appendChild($('#clock'));tl.appendChild($('#mini'));top.appendChild(tl);for(const id of ['b-reset','b-menu'])top.appendChild($('#'+id));
-  $('#menu-places').appendChild($('#places'));$('#menu-models').appendChild($('#models'));for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
+  $('#menu-places').appendChild($('#places'));$('#menu-models').appendChild($('#planes'));$('#models').hidden=true;$('#planes-h').hidden=$('#places-h').hidden=true;for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
   if(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen){const b=document.createElement('button');b.type='button';b.className='act';b.id='b-full';b.textContent='Vollbild';b.setAttribute('aria-pressed','false');
    b.addEventListener('click',()=>fullscreen(!fsOn()));for(const t of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(t,()=>{b.setAttribute('aria-pressed',fsOn()?'true':'false');setTimeout(resize,200)});$('#menu-acts').appendChild(b)}
   $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#spec').appendChild($('#b-drop'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}

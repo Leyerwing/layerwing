@@ -556,6 +556,20 @@ table.data tfoot td{font-weight:700;border-bottom:0}
 .foot-wd:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)!important;text-decoration:none!important}
 .foot-base{margin-top:var(--s32);padding-top:var(--s16);border-top:1px solid var(--line);font-size:var(--t12)}
 @media (max-width:860px){.foot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.foot-brand{grid-column:1/-1}}
+
+/* Aufgeräumt und breiter: die Seite nutzt mehr Breite, die fünf Modelle stehen in einer Reihe, im Größenvergleich stehen alle Namen auf einer Linie */
+.wrap{max-width:1340px}
+@media (min-width:1240px){
+  .types{grid-template-columns:repeat(5,minmax(0,1fr));gap:16px}
+  .type{padding:14px 14px 16px;gap:10px}
+  .type-title{flex-direction:column;align-items:flex-start;gap:2px}
+  .type-title h3{font-size:var(--t20)}
+  .price{font-size:var(--t16)}
+  .type-sub{margin-top:-4px;font-size:var(--t12);line-height:1.45;min-height:4.35em}
+  .type-actions .btn{padding-inline:8px;font-size:var(--t14)}
+}
+.sizes-row{align-items:flex-end}
+.size-cap{margin-top:12px}
 </style>
 
 </head>
