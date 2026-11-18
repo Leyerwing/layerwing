@@ -45,7 +45,9 @@ button{font:inherit;color:inherit;cursor:pointer}
 .inst{position:fixed;left:max(18px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:10px;pointer-events:none}
 .inst svg{width:132px;height:132px;display:block;flex:none;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5)) drop-shadow(0 1px 2px rgba(0,0,0,.6))}
 .inst #g-w{width:100px;height:100px}
-@media (max-width:1250px) and (pointer:fine){.inst{gap:7px}.inst svg{width:104px;height:104px}.inst #g-w{width:80px;height:80px}}      /* schmale Fenster: kleinere Instrumente, damit sie nicht unter die Knöpfe geraten */
+@media (max-width:1250px) and (pointer:fine){.inst{gap:7px}.inst svg{width:104px;height:104px}.inst #g-w{width:80px;height:80px}}
+@media (max-width:1120px) and (pointer:fine){.inst{gap:5px}.inst svg{width:88px;height:88px}.inst #g-w{width:68px;height:68px}}
+@media (max-width:1560px) and (pointer:fine){.inst{bottom:calc(max(16px,env(safe-area-inset-bottom)) + 54px)}}      /* nicht breit genug für Instrumente und Knöpfe in einer Reihe: Instrumente stehen über der Knopfleiste */      /* schmale Fenster: kleinere Instrumente, damit sie nicht unter die Knöpfe geraten */
 .gM{stroke:#F2EEE5;stroke-width:1.45;stroke-linecap:round}
 .gm{stroke:rgba(236,232,223,.5);stroke-width:.75}
 .gt{fill:#F2EEE5;font-size:7.6px;font-weight:600;text-anchor:middle;dominant-baseline:central}
@@ -248,6 +250,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 
 <div class="inst" aria-label="Instrumente">
   <svg id="g-v" viewBox="0 0 100 100" role="img" aria-label="Fahrtmesser"></svg>
+  <svg id="g-t" viewBox="0 0 100 100" role="img" aria-label="Wendezeiger mit Kugel"></svg>
   <svg id="g-h" viewBox="0 0 100 100" role="img" aria-label="Höhenmesser"></svg>
   <svg id="g-n" viewBox="0 0 100 100" role="img" aria-label="Drehzahlmesser"></svg>
   <svg id="g-w" viewBox="0 0 100 100" role="img" aria-label="Wind"></svg>
@@ -2005,6 +2008,30 @@ function windDial(svg){const id=svg.id;let h=dialCase(id)+'<g transform="transla
    <text x="50" y="62" class="gv" style="font-size:19px" id="i-w">0</text><text x="50" y="72.5" class="gu" style="font-size:7.4px">km/h Wind</text>
    <g id="i-wa"><path d="M50 79.5l7.2 12.6h-14.4z" fill="#F4C61F" stroke="#0A0908" stroke-width="1"/></g></g>`+dialGlass(id);
   svg.innerHTML=h}
+/* Wendezeiger (Turn Coordinator): das Flugzeugsymbol neigt sich mit der Drehrate, die Kugel im gebogenen Röhrchen zeigt Schieben und Schmieren.
+   Steht der Flügel auf der Marke L oder R, fliegt das Modell einen Vollkreis in 12 Sekunden (30 °/s; beim großen Flugzeug wären es 2 Minuten).
+   Kugel in der Mitte = sauber koordinierte Kurve. Kugel zur Kurveninnenseite: Seitenruder in die Richtung der Kugel geben. */
+function turnDial(svg){const id=svg.id;let h=dialCase(id)+'<g transform="translate(50 50) scale(.92) translate(-50 -50)">';
+  const at=(a,r)=>[(50+r*Math.cos(a*Math.PI/180)).toFixed(2),(50+r*Math.sin(a*Math.PI/180)).toFixed(2)];
+  for(const a of [180,0,160,20]){const p=at(a,42.2),q=at(a,a%180?34:35.5);h+=`<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}" class="gM" style="stroke-width:2.6"/>`}
+  {const l=at(160,29.6),r=at(20,29.6);h+=`<text x="${l[0]}" y="${l[1]}" class="gt" style="font-size:8.4px">L</text><text x="${r[0]}" y="${r[1]}" class="gt" style="font-size:8.4px">R</text>`}
+  h+='<text x="50" y="21" class="gu" style="font-size:4.6px;letter-spacing:.4px">WENDEZEIGER</text><text x="50" y="62.5" class="gu" style="font-size:5.2px">12 s</text>';
+  /* Libelle: gebogenes Glasröhrchen mit zwei Strichen, darin die Kugel */
+  h+=`<path d="M30.5 71.8Q50 80.6 69.5 71.8" fill="none" stroke="#000" stroke-width="9.6" stroke-linecap="round"/>
+   <path d="M30.5 71.8Q50 80.6 69.5 71.8" fill="none" stroke="#2C2B27" stroke-width="8" stroke-linecap="round"/>
+   <path d="M31.5 69.6Q50 77.6 68.5 69.6" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="1.6" stroke-linecap="round"/>
+   <line x1="45.4" y1="71.3" x2="45.4" y2="80.2" stroke="#F2EEE5" stroke-width=".9"/><line x1="54.6" y1="71.3" x2="54.6" y2="80.2" stroke="#F2EEE5" stroke-width=".9"/>
+   <g data-k><circle cx="50" cy="76.1" r="3.35" fill="url(#${id}-bl)"/></g>
+   <defs><radialGradient id="${id}-bl" cx=".36" cy=".3" r=".8"><stop offset="0" stop-color="#5E5B55"/><stop offset=".55" stop-color="#121110"/><stop offset="1" stop-color="#000"/></radialGradient></defs>`;
+  /* Flugzeugsymbol von hinten: Rumpf, Flügel, Seitenleitwerk */
+  const plane='M18.6 49.1H43.2A6.8 6.8 0 0 1 56.8 49.1H81.4V51.2H56.6A6.8 6.8 0 0 1 43.4 51.2H18.6Z M49 43.2L50 36.2L51 43.2Z';
+  h+=`<g data-p><path d="${plane}" fill="#000" opacity=".5" transform="translate(.6 .9)"/><path d="${plane}" fill="#F4F1EA"/><circle cx="50" cy="50" r="2.6" fill="url(#${id}-hb)" stroke="#000" stroke-width=".5"/></g></g>`+dialGlass(id);
+  svg.innerHTML=h;
+  const pl=svg.querySelector('[data-p]'),ball=svg.querySelector('[data-k]');
+  return {set:(rate,slip)=>{pl.setAttribute('transform','rotate('+clamp(rate*20,-42,42).toFixed(1)+' 50 50)');
+    const b=clamp(slip,-1,1),dx=b*17.4,x=50+dx,y=76.1-4.4*(dx/19.5)*(dx/19.5);ball.setAttribute('transform','translate('+(x-50).toFixed(2)+' '+(y-76.1).toFixed(2)+')')}};
+}
+const TC={v:new T.Vector3(),ok:false,rate:0,slip:0,psi:0,f:new T.Vector3(),r:new T.Vector3(),u:new T.Vector3()};
 const GA={id:null};
 function gauges(d){
   const top=d.vMax*3.6,mj=top>300?100:40,mx=Math.ceil(top*1.06/mj)*mj,vs=d.vS*3.6,rm=d.snd.f1*.06,nx=Math.ceil(rm*1.14/2)*2;
@@ -2012,6 +2039,7 @@ function gauges(d){
   GA.h=dial($('#g-h'),{max:1000,major:100,minor:20,full:true,unit:'m',fmt:v=>v/100});
   GA.n=dial($('#g-n'),{max:nx,major:2,minor:.5,unit:'× 1000 U/min',bug:true,arcs:[[rm*1.02,nx,'#E0533D']]});
   if(!GA.w){windDial($('#g-w'));GA.w=$('#i-w');GA.wa=$('#i-wa')}
+  if(!GA.t)GA.t=turnDial($('#g-t'));
   GA.id=d.id;GA.rpm0=d.snd.f0*.06;GA.rpm1=rm;
 }
 function frame(dt,still){
@@ -2082,6 +2110,13 @@ function frame(dt,still){
      hudT+=dt;
      if(coarse){if(hudT>.1){MI.v.textContent=Math.round(kmh);MI.h.textContent=Math.round(alt);const low=!S.ground&&!S.crashed&&S.va<P.def.vS*1.22;if(low!==MI.low){MI.low=low;MI.v.parentNode.classList.toggle('low',low)}}}
      else{GA.v.set(kmh);GA.h.set(alt);GA.h.small(alt*.036);GA.n.set(rpm);GA.n.bug(GA.rpm0+(GA.rpm1-GA.rpm0)*S.thr);
+      /* Wendezeiger: Drehrate aus der Kursänderung, Kugel aus der seitlichen Beschleunigung im Flugzeug */
+      if(dt>1e-3){const fw=TC.f.set(0,0,-1).applyQuaternion(S.Q),psi=Math.atan2(-fw.x,-fw.z);
+        if(TC.ok){let dp=psi-TC.psi;dp-=Math.round(dp/(2*Math.PI))*2*Math.PI;
+          const rr=S.ground||S.crashed?0:-dp/dt*180/Math.PI/30,ac=TC.r.copy(S.vel).sub(TC.v).multiplyScalar(1/dt);ac.y+=G;
+          const lat=ac.dot(TC.u.set(1,0,0).applyQuaternion(S.Q)),up=ac.dot(TC.u.set(0,1,0).applyQuaternion(S.Q)),sl=S.crashed?0:clamp(-lat/Math.max(2,Math.abs(up))*3.2,-1.2,1.2);
+          const k=1-Math.exp(-dt*6),kb=1-Math.exp(-dt*4);TC.rate+=(clamp(rr,-2.2,2.2)-TC.rate)*k;TC.slip+=(sl-TC.slip)*kb}
+        TC.psi=psi;TC.v.copy(S.vel);TC.ok=true;GA.t.set(TC.rate,TC.slip)}
       if(hudT>.1){GA.v.v.textContent=Math.round(kmh);GA.h.v.textContent=Math.round(alt);GA.n.v.textContent=(Math.round(rpm*10)/10).toFixed(1).replace('.',',')}}}
     if(hudT>.1){hudT=0;touch.draw();
       /* Stoppuhr: läuft ab Tor 1, bleibt nach dem letzten Tor auf der Rundenzeit stehen */
