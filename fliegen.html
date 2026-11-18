@@ -262,6 +262,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 <div class="acts">
   <button class="act" id="b-fire" type="button" hidden>Raketen <b id="i-r">6</b><kbd>F</kbd></button>
   <button class="act" id="b-ramp" type="button" aria-pressed="false" hidden>Heckklappe<kbd>F</kbd></button>
+  <button class="act" id="b-drop" type="button" hidden>Wasser <b id="i-wt">0 %</b><kbd>F</kbd></button>
   <button class="act" id="b-smoke" type="button" aria-pressed="false">Rauch<kbd>Leer</kbd></button>
   <button class="act" id="b-snd" type="button" aria-pressed="true">Ton<kbd>M</kbd></button>
   <button class="act" id="b-cam" type="button"><svg class="ic" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7h3l1.5-2h5L14 7h3v9H3z"/><circle cx="10" cy="11.5" r="3"/></svg><span class="lb">Kamera</span><kbd>C</kbd></button>
@@ -305,10 +306,11 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <div><dt>Rechter Stick</dt><dd id="p-pitch">Quer- und Höhenruder: seitlich rollt das Modell, ziehen hebt die Nase</dd></div>
       <div><dt>Linker Stick</dt><dd>Seitenruder: dreht die Nase, am Boden lenkst du damit</dd></div>
       <div><dt>RT und LT</dt><dd>Mehr Gas und weniger Gas. Das Gas bleibt stehen wie der Schieber am Sender, das Steuerkreuz hoch und runter geht auch.</dd></div>
-      <div><dt>A, B, X, Y</dt><dd>Rauch, Raketen oder Heckklappe, Ton, Kamera wechseln</dd></div>
+      <div><dt>A, B, X, Y</dt><dd>Rauch, Raketen, Heckklappe oder Wasser, Ton, Kamera wechseln</dd></div>
       <div><dt>LB, Ansicht, Menü</dt><dd>Bestzeiten, neu starten, diese Hilfe öffnen und schließen</dd></div>
     </dl>
     <p id="pad-tip">Mit Controller fliegen: anschließen und eine Taste drücken.</p>
+    <p id="fire-tip" hidden>Waldbrand löschen: Mit der CL-215T ohne Fahrwerk auf dem See aufsetzen, Flächen gerade, mit 60 bis 90 km/h. Gas halten, bis der Tank voll ist, dann bei gut 90 km/h abheben. Über dem Feuer tief abwerfen (F oder Knopf Wasser), etwa 20 bis 50 m hoch: Das Wasser fliegt noch ein Stück weiter, also kurz vor dem Brand auslösen. Aus großer Höhe verweht es. Der gelbe Wegweiser zeigt den nächsten Brand, der blaue den See.</p>
     <div class="go">
       <button class="btn btn-primary" id="b-go" type="button">Losfliegen</button>
       <a class="btn" href="/" style="text-decoration:none;color:inherit;display:inline-flex;align-items:center">Zurück zum Shop</a>
@@ -355,7 +357,7 @@ const T=window.THREE, $=s=>document.querySelector(s);
 const note=$('#note');let noteT=0;
 /* Am Handy erscheinen nur Meldungen, die man nicht ohnehin sieht: Absturz, Landung, Rundenzeit, Strömungsabriss */
 function say(text,good,hold){
-  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
+  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen|Brandherd|Tank|Alle Brände|Wasser schöpfen)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
   note.textContent=text;note.classList.toggle('good',!!good);note.classList.add('on');clearTimeout(noteT);if(!hold)noteT=setTimeout(()=>note.classList.remove('on'),3200)}
 if(!T||!window.DecompressionStream||!window.fetch){$('#loadline').textContent='Dein Browser kann die 3D-Ansicht nicht starten. Probier es mit einem aktuellen Chrome, Safari oder Firefox.';$('#b-go').disabled=true;return}
 
@@ -394,6 +396,14 @@ const PLANES=[
   HINGE:{Querruder_R:[[393.35,484.07,-18.05],[-0.0563,0.9967,0.058]],Querruder_L:[[393.35,-484.07,-18.05],[0.0563,0.9967,-0.058]],Hoehenruder_R:[[836.0,105.0,5.41],[0.0,1.0,-0.0047]],Hoehenruder_L:[[836.0,-105.0,5.41],[-0.0,1.0,0.0047]],Seitenruder:[[831.67,-4.43,100.75],[0.3465,0.0183,0.9379]]},
   CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Motor:'dark',Spinner:'dark',Haube:'glass',Akku:'dark',Regler:'dark',Empfaenger:'dark',Servo_Hoehe:'dark',Servo_Seite:'dark',Servo_Quer_R:'dark',Servo_Quer_L:'dark'},props:[[114.3,30,0,0,2,false]],
   snd:{f0:48,f1:160,motors:1,detune:1,whine:3.52},
+  controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}},
+ /* Löschflugzeug Canadair CL-215T: Flugboot mit Stufe im Rumpf, Turboprops mit Vierblattpropellern, Winglets und Finlets am Höhenleitwerk; schöpft im Gleitflug Wasser aus dem See und wirft es über dem Feuer ab */
+ {id:'loescher',name:'CL-215T',tank:true,boat:true,col:0xF0BE2A,ctlCol:0xC42F2A,accent:0xC42F2A,pivot:[392,30],vS:17,vMax:68,twr:.74,roll:2.4,yaw:1,tq:0,dih:.3,ar:8.3,wo:.012,wash:.6,
+  gear:{retract:1,trv:.16,sag:.06,legs:[{t:'oleo',a:[96,0,-52],b:[96,0,-110],R:20,w:12,fork:1,fold:['y',-1.5]},{t:'oleo',a:[468,56,-36],b:[472,90,-105],R:26,w:14,fold:['x',1.5],mir:1}]},
+  HINGE:{Querruder_R:[[501,0,110],[0,1,0]],Querruder_L:[[501,0,110],[0,1,0]],Hoehenruder_R:[[979.4,0,300],[.03,1,0]],Hoehenruder_L:[[979.4,0,300],[-.03,1,0]],Seitenruder:[[930.6,0,70],[.332,0,.943]]},
+  CTL:/^(Querruder|Hoehenruder|Seitenruder)/,MAT:{Scheiben:'glass',Rumpf_Boden:'accent',Schwimmer_R:'accent',Schwimmer_L:'accent'},
+  props:[[100,258,250,124,4,true],[100,258,-250,124,4,true]],
+  snd:{f0:44,f1:140,motors:2,detune:1.03,whine:3.01},
   controls:(set,r)=>{set('Querruder_R',-r.da);set('Querruder_L',r.da);set('Hoehenruder_R',-r.de);set('Hoehenruder_L',-r.de);set('Seitenruder',-r.dr)}}
 ];
 
@@ -425,6 +435,12 @@ const SCENES={
   pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
   mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.3,.06,.42,.18,.1],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
   course:[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]]},
+ /* Waldbrand: bewaldete Hügel, in drei Tälern brennt es. Löschwasser gibt es im See nördlich der Bahn. Rauch legt sich als Dunst über das Land */
+ waldbrand:{name:'Waldbrand',sub:'Wasser im See schöpfen und drei Brände löschen',L:{abend:{sun:[-.72,.21,-.66],sunC:0xFF9E58,sunI:2.4,hemi:[0x979BB2,0x5E4A36,.4],gold:{t:0xF2B987,g:0xFF9545,s:0xDAB9A0,a:0xA8A7B0},hor:0xD9B89C,mid:0x9AA5B6,top:0x4B6388,envG:0x6A6646,fog:[750,6000],tint:[1.07,.98,.86]},
+   tag:{sun:[-.5,.68,-.53],sunC:0xFFEAC8,sunI:1.25,hemi:[0xC0C8D8,0x6A7050,.5],gold:{t:0xE4DCCC,g:0xFFE0B4,s:0xD9D2C4,a:0xC4CCD8},hor:0xDAD0BF,mid:0x8CAED6,top:0x3E6EB0,envG:0x5E7A3A,fog:[1000,7000],tint:[1.03,1,.94]}},water:-2.4,
+  pal:[0x46682B,0x66873A,0x958C4E,0x2A4523,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[9000,9001],mix:[.45,.55,.24,0],beach:[2,-1.5],
+  mow:['#7FA453','#729848'],firs:1.3,firH:[3,560],firC:[.3,.06,.42,.18,.1],leafy:1.25,leafH:[.8,90],leafS:[17,15],leafK:.48,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>h>140&&h<700&&sl>14,rockC:[.09,.05,.42],clouds:.55,
+  course:[],fire:[[1050,-950],[-1250,-950],[-820,-2350]]},
  kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',L:{abend:{sun:[-.966,.213,-.259],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x665640,.36],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x77795A,fog:[1000,7800],tint:[1.05,1,.9]},tag:{sun:[-.6,.68,.42],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x80785C,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x6F8048,fog:[1400,8600],tint:[1,1,1]}},water:-2.4,sea:true,
   pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[70,150,380,520],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.3,.3,1],beach:[4.2,1.2],
   mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.29,.06,.4,.17,.1],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
@@ -511,7 +527,7 @@ function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=x
 function fbm(x,z){let a=.5,f=1,s=0;for(let i=0;i<5;i++){s+=a*vnoise(x*f,z*f);a*=.5;f*=2.03}return s}
 const RW={len:920,wid:46};          /* Bahn liegt auf der z-Achse, Mitte im Ursprung, Höhe 0 */
 /* ein See im Quertal des Alpentals, ein Weiher zwischen den Feldern; die anderen Plätze haben keinen */
-const LAKE=SID==='alpen'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
+const LAKE=SID==='alpen'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='waldbrand'?{x:-180,z:-1500,rx:480,rz:150,y:-2.4}:SID==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
 const lakeD=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Math.sqrt(dx*dx+dz*dz)};
 /* einzelne Kuppen: Inseln vor der Küste, Tafelberge im Becken. x, z, Radius, Höhe, Form (1 rund, 0 mit flachem Dach) */
 const BUMPS=SID==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,2],[-1700,330,120,120,2],[-2700,900,520,210,1],[-1380,-1000,60,62,2]]:SID==='traeger'?[[-2500,-1500,520,230,1],[-2900,1500,440,170,1],[2700,-600,480,200,1],[-1250,-640,130,120,2],[-900,1650,110,95,2],[1500,900,140,130,2],[1300,-1500,90,80,2]]:SID==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
@@ -533,6 +549,11 @@ const TERR={
   const m1=sstep(w,w+950,Math.abs(x-cx)),m2=sstep(190,1000,Math.abs(z+2000-240*Math.sin(x/820))),m3=sstep(160,900,Math.abs(z-2300+200*Math.sin(x/700))),m=Math.min(m1,m2,m3);
   const ridge=Math.pow(fbm(x/1050+3.1,z/1050+7.7),1.55)*1350+fbm(x/260,z/260)*90,meadow=(fbm(x/170+11,z/170+5)-.5)*14;
   return m*(70+ridge)+meadow*(1-m*.5)},
+ /* Hügelland: um den Platz flach, nach außen bewaldete Kuppen und Rücken; der See liegt in einer breiten Mulde */
+ waldbrand(x,z){const r=Math.hypot(x*.95,z*.7),lk=sstep(1.1,4.2,lakeD(x,z));
+  const hills=sstep(420,2300,r+(fbm(x/900+6.1,z/900+2.4)-.5)*650);
+  const ridge=Math.pow(fbm(x/950+1.7,z/950+4.3),1.4)*440+fbm(x/230+3,z/230+8)*45,roll=(fbm(x/420+8.2,z/420+3.3)-.5)*24;
+  return (roll+hills*(26+ridge))*lk+2.2*lk},
  /* Küstenebene: im Westen das Meer mit Inseln, im Süden eine Steilküste, landeinwärts Hügel */
  kueste(x,z){const sh=x+780+170*Math.sin(z/900)+80*Math.sin(z/310+1.3),land=sstep(-50,240,sh);
   const hills=Math.max(sstep(520,2700,x-220*Math.sin(z/1100)+(fbm(x/900+2,z/900)-.5)*520),sstep(2700,4700,Math.abs(z)))*sstep(0,600,sh);
@@ -1298,18 +1319,18 @@ async function build(def){
   const fit=new T.Group();fit.matrixAutoUpdate=false;
   fit.matrix.copy(BASIS).multiply(new T.Matrix4().makeScale(K,K,K)).multiply(new T.Matrix4().makeTranslation(-def.pivot[0],0,-def.pivot[1]));
   /* Lack mit Klarlack-Schicht: der Himmel spiegelt sich flach gesehen deutlich. Die Flächen liegen etwas hinter den Kantenlinien, die Ruder vor der Fläche. */
-  const body=new T.MeshPhysicalMaterial({color:0xDCDAD3,roughness:.46,clearcoat:.9,clearcoatRoughness:.14,envMap:ENV,envMapIntensity:.6,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:2}),ctl=new T.MeshPhysicalMaterial({color:0xEDB106,roughness:.46,clearcoat:.9,clearcoatRoughness:.16,envMap:ENV,envMapIntensity:.45,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}),lineMat=new T.LineBasicMaterial({color:0x3A3834,transparent:true,opacity:.5});      /* Ruder liegen sauber vor der Fläche, statt mit ihr zu flimmern */
-  const parts=[],hinge={},box=new T.Box3(),wheels=[],bodyIn=body.clone();bodyIn.side=T.DoubleSide;
+  const body=new T.MeshPhysicalMaterial({color:def.col||0xDCDAD3,roughness:.46,clearcoat:.9,clearcoatRoughness:.14,envMap:ENV,envMapIntensity:.6,polygonOffset:true,polygonOffsetFactor:2,polygonOffsetUnits:2}),ctl=new T.MeshPhysicalMaterial({color:def.ctlCol||0xEDB106,roughness:.46,clearcoat:.9,clearcoatRoughness:.16,envMap:ENV,envMapIntensity:.45,polygonOffset:true,polygonOffsetFactor:1,polygonOffsetUnits:1}),lineMat=new T.LineBasicMaterial({color:0x3A3834,transparent:true,opacity:.5});      /* Ruder liegen sauber vor der Fläche, statt mit ihr zu flimmern */
+  const parts=[],hinge={},box=new T.Box3(),wheels=[],bodyIn=body.clone(),acc=ctl.clone();bodyIn.side=T.DoubleSide;if(def.accent)acc.color.setHex(def.accent);
   /* gedruckter Kunststoff ist dünn: steht die Sonne hinter einer Fläche, scheint etwas Licht durch und sie glimmt warm */
-  [body,ctl,bodyIn].forEach(m=>{m.onBeforeCompile=sh=>{sh.uniforms.uBnc=BNC.u;sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nuniform vec3 uBnc;').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n#if NUM_DIR_LIGHTS > 0\n{float bk=max(dot(-geometry.normal,directionalLights[0].direction),0.0);reflectedLight.directDiffuse+=directionalLights[0].color*material.diffuseColor*bk*0.2;}\n#endif\n{vec3 nW=inverseTransformDirection(geometry.normal,viewMatrix);reflectedLight.indirectDiffuse+=uBnc*material.diffuseColor*max(-nW.y,0.0);}')};keepSharp(m,'pla')});      /* wo man in den Rumpf sehen kann, wird auch die Innenseite gezeichnet */
+  [body,ctl,bodyIn,acc].forEach(m=>{m.onBeforeCompile=sh=>{sh.uniforms.uBnc=BNC.u;sh.fragmentShader=sh.fragmentShader.replace('#include <common>','#include <common>\nuniform vec3 uBnc;').replace('#include <lights_fragment_end>','#include <lights_fragment_end>\n#if NUM_DIR_LIGHTS > 0\n{float bk=max(dot(-geometry.normal,directionalLights[0].direction),0.0);reflectedLight.directDiffuse+=directionalLights[0].color*material.diffuseColor*bk*0.2;}\n#endif\n{vec3 nW=inverseTransformDirection(geometry.normal,viewMatrix);reflectedLight.indirectDiffuse+=uBnc*material.diffuseColor*max(-nW.y,0.0);}')};keepSharp(m,'pla')});      /* wo man in den Rumpf sehen kann, wird auch die Innenseite gezeichnet */
   for(const [name,g] of list){
-    const mesh=new T.Mesh(g,def.MAT[name]==='glass'?matGlass:def.MAT[name]?matDark:def.CTL.test(name)?ctl:def.open&&def.open.test(name)?bodyIn:body),outer=new T.Group(),holder=new T.Group();mesh.castShadow=mesh.receiveShadow=true;
+    const mesh=new T.Mesh(g,def.MAT[name]==='glass'?matGlass:def.MAT[name]==='accent'?acc:def.MAT[name]?matDark:def.CTL.test(name)?ctl:def.open&&def.open.test(name)?bodyIn:body),outer=new T.Group(),holder=new T.Group();mesh.castShadow=mesh.receiveShadow=true;
     const H=def.HINGE[name];
     const c=g.boundingBox.getCenter(new T.Vector3());outer.position.copy(c);        /* Drehpunkt für Trümmer: die Mitte des Teils */
     if(H){holder.position.set(H[0][0]-c.x,H[0][1]-c.y,H[0][2]-c.z);mesh.position.set(-H[0][0],-H[0][1],-H[0][2]);hinge[name]={holder,axis:new T.Vector3(H[1][0],H[1][1],H[1][2]).normalize()}}
     else holder.position.set(-c.x,-c.y,-c.z);
     holder.add(mesh);outer.add(holder);fit.add(outer);box.union(g.boundingBox);
-    if(g.userData.lines&&!def.MAT[name])mesh.add(new T.LineSegments(g.userData.lines,lineMat));
+    if(g.userData.lines&&(!def.MAT[name]||def.MAT[name]==='accent'))mesh.add(new T.LineSegments(g.userData.lines,lineMat));
     /* gedruckte Räder durch saubere ersetzen */
     if(def.wheels&&def.wheels.test(name)){mesh.visible=false;const b=g.boundingBox,R=(b.max.z-b.min.z)/2,wd=b.max.y-b.min.y;if(/^Rad/.test(name)){const w=makeWheel(R,wd);outer.add(w);wheels.push({w,R:R*K})}}
     parts.push({name,outer,c,bb:g.boundingBox,v:new T.Vector3(),w:new T.Vector3()});
@@ -1338,11 +1359,12 @@ async function build(def){
   const setGear=r=>{const e=r*r*(3-2*r);for(const l of gearLegs){if(l.fold)l.sw.rotation[l.fold[0]]=l.fold[1]*e;if(l.lift)l.sw.position.z=l.lift*e;l.sw.visible=r<.985}};
   gearFlex(0);
   /* wie tief reicht das Modell unter den Schwerpunkt, wenn die Nase um a angehoben ist? Tabelle in 3-Grad-Schritten aus den Eckpunkten */
-  const lowT=new Float32Array(61).fill(-1e9);
+  const lowT=new Float32Array(61).fill(-1e9),lowM=new Float32Array(61).fill(-1e9);
   if(def.gear)for(const q of def.gear.legs)for(let k=0;k<61;k++){const a=(k-30)*.05236;for(let f=-1.2;f<=1.2;f+=.2){const dx=q.b[0]+q.R*Math.sin(f)-def.pivot[0],dz=q.b[2]-q.R*Math.cos(f)-def.pivot[1],v=dx*Math.sin(a)-dz*Math.cos(a);if(v>lowT[k])lowT[k]=v}}
   for(const [,g] of list){const q=g.attributes.position;for(let i=0;i<q.count;i+=5){const dx=q.getX(i)-def.pivot[0],dz=q.getZ(i)-def.pivot[1];
-    for(let k=0;k<61;k++){const a=(k-30)*.05236,v=dx*Math.sin(a)-dz*Math.cos(a);if(v>lowT[k])lowT[k]=v}}}
+    for(let k=0;k<61;k++){const a=(k-30)*.05236,v=dx*Math.sin(a)-dz*Math.cos(a);if(v>lowT[k])lowT[k]=v;if(v>lowM[k])lowM[k]=v}}}
   const lowAt=a=>{const f=clamp(a/.05236+30,0,60),i=Math.min(59,Math.floor(f));return (lowT[i]+(lowT[i+1]-lowT[i])*(f-i))*K+.02};
+  const hullAt=a=>{const f=clamp(a/.05236+30,0,60),i=Math.min(59,Math.floor(f));return (lowM[i]+(lowM[i+1]-lowM[i])*(f-i))*K};
   let aTail=.1;while(aTail<.3&&lowAt(aTail+.01)<=lowAt(0)+.1)aTail+=.01;      /* ab diesem Winkel setzt am Boden das Heck auf */
   /* Raketen hängen sichtbar an ihren Trägern und verschwinden dort, sobald sie abgefeuert sind */
   const mounts=(def.rockets||[]).map(([x,y,z])=>{const g=new T.Group(),rocket=makeRocket(),py=new T.Mesh(new T.BoxGeometry(56,3,9),matDark);g.position.set(x,y,z);py.position.set(8,0,8.5);py.castShadow=true;g.add(py);g.add(rocket);fit.add(g);return {g,rocket,p:[x,y,z]}});
@@ -1369,7 +1391,7 @@ async function build(def){
    const sp=(c,x,y,z,sz)=>{const m=new T.Sprite(new T.SpriteMaterial({map:glowTex,color:c,transparent:true,blending:T.AdditiveBlending,depthWrite:false,fog:false}));m.position.set(x,y,z);m.scale.set(sz,sz,1);lamps.g.add(m);return m},sz=Math.max(46,hy*.11);
    if(tipL[3])sp(0xFF3A22,tipL[0]/tipL[3],box.min.y-3,tipL[2]/tipL[3],sz);if(tipR[3])sp(0x38FF6A,tipR[0]/tipR[3],box.max.y+3,tipR[2]/tipR[3],sz);
    lamps.strobe=sp(0xFFFFFF,tail[0]+2,tail[1],tail[2],sz*1.5);fit.add(lamps.g)}
-  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,lamps,low:lowAt,aTail,tipUp:(tipZ-def.pivot[1])*K,track,flex,setGear,retract:!!(def.gear&&def.gear.retract),trv:G0.trv,sag:G0.sag,kS,cS,imp:def.gear?Math.sqrt(kS/44)*G0.trv/.5:1,sprung:legs.length>0||gearLegs.length>0,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
+  const M={def,fit,parts,hinge,props,wheels,mounts,aero,lineMat,lamps,low:lowAt,hull:hullAt,aTail,tipUp:(tipZ-def.pivot[1])*K,track,flex,setGear,retract:!!(def.gear&&def.gear.retract),trv:G0.trv,sag:G0.sag,kS,cS,imp:def.gear?Math.sqrt(kS/44)*G0.trv/.5:1,sprung:legs.length>0||gearLegs.length>0,span:(box.max.y-box.min.y)*K,gear:(def.pivot[1]-box.min.z)*K+.02,len:(box.max.x-box.min.x)*K,tailL:(box.max.x-def.pivot[0])*K,noseL:(def.pivot[0]-box.min.x)*K};
   return cache[def.id]=M;
 }
 
@@ -1398,13 +1420,14 @@ function reset(msg){
   if(P){S.Q.setFromEuler(eul.set(S.pitchG,0,0,'YXZ'));S.pos.y=ground(START.x,START.z)+P.low(S.pitchG)}      /* Spornradmodelle stehen von Anfang an mit dem Heck am Boden */
   if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0);p.outer.scale.set(1,1,1)});S.best=lbBest(P.def.id);S.last=null}
   camYaw=Math.PI;camPos.set(S.pos.x,S.pos.y+6,S.pos.z+30);if(msg)say(msg);
-  if(P){S.rk=P.mounts.length;P.mounts.forEach(m=>{m.rocket.visible=true});RK.pool.forEach(r=>{r.on=false;r.g.visible=false});$('#b-fire').hidden=!S.rk;$('#b-fire').disabled=false;$('#i-r').textContent=S.rk;$('#b-ramp').hidden=!P.def.ramp;$('#b-ramp').setAttribute('aria-pressed','false')}      /* am Start wird nachgeladen */
+  if(P){S.rk=P.mounts.length;P.mounts.forEach(m=>{m.rocket.visible=true});RK.pool.forEach(r=>{r.on=false;r.g.visible=false});$('#b-fire').hidden=!S.rk;$('#b-fire').disabled=false;$('#i-r').textContent=S.rk;$('#b-ramp').hidden=!P.def.ramp;$('#b-ramp').setAttribute('aria-pressed','false');$('#b-drop').hidden=!P.def.tank}
+  S.tank=0;S.onW=0;FIRE.wt='';if(FIRE.on){FIRE.reset();S.last=null}      /* am Start wird nachgeladen */
 }
 async function choose(id){
   const def=PLANES.find(p=>p.id===id);
   document.querySelectorAll('#models .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
   $('#loadline').textContent='Modell lädt …';
-  try{const M=await build(def);if(P)craft.remove(P.fit);P=M;craft.add(M.fit);reset();if(def.rockets&&S.started)say('Die F2 trägt sechs Raketen: Feuer mit '+(coarse?'dem Knopf Raketen':'F'));if(def.ramp&&S.started)say('Die C-160 öffnet ihre Heckklappe mit '+(coarse?'dem Knopf Heckklappe':'F'));$('#loadline').textContent='';try{localStorage.setItem('lw-fliegen-modell',id)}catch(e){}}
+  try{const M=await build(def);if(P)craft.remove(P.fit);P=M;craft.add(M.fit);reset();if(def.rockets&&S.started)say('Die F2 trägt sechs Raketen: Feuer mit '+(coarse?'dem Knopf Raketen':'F'));if(def.ramp&&S.started)say('Die C-160 öffnet ihre Heckklappe mit '+(coarse?'dem Knopf Heckklappe':'F'));if(def.tank&&S.started)say('Wasser schöpfen: mit Fahrt auf dem See aufsetzen. Abwerfen mit '+(coarse?'dem Knopf Wasser':'F'));if(FIRE.on&&!def.tank&&S.started)say('Löschen kann nur die CL-215T');$('#loadline').textContent='';try{localStorage.setItem('lw-fliegen-modell',id)}catch(e){}}
   catch(e){$('#loadline').textContent='Das Modell konnte nicht geladen werden. Lade die Seite neu.';say('Das Modell konnte nicht geladen werden.',false,true)}
 }
 PLANES.forEach(p=>{const b=document.createElement('button');b.className='chip';b.type='button';b.dataset.id=p.id;b.textContent=p.name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{choose(p.id);b.blur()});$('#models').appendChild(b)});
@@ -1425,7 +1448,8 @@ const card=$('#card');
 /* Licht: Abend oder Tag; auch das lädt die Seite neu, weil Schatten und Himmel vorab gerechnet werden */
 {const box=$('#lights');for(const [id,nm,sb] of [['abend','Abendlicht','tiefe Sonne'],['tag','Tageslicht','blauer Himmel']]){const b=document.createElement('button'),sm=document.createElement('small');b.type='button';b.className='place';b.textContent=nm;sm.textContent=sb;b.appendChild(sm);b.setAttribute('aria-pressed',id===LID);
   b.addEventListener('click',()=>{if(id===LID)return;try{localStorage.setItem('lw-fliegen-licht',id)}catch(e){}$('#loadline').textContent=nm+' lädt …';location.search='?platz='+SID+'&licht='+id});box.appendChild(b)}}
-function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();if(S.ground&&S.gs<1)say(pad.act?'RT für Vollgas, mit dem linken Stick geradeaus halten, dann rechts leicht ziehen':coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
+function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();
+  if(FIRE.on&&!FIRE.told){FIRE.told=true;setTimeout(()=>say(P&&P.def.tank?'Drei Waldbrände: im See nördlich der Bahn Wasser schöpfen, tief über dem Feuer abwerfen':'Drei Waldbrände: löschen kann nur die CL-215T',false,true),5200)}if(S.ground&&S.gs<1)say(pad.act?'RT für Vollgas, mit dem linken Stick geradeaus halten, dann rechts leicht ziehen':coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{view('help');$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
 $('#b-reset').addEventListener('click',()=>{reset('Zurück am Start');});
@@ -1441,7 +1465,7 @@ window.addEventListener('keydown',e=>{
   if(!card.hidden){if(k==='Escape'&&S.started)start();return}
   if(STEER.includes(k))e.preventDefault();
   keys[k]=true;if(STEER.includes(k))pad.act=false;if(e.repeat)return;
-  if(k==='r')reset('Zurück am Start');else if(k==='c')$('#b-cam').click();else if(k==='h')$('#b-help').click();else if(k===' ')toggleSmoke();else if(k==='m')toggleSound();else if(k==='f'){if(P&&P.def.ramp)toggleRamp();else fire()}else if(k==='b')openBoard();
+  if(k==='r')reset('Zurück am Start');else if(k==='c')$('#b-cam').click();else if(k==='h')$('#b-help').click();else if(k===' ')toggleSmoke();else if(k==='m')toggleSound();else if(k==='f'){if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}else if(k==='b')openBoard();
   else if((k==='a'||k==='d')&&P&&!P.def.yaw&&!S.ground)say('Die F2 hat kein Seitenruder: Kurven fliegst du mit Quer und Höhe');
 });
 window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false});
@@ -1548,6 +1572,111 @@ function rockets(dt){
     else if(r.t>5||Math.hypot(r.pos.x,r.pos.z)>5600)detonate(r,true)}
 }
 /* Aufsetzen: Reifen quietschen und qualmen kurz auf Asphalt, auf der Wiese staubt es; Rumpflander schaben */
+/* ---------- Waldbrand und Löschwasser ----------
+   Jeder Brandherd besteht aus Glutnestern im Wald. Ein Nest brennt heißer, solange es trocken ist, und greift langsam auf die Nachbarn über.
+   Das abgeworfene Wasser fällt als Schwall, bremst in der Luft und fächert sich auf: tief abgeworfen trifft es geballt, aus großer Höhe
+   verteilt es sich weit und verdunstet zum Teil, bevor es ankommt. Was trifft, kühlt die Nester, nasser Wald fängt eine Weile nicht wieder Feuer. */
+const FIRE={on:!!SC.fire,cells:[],zones:[],t:0,done:false,drop:0,dacc:0,told:false,lights:[],out:0,best:null};
+const FP=(()=>{
+  const fog=v=>'float d=-mv.z;vf=smoothstep(uFog.x,uFog.y,d);gl_PointSize=a>=1.0?0.0:min(s*uPx/max(d,1.0),uPx*0.45);',
+   head='attribute float a;attribute float s;attribute float k;uniform float uPx;uniform vec2 uFog;varying float va;varying float vk;varying float vf;void main(){va=a;vk=k;vec4 mv=modelViewMatrix*vec4(position,1.0);gl_Position=projectionMatrix*mv;';
+  const mk=(n,mat)=>{const g=new T.BufferGeometry(),o={n,i:0,pos:new Float32Array(n*3),vel:new Float32Array(n*3),age:new Float32Array(n).fill(9),life:new Float32Array(n).fill(1),s0:new Float32Array(n),s1:new Float32Array(n),k:new Float32Array(n),m:new Float32Array(n),a:new Float32Array(n).fill(1),s:new Float32Array(n),g,mat,live:0};
+    g.setAttribute('position',new T.BufferAttribute(o.pos,3));g.setAttribute('a',new T.BufferAttribute(o.a,1));g.setAttribute('s',new T.BufferAttribute(o.s,1));g.setAttribute('k',new T.BufferAttribute(o.k,1));
+    o.pts=new T.Points(g,mat);o.pts.frustumCulled=false;scene.add(o.pts);return o};
+  const U=()=>({uPx:{value:900},uFog:{value:new T.Vector2(scene.fog.near,scene.fog.far)},uFc:{value:scene.fog.color},uTint:{value:new T.Color(1,1,1).lerp(new T.Color(SC.sunC),.3)}});
+  /* Flammen: leuchten (werden addiert), unten hell gelb, oben rot und durchsichtig */
+  const flame=mk(FIRE.on?(coarse?520:1100):8,new T.ShaderMaterial({transparent:true,depthWrite:false,blending:T.AdditiveBlending,uniforms:U(),
+    vertexShader:head+fog()+'}',
+    fragmentShader:'varying float va;varying float vk;varying float vf;void main(){vec2 p=gl_PointCoord-0.5;p.y*=0.8+0.4*va;float r=length(p);if(r>0.5)discard;float c0=smoothstep(0.5,0.0,r);vec3 c=mix(vec3(1.0,0.9,0.55),vec3(1.0,0.45,0.1),smoothstep(0.0,0.4,va));c=mix(c,vec3(0.6,0.12,0.03),smoothstep(0.4,0.9,va));float al=c0*c0*(1.0-va)*smoothstep(0.0,0.1,va)*(1.0-vf)*0.95;gl_FragColor=vec4(c,al);}'}));
+  flame.pts.renderOrder=4;
+  /* Dunst: Art 0 Rauch des Feuers, 1 Dampf über gelöschter Glut, 2 fallendes Löschwasser, 3 Gischt und Sprühnebel */
+  const haze=mk(coarse?700:1600,new T.ShaderMaterial({transparent:true,depthWrite:false,uniforms:U(),
+    vertexShader:head+fog()+'}',
+    fragmentShader:'uniform vec3 uFc;uniform vec3 uTint;varying float va;varying float vk;varying float vf;void main(){float r=length(gl_PointCoord-0.5);if(r>0.5)discard;float sf=smoothstep(0.5,0.08,r);vec3 c;float al;'+
+     'if(vk<0.5){c=mix(vec3(0.2,0.19,0.18),vec3(0.52,0.5,0.48),smoothstep(0.0,0.55,va));al=0.5*smoothstep(0.0,0.05,va)*(1.0-va);}'+
+     'else if(vk<1.5){c=vec3(0.92,0.92,0.91);al=0.5*smoothstep(0.0,0.06,va)*(1.0-va)*(1.0-va);}'+
+     'else if(vk<2.5){c=vec3(0.84,0.89,0.93);al=0.62*(1.0-0.5*va);}'+
+     'else{c=vec3(0.9,0.93,0.95);al=0.45*(1.0-va)*(1.0-va);}'+
+     'c=mix(c*uTint,uFc,vf*0.85);gl_FragColor=vec4(c,sf*al*(1.0-0.5*vf));}'}));
+  haze.pts.renderOrder=3;
+  const put=(o,x,y,z,vx,vy,vz,life,s0,s1,k,m)=>{const i=o.i=(o.i+1)%o.n;o.pos[i*3]=x;o.pos[i*3+1]=y;o.pos[i*3+2]=z;o.vel[i*3]=vx;o.vel[i*3+1]=vy;o.vel[i*3+2]=vz;o.age[i]=0;o.life[i]=life;o.s0[i]=s0;o.s1[i]=s1;o.k[i]=k;o.m[i]=m||0;return i};
+  return {flame,haze,put}})();
+/* Brandherde anlegen: um jeden Mittelpunkt ein Dutzend Nester am Hang, die inneren brennen schon */
+if(FIRE.on){SC.fire.forEach(([zx,zz],zi)=>{const zn={x:zx,z:zz,cells:[],y:0,heat:0,out:false};
+   for(let k=0;k<12;k++){const a=k*2.39996+zi*1.3,r=k?8+Math.sqrt(k)*11:0,x=zx+Math.cos(a)*r*(1+.25*hash(k,zi)),z=zz+Math.sin(a)*r;
+     const c={x,z,y:ground(x,z),zone:zi,heat:0,st:0,wet:0,smo:0,fa:0,sa:0,base:k<3,nb:[]};zn.cells.push(c);FIRE.cells.push(c)}
+   zn.y=zn.cells.reduce((m,c)=>m+c.y,0)/zn.cells.length;FIRE.zones.push(zn);
+   if(!coarse){const l=new T.PointLight(0xFF7A2E,0,560,1.6);l.position.set(zx,zn.y+30,zz);scene.add(l);FIRE.lights.push(l)}});
+ for(const c of FIRE.cells)c.nb=FIRE.cells.filter(o=>o!==c&&o.zone===c.zone&&Math.hypot(o.x-c.x,o.z-c.z)<34)}
+FIRE.reset=()=>{FIRE.t=0;FIRE.done=false;FIRE.drop=0;FIRE.dacc=0;FIRE.out=0;
+  for(const c of FIRE.cells){c.st=c.base?1:0;c.heat=c.base?.72+.28*Math.random():0;c.wet=0;c.smo=0}
+  for(const z of FIRE.zones)z.out=false;
+  for(const o of [FP.flame,FP.haze]){o.age.fill(9);o.a.fill(1)}
+  if(FIRE.on)for(let i=0;i<90;i++)FIRE.update(.3,true)};      /* die Rauchsäulen stehen schon, wenn es losgeht */
+FIRE.burning=()=>FIRE.zones.filter(z=>!z.out).length;
+/* Gischt am Rumpf: beim Gleiten zwei Fahnen hinter der Stufe, beim Schöpfen eine dichte Wand */
+FIRE.spray=(dt,sp,scoop)=>{const n=Math.min(6,(coarse?.5:1)*(sp*.5+(scoop?22:0))*dt+Math.random());if(sp<3)return;
+  fwd.set(0,0,-1).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);
+  for(let j=0;j<n|0;j++){const sd=Math.random()<.5?-1:1,b=1.2+Math.random()*1.8;FP.put(FP.haze,S.pos.x-fwd.x*b+rgt.x*sd*.7,WATER+.3,S.pos.z-fwd.z*b+rgt.z*sd*.7,
+    S.vel.x*.35+rgt.x*sd*(2+Math.random()*3),2+Math.random()*(scoop?5:3),S.vel.z*.35+rgt.z*sd*(2+Math.random()*3),1.4+Math.random(),scoop?2.6:1.6,scoop?9:6,3)}};
+FIRE.splash=(p,v,str,sz)=>{for(let j=0;j<(coarse?10:22);j++){const a=Math.random()*6.283,r=Math.random()*str;FP.put(FP.haze,p.x+(Math.random()-.5)*4,WATER+.4,p.z+(Math.random()-.5)*4,v.x*.3+Math.cos(a)*r,2+Math.random()*str*.8,v.z*.3+Math.sin(a)*r,1.2+Math.random()*1.2,2.5*sz,9*sz,3)}};
+/* Abwurf: der ganze Tankinhalt geht in gut einer Sekunde durch die Klappen im Rumpfboden */
+function dropWater(){
+  if(!P||!P.def.tank||S.crashed||!card.hidden||!S.started)return;
+  if(FIRE.drop>0)return;
+  if(S.tank<.05){say(coarse?'Tank leer: mit Fahrt auf dem See aufsetzen und Wasser schöpfen':'Tank leer: mit Fahrt auf dem See aufsetzen, dann füllt sich der Tank');return}
+  FIRE.drop=S.tank;whoosh();buzz(30);pad.rumble(.3,.5,600);
+  if(S.ground||S.onW)say('Das Wasser ist wieder im See',false)}
+$('#b-drop').addEventListener('click',()=>dropWater());if(FIRE.on)$('#fire-tip').hidden=false;
+FIRE.update=(dt,warm)=>{
+  const run=!warm&&S.started&&card.hidden&&P&&!S.crashed;
+  /* Wasser ablassen */
+  if(FIRE.drop>0&&P&&!S.crashed&&!warm){const r=Math.min(FIRE.drop,dt/1.3);FIRE.drop-=r;S.tank=Math.max(0,S.tank-r);FIRE.dacc+=r*(coarse?110:170);S.w.y+=r*.5;
+    fwd.set(0,0,-1).applyQuaternion(S.Q);upv.set(0,1,0).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);
+    while(FIRE.dacc>=1){FIRE.dacc--;const sd=(Math.random()-.5)*2,b=(Math.random()-.3)*2.4;
+      FP.put(FP.haze,S.pos.x-upv.x*1.1+rgt.x*sd*.8-fwd.x*b,S.pos.y-upv.y*1.1-fwd.y*b,S.pos.z-upv.z*1.1+rgt.z*sd*.8-fwd.z*b,
+        S.vel.x*.92+rgt.x*sd*6-fwd.x*b*1.2+(Math.random()-.5)*2,S.vel.y*.9-1-Math.random()*2,S.vel.z*.92+rgt.z*sd*6-fwd.z*b*1.2+(Math.random()-.5)*2,5.5,3,26,2,1/(coarse?110:170))}
+    if(FIRE.drop<=0)FIRE.drop=0}
+  /* Nester: brennen heißer, greifen über, gelöschte dampfen noch eine Weile */
+  if(FIRE.on){let hot=0;
+    for(const c of FIRE.cells){if(c.wet>0)c.wet-=dt;
+      if(c.st===1){if(run&&c.wet<=0)c.heat=Math.min(1,c.heat+dt*.02);hot++;
+        if(c.heat<.05){c.st=2;c.heat=0;c.smo=16}
+        else if(run&&c.heat>.6&&c.wet<=0&&Math.random()<dt*.0045&&c.nb.length){const n=c.nb[(Math.random()*c.nb.length)|0];if(n.st===0&&n.wet<=0){n.st=1;n.heat=.3}}}
+      else if(c.smo>0)c.smo-=dt;
+      /* Flammen und Rauch */
+      const fr=c.st===1?(coarse?14:30)*(.25+c.heat):0;c.fa+=fr*dt;
+      while(c.fa>=1){c.fa--;const ht=.6+c.heat*.6;FP.put(FP.flame,c.x+(Math.random()-.5)*24,c.y+2+Math.random()*12,c.z+(Math.random()-.5)*24,(Math.random()-.5)*2+WIND.v.x*.35,(7+Math.random()*9)*ht,(Math.random()-.5)*2+WIND.v.z*.35,.8+Math.random()*.8,(10+Math.random()*9)*ht,3+Math.random()*3,0)}
+      c.sa+=(c.st===1?(coarse?.7:1.3)*(.3+c.heat):c.smo>0?.6*c.smo/16:0)*dt;
+      while(c.sa>=1){c.sa--;FP.put(FP.haze,c.x+(Math.random()-.5)*18,c.y+10+Math.random()*12,c.z+(Math.random()-.5)*18,WIND.v.x*.5,9+Math.random()*5,WIND.v.z*.5,c.st===1?22+Math.random()*10:12+Math.random()*6,20+Math.random()*10,110+Math.random()*60,c.st===1?0:1)}}
+    /* Brandherd aus? */
+    for(const z of FIRE.zones){if(z.out)continue;let h=0;for(const c of z.cells)if(c.st===1)h+=c.heat;z.heat=h;
+      if(!z.cells.some(c=>c.st===1)){z.out=true;FIRE.out++;const left=FIRE.burning();if(left){chime(1);say('Brandherd gelöscht. Noch '+(left===1?'einer':left===2?'zwei':left),true)}}}
+    FIRE.lights.forEach((l,i)=>{const z=FIRE.zones[i];l.intensity=Math.min(2.2,z.heat*.32)*(.82+.12*Math.sin(WIND.t*13+i*2)+.1*Math.random())});
+    if(run&&!FIRE.done){FIRE.t+=dt;
+      if(!hot){FIRE.done=true;const t=FIRE.t,rank=lbAdd(t);S.last=t;S.rank=rank;S.best=lbBest(P.def.id);chime(2);buzz([20,40,20]);
+        say('Alle Brände gelöscht in '+fmtH(t)+(rank===1?'. Neue Bestzeit':rank?'. Platz '+rank:'')+(coarse?'':'. R startet einen neuen Einsatz'),true,true)}}}
+  /* Teilchen bewegen */
+  {const o=FP.flame;let live=0;for(let i=0;i<o.n;i++){if(o.age[i]>=o.life[i]){o.a[i]=1;continue}live++;o.age[i]+=dt;const a=Math.min(1,o.age[i]/o.life[i]);o.a[i]=a;o.s[i]=o.s0[i]+(o.s1[i]-o.s0[i])*a;
+    const k=1-Math.min(1,1.4*dt);o.vel[i*3]*=k;o.vel[i*3+2]*=k;o.vel[i*3+1]+=2.5*dt;o.pos[i*3]+=o.vel[i*3]*dt;o.pos[i*3+1]+=o.vel[i*3+1]*dt;o.pos[i*3+2]+=o.vel[i*3+2]*dt}o.live=live}
+  {const o=FP.haze;let live=0;for(let i=0;i<o.n;i++){if(o.age[i]>=o.life[i]){o.a[i]=1;continue}live++;o.age[i]+=dt;const kd=o.k[i],v=o.vel,j=i*3;
+    if(kd<1.5){const r=Math.min(1,.25*dt);v[j]+=(WIND.v.x*1.3-v[j])*r;v[j+2]+=(WIND.v.z*1.3-v[j+2])*r;v[j+1]+=(3.6-v[j+1])*Math.min(1,.13*dt)}
+    else if(kd<2.5){v[j+1]-=G*dt;const r=Math.min(1,.3*dt);v[j]+=(WIND.v.x-v[j])*r;v[j+2]+=(WIND.v.z-v[j+2])*r}
+    else{const r=1-Math.min(1,1.3*dt);v[j]*=r;v[j+2]*=r;v[j+1]=v[j+1]*r-3*dt}
+    o.pos[j]+=v[j]*dt;o.pos[j+1]+=v[j+1]*dt;o.pos[j+2]+=v[j+2]*dt;
+    const a=Math.min(1,o.age[i]/o.life[i]);o.a[i]=kd>1.5&&kd<2.5?Math.min(.9,o.age[i]/o.life[i]):a;o.s[i]=kd>1.5&&kd<2.5?o.s0[i]+(o.s1[i]-o.s0[i])*Math.min(1,o.age[i]/4):o.s0[i]+(o.s1[i]-o.s0[i])*Math.sqrt(a);
+    if(kd>1.5&&kd<2.5){const gy=ground(o.pos[j],o.pos[j+2]),fl=Math.max(gy,WATER);
+      if(o.pos[j+1]<=fl+(gy>WATER?6:0)){      /* auf dem Wald angekommen (die Kronen fangen den Schwall etwas über dem Boden) */
+        const x=o.pos[j],z=o.pos[j+2],tf=o.age[i];let hitF=false;
+        if(FIRE.on&&gy>WATER){const r=14+4*tf,amp=o.m[i]*22*Math.pow(16/r,3);
+          for(const c of FIRE.cells){if(c.st!==1&&c.st!==0)continue;const d=Math.hypot(c.x-x,c.z-z);if(d<r){const w=amp*(1-d/r);c.wet=Math.min(30,c.wet+w*70);if(c.st===1){c.heat-=w;hitF=true}}}}
+        o.k[i]=3;o.age[i]=0;o.life[i]=2.5+Math.random()*2;o.s0[i]=o.s[i];o.s1[i]=o.s[i]*1.8;o.pos[j+1]=fl+(gy>WATER?3:.5);v[j]*=.15;v[j+1]=1+Math.random()*2;v[j+2]*=.15;
+        if(hitF&&Math.random()<.3)FP.put(o,x,gy+5,z,WIND.v.x*.4,5+Math.random()*4,WIND.v.z*.4,8+Math.random()*5,14,55,1)}}}
+    o.live=live}
+  for(const o of [FP.flame,FP.haze]){o.pts.visible=o.live>0;if(!o.live)continue;const px=renderer.domElement.height/(2*Math.tan(cam.fov*Math.PI/360));o.mat.uniforms.uPx.value=px;
+    o.g.attributes.position.needsUpdate=true;o.g.attributes.a.needsUpdate=true;o.g.attributes.s.needsUpdate=true;o.g.attributes.k.needsUpdate=true}
+  if(P&&P.def.tank){const v=Math.round(S.tank*100)+' %';if(v!==FIRE.wt){FIRE.wt=v;$('#i-wt').textContent=v;$('#b-drop').disabled=S.tank<.05}}
+};
 function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);pad.rumble(clamp(sink*.22,.12,.9),.35,150);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
@@ -1692,8 +1821,8 @@ function tipDip(flat){      /* beim Rollen zählt die Höhe unter dem Rumpf: ein
   return worst}
 const CQ=6,CY=4.6;      /* zusätzliche Nick- und Gierdämpfung von Rumpf und Fläche */
 function flying(dt){
-  const d=P.def;S.air+=dt;
-  const agl=S.pos.y-P.gear-ground(S.pos.x,S.pos.z);
+  const d=P.def;S.air+=dt;if(S.onW)S.onW=Math.max(0,S.onW-dt);
+  const agl=S.pos.y-P.gear-Math.max(ground(S.pos.x,S.pos.z),WATER);
   va.copy(S.vel).addScaledVector(WIND.v,-lerp(.35,1,clamp(agl/40,0,1)));      /* am Boden weht es deutlich schwächer als in der Höhe */
   /* Böen kommen auch von unten und oben: über dem Platz ruhig, in der Höhe und bei viel Wind unruhiger */
   va.y-=(Math.sin(WIND.t*1.3+2)+Math.sin(WIND.t*2.9+.7)+Math.sin(WIND.t*6.1))*.17*clamp(WIND.speed/4.2,0,1.6)*clamp(agl/18,0,1);
@@ -1758,7 +1887,8 @@ function flying(dt){
   acc.set(0,0,0).addScaledVector(rgt,Fx).addScaledVector(upv,Fy).addScaledVector(fwd,-Fz);
   if(V>1.5)acc.addScaledVector(va,-qd*CDb/V).addScaledVector(rgt,-qd*.9*beta);
   {const m=acc.length();if(m>12*G)acc.multiplyScalar(12*G/m)}
-  acc.y-=G;acc.addScaledVector(fwd,d.aT0*S.pw*Math.max(0,1-uf/d.vP));
+  const ms=1/(1+.4*(S.tank||0));acc.multiplyScalar(ms);      /* volle Tanks: gut 40 Prozent mehr Masse, das Flugzeug wird träger und braucht mehr Fahrt */
+  acc.y-=G;acc.addScaledVector(fwd,d.aT0*S.pw*Math.max(0,1-uf/d.vP)*ms);
   S.vel.addScaledVector(acc,dt);S.pos.addScaledVector(S.vel,dt);
   /* Drehung: Hebel der Flächenkräfte, dazu Dämpfung von Rumpf und Fläche, das Nachkippen der abgerissenen Fläche,
      und der Propeller: Gegendrehmoment, Drall des Strahls, P-Faktor bei hoher Nase und Kreiselwirkung */
@@ -1769,10 +1899,27 @@ function flying(dt){
   S.w.x=clamp(S.w.x+aR*dt,-14,14);S.w.y=clamp(S.w.y+aP*dt,-9,9);S.w.z=clamp(S.w.z+aY*dt,-7,7);
   S.Q.multiply(dq.setFromEuler(eul.set(S.w.y*dt,S.w.z*dt,-S.w.x*dt,'XYZ'))).normalize();
   S.stalled=stS;S.alpha=alpha;S.va=V;S.shake=shake;const st=stS;
-  if(st>.5&&agl>4&&S.air>1.5&&WIND.t-S.warn>4){S.warn=WIND.t;say('Strömungsabriss: Nase runter und Gas rein')}
+  if(st>.5&&agl>4&&!S.onW&&S.air>1.5&&WIND.t-S.warn>4){S.warn=WIND.t;say('Strömungsabriss: Nase runter und Gas rein')}
   /* Bodenberührung */
   const h=ground(S.pos.x,S.pos.z);
-  if(h<WATER&&S.pos.y-P.gear<=WATER){S.pos.y=WATER+P.gear;crash(SC.sea?'Im Meer gelandet.':'Im See gelandet.',true);return}
+  if(h<WATER&&d.boat){const nose=Math.asin(clamp(fwd.y,-1,1)),dip=WATER-(S.pos.y-P.hull(nose));
+    if(dip>0){upv.set(0,1,0).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);
+      const sink=-S.vel.y,bank=Math.atan2(-rgt.y,upv.y),sp=Math.hypot(S.vel.x,S.vel.z);
+      if(S.gr<.5){crash('Mit ausgefahrenem Fahrwerk gewassert.',true);return}
+      if(upv.y<.3){crash('Im Wasser überschlagen.',true);return}
+      if(Math.abs(bank)>.36){crash('Mit hängender Fläche ins Wasser.',true);return}
+      if(nose<-.2){crash('Mit der Nase ins Wasser.',true);return}
+      if(sink>3.6){crash('Zu hart aufs Wasser.',true);return}
+      /* aufgesetzt: der Rumpf trägt, Wasser bremst und hält das Boot auf Kurs, die Stützschwimmer halten die Flächen gerade */
+      if(!S.onW){S.onW=1;pad.rumble(clamp(sink*.2,.1,.6),.4,140);FIRE.splash(S.pos,S.vel,sp*.35+sink*4,1.2);if(sp>d.vS*.7&&WIND.t-S.tw>6){S.tw=WIND.t;say(S.tank<.98?'Auf dem Wasser: Fahrt halten, der Tank füllt sich':'Tank voll: Gas rein und abheben')}}
+      S.onW=1.5;S.pos.y+=dip;if(S.vel.y<0)S.vel.y*=.2;
+      const sc=sp>d.vS*.65&&S.tank<1,k=1-Math.min(1,(.08+(sc?.08:0)+(sp<6?.4:0))*dt);S.vel.x*=k;S.vel.z*=k;
+      S.vel.addScaledVector(rgt,-S.vel.dot(rgt)*Math.min(1,3*dt));
+      S.w.x=lerp(S.w.x,-bank*3,1-Math.exp(-6*dt));if(nose<.02)S.w.y=Math.max(S.w.y,(.03-nose)*4);S.w.y*=Math.exp(-2.5*dt);
+      if(sc){S.tank=Math.min(1,S.tank+dt/5);if(S.tank>=1)say('Tank voll: Gas rein und abheben',true)}
+      FIRE.spray(dt,sp,sc);
+    }
+  }else if(h<WATER&&S.pos.y-P.gear<=WATER){S.pos.y=WATER+P.gear;crash(SC.sea?'Im Meer gelandet.':'Im See gelandet.',true);return}
   fwd.set(0,0,-1).applyQuaternion(S.Q);const lowP=low(Math.asin(clamp(fwd.y,-1,1)));
   upv.set(0,1,0).applyQuaternion(S.Q);rgt.set(1,0,0).applyQuaternion(S.Q);
   if(S.pos.y-lowP<=h&&S.pos.y-P.gear>h+.04&&fwd.y>.05&&upv.y>.8&&S.vel.y>-3.9){
@@ -1818,7 +1965,7 @@ const pad={act:false,seen:false,ui:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[]
 {const dz=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),ex=v=>.5*v+.5*v*v*v,bv=(g,i)=>{const b=i>=0&&g.buttons[i];return b?(b.value||(b.pressed?1:0)):0};
  const get=()=>{let l;try{l=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return null}let best=null;
    for(const g of l){if(!g||!g.connected||g.axes.length<4)continue;if(g.index===pad.idx)return g;if(!best||(g.mapping==='standard'&&best.mapping!=='standard'))best=g}return best};
- const PADK={'b-fire':'B','b-ramp':'B','b-smoke':'A','b-snd':'X','b-cam':'Y','b-reset':'Ansicht','b-board':'LB','b-help':'Menü'},
+ const PADK={'b-fire':'B','b-ramp':'B','b-drop':'B','b-smoke':'A','b-snd':'X','b-cam':'Y','b-reset':'Ansicht','b-board':'LB','b-help':'Menü'},
   ICON={Ansicht:'<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1.2" y="1.5" width="6.6" height="5.4" rx="1"/><path d="M4.4 9.9h5.4a1 1 0 0 0 1-1V5.2"/></svg>',Menü:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 3.2h8M2 6h8M2 8.8h8"/></svg>'};
  const padUI=on=>{if(pad.ui===on)return;pad.ui=on;document.body.classList.toggle('pad-on',on);
    for(const id in PADK){const k=$('#'+id+' kbd'),v=PADK[id];if(k.dataset.key===undefined)k.dataset.key=k.textContent;
@@ -1833,7 +1980,7 @@ const pad={act:false,seen:false,ui:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[]
      if(!pad.seen){pad.seen=true;$('#pad-keys').hidden=false;$('#pad-tip').hidden=true;if(card.hidden)say('Controller erkannt: rechter Stick Quer und Höhe, linker Stick Seite, RT mehr Gas, LT weniger')}}
    pad.dev=g;pad.x=x;pad.y=y;pad.r=r;pad.g=gas;
    if(!card.hidden){if((hA||hM)&&$('#v-who').hidden)start();return}
-   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else fire()}if(hY)$('#b-cam').click();if(hX)toggleSound();if(hL)openBoard();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
+   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}if(hY)$('#b-cam').click();if(hX)toggleSound();if(hL)openBoard();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
  pad.poll=dt=>{poll0(dt);padUI(pad.act)};
  pad.rumble=(strong,weak,ms)=>{if(!pad.act||!pad.dev)return;try{const a=pad.dev.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:strong,weakMagnitude:weak}).catch(()=>{})}catch(e){}};
  window.addEventListener('gamepaddisconnected',()=>{pad.act=false;pad.dev=null;pad.idx=-1;pad.x=pad.y=pad.r=pad.g=0})}
@@ -2110,7 +2257,12 @@ function frame(dt,still){
     for(const q of PAPI){const dz=(S.pos.z-q.z)*q.e;if(dz<4&&q.k>=0)continue;
       const k=dz<4?1:clamp((Math.atan2(S.pos.y-2.5,Math.hypot(dz,S.pos.x-q.x))-q.ang)/.0024+.5,0,1);      /* am Übergang wird die Lampe kurz rosa, wie beim echten Gerät */
       if(Math.abs(k-q.k)>.03||(k!==q.k&&(k===0||k===1))){q.k=k;q.red=k<.5;const r=1,g=lerp(.14,.965,k),b=lerp(.08,.87,k);q.lm.color.setRGB(r,g,b);LAMP.col.setXYZ(q.li,r,g,b);LAMP.col.needsUpdate=true}}
-    {const g=COL.gates[S.next],mk=scene.userData.mark;mk.position.set(g.x,g.top+24+3*Math.sin(WIND.t*2.4),g.z);mk.rotation.y=WIND.t*1.6}
+    {const mk=scene.userData.mark;
+     if(FIRE.on){let t=null,bd=1e12;const lake=P.def.tank&&S.tank<.2&&FIRE.drop<=0;
+       if(lake)t={x:LAKE.x,z:LAKE.z,y:WATER+50};else for(const z of FIRE.zones){if(z.out)continue;const d=(z.x-S.pos.x)**2+(z.z-S.pos.z)**2;if(d<bd){bd=d;t={x:z.x,z:z.z,y:z.y+95}}}
+       mk.visible=!!t;if(t){mk.position.set(t.x,t.y+4*Math.sin(WIND.t*2.4),t.z);mk.scale.setScalar(2.4);mk.material.color.setHex(lake?0x6FC3F2:0xF4C61F)}}
+     else if(COL.gates.length){const g=COL.gates[S.next];mk.position.set(g.x,g.top+24+3*Math.sin(WIND.t*2.4),g.z)}else mk.visible=false;
+     mk.rotation.y=WIND.t*1.6}
     if(FX.t<.45){FX.t+=dt;const k=clamp(FX.t/.4,0,1);flash.visible=true;flash.scale.setScalar(FX.size*(1+2.4*Math.sqrt(k)));flash.material.opacity=(1-k)*(1-k);glow.intensity=(1-k)*2.6}else if(flash.visible){flash.visible=false;glow.intensity=0}
     if(GA.id!==P.def.id)gauges(P.def);
     {const kmh=S.crashed?0:S.va*3.6,alt=agl<.3?0:Math.max(0,S.pos.y-P.gear),rpm=S.crashed?0:(GA.rpm0+(GA.rpm1-GA.rpm0)*S.pw)*(1+.1*clamp(S.va/P.def.vMax,0,1.3));
@@ -2123,11 +2275,13 @@ function frame(dt,still){
       if(hudT>.1){GA.v.v.textContent=Math.round(kmh);GA.h.v.textContent=Math.round(alt);GA.n.v.textContent=(Math.round(rpm*10)/10).toFixed(1).replace('.',',')}}}
     if(hudT>.1){hudT=0;touch.draw();
       /* Stoppuhr: läuft ab Tor 1, bleibt nach dem letzten Tor auf der Rundenzeit stehen */
-      {const run=S.lap0!==null;CK.el.classList.toggle('run',run);CK.t.textContent=run?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):'0:00,0';
+      if(FIRE.on){const run=!FIRE.done&&S.started,n=FIRE.burning();CK.el.classList.toggle('run',run);CK.t.textContent=FIRE.done?fmtH(FIRE.t):fmtT(FIRE.t);
+        CK.g.textContent=FIRE.done?(S.rank?'Alles gelöscht · Platz '+S.rank:'Alles gelöscht'):(n===1?'1 Brand':n+' Brände')+(P.def.tank?' · Tank '+Math.round(S.tank*100)+' %':'');CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
+      else{const run=S.lap0!==null;CK.el.classList.toggle('run',run);CK.t.textContent=run?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):'0:00,0';
        CK.g.textContent=run?'Tor '+(S.next+1)+'/'+COL.gates.length:S.last?(S.rank?'Platz '+S.rank:'Runde fertig'):coarse?'Tor 1':'Start an Tor 1';CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
       {const w=Math.round(WIND.speed*3.6),dg=(-(WIND.ang-Math.atan2(fwd.x,fwd.z))*180/Math.PI).toFixed(0);if(coarse){MI.w.textContent=w;MI.wa.style.transform='rotate('+dg+'deg)'}else if(GA.w){GA.w.textContent=w;GA.wa.setAttribute('transform','rotate('+dg+' 50 50)')}}}
   }
-  smoke(dt);audioUpdate(dt);
+  smoke(dt);FIRE.update(dt);audioUpdate(dt);
   if(!coarse||(QL.n&1)===0)renderer.shadowMap.needsUpdate=true;QL.n++;
   mirror();POST.render(dt,still||!S.started||!card.hidden);
 }
@@ -2248,9 +2402,10 @@ let last=0,raf=0;
 function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;pad.poll(dt);if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
+window.__flug={FIRE,FP,LAKE,dropWater,pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
+if(SID==='waldbrand')first='loescher';      /* zum Waldbrand gehört die CL-215T */
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
 try{const q=new URLSearchParams(location.search).get('modell');if(PLANES.some(p=>p.id===q))first=q}catch(e){}
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
@@ -2259,7 +2414,7 @@ if(coarse){const top=document.querySelector('.top'),tl=document.createElement('d
   $('#menu-places').appendChild($('#places'));$('#menu-places').appendChild($('#lights'));$('#menu-models').appendChild($('#models'));for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
   if(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen){const b=document.createElement('button');b.type='button';b.className='act';b.id='b-full';b.textContent='Vollbild';b.setAttribute('aria-pressed','false');
    b.addEventListener('click',()=>fullscreen(!fsOn()));for(const t of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(t,()=>{b.setAttribute('aria-pressed',fsOn()?'true':'false');setTimeout(resize,200)});$('#menu-acts').appendChild(b)}
-  $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
+  $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#spec').appendChild($('#b-drop'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
 $('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'Weiterfliegen':'Losfliegen';view('menu')});
 $('#b-go2').addEventListener('click',start);
 lbLoad();if(!LB.name)askName();else if(coarse)view('menu');      /* beim ersten Start zuerst nach dem Namen fragen */
