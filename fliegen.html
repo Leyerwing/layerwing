@@ -310,6 +310,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <div><dt>LB, Ansicht, Menü</dt><dd>Bestzeiten, neu starten, diese Hilfe öffnen und schließen</dd></div>
     </dl>
     <p id="pad-tip">Mit Controller fliegen: anschließen und eine Taste drücken.</p>
+    <p id="fr-tip" hidden>Bergfracht: Die Ladung muss der Reihe nach auf drei Almen. Auf der Graspiste landen und anhalten, dann wird abgeladen und die nächste Fracht kommt an Bord. Zum Schluss zurück auf die Bahn am Platz. Mit Ladung ist das Flugzeug schwerer. Bergauf landen bremst, der Windsack an jeder Alm zeigt den Wind. Der gelbe Wegweiser steht über dem nächsten Ziel.</p>
     <p id="fire-tip" hidden>Waldbrand löschen: Mit der CL-215T ohne Fahrwerk auf dem See aufsetzen, Flächen gerade, mit 60 bis 90 km/h. Gas halten, bis der Tank voll ist, dann bei gut 90 km/h abheben. Über dem Feuer tief abwerfen (F oder Knopf Wasser), etwa 20 bis 50 m hoch: Das Wasser fliegt noch ein Stück weiter, also kurz vor dem Brand auslösen. Aus großer Höhe verweht es. Der gelbe Wegweiser zeigt den nächsten Brand, der blaue den See.</p>
     <div class="go">
       <button class="btn btn-primary" id="b-go" type="button">Losfliegen</button>
@@ -357,7 +358,7 @@ const T=window.THREE, $=s=>document.querySelector(s);
 const note=$('#note');let noteT=0;
 /* Am Handy erscheinen nur Meldungen, die man nicht ohnehin sieht: Absturz, Landung, Rundenzeit, Strömungsabriss */
 function say(text,good,hold){
-  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen|Brandherd|Tank|Alle Brände|Wasser schöpfen)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
+  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen|Brandherd|Tank|Alle Brände|Wasser schöpfen|Bergfracht|Fracht|Alles zugestellt|Falsche Alm)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
   note.textContent=text;note.classList.toggle('good',!!good);note.classList.add('on');clearTimeout(noteT);if(!hold)noteT=setTimeout(()=>note.classList.remove('on'),3200)}
 if(!T||!window.DecompressionStream||!window.fetch){$('#loadline').textContent='Dein Browser kann die 3D-Ansicht nicht starten. Probier es mit einem aktuellen Chrome, Safari oder Firefox.';$('#b-go').disabled=true;return}
 
@@ -435,6 +436,17 @@ const SCENES={
   pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
   mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.3,.06,.42,.18,.1],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
   course:[[0,-600],[-140,-1050],[-330,-1620],[-600,-2020],[-840,-1760],[-860,-1300],[-960,-800],[-1000,-300],[-850,200],[-560,620],[-250,900],[-60,700]]},
+ /* Waldbrand: bewaldete Hügel, in drei Tälern brennt es. Löschwasser gibt es im See nördlich der Bahn. Rauch legt sich als Dunst über das Land */
+ waldbrand:{name:'Waldbrand',sub:'Wasser im See schöpfen und drei Brände löschen',L:{abend:{sun:[-.72,.21,-.66],sunC:0xFF9E58,sunI:2.4,hemi:[0x979BB2,0x5E4A36,.4],gold:{t:0xF2B987,g:0xFF9545,s:0xDAB9A0,a:0xA8A7B0},hor:0xD9B89C,mid:0x9AA5B6,top:0x4B6388,envG:0x6A6646,fog:[750,6000],tint:[1.07,.98,.86]},
+   tag:{sun:[-.5,.68,-.53],sunC:0xFFEAC8,sunI:1.25,hemi:[0xC0C8D8,0x6A7050,.5],gold:{t:0xE4DCCC,g:0xFFE0B4,s:0xD9D2C4,a:0xC4CCD8},hor:0xDAD0BF,mid:0x8CAED6,top:0x3E6EB0,envG:0x5E7A3A,fog:[1000,7000],tint:[1.03,1,.94]}},water:-2.4,
+  pal:[0x46682B,0x66873A,0x958C4E,0x2A4523,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[9000,9001],mix:[.45,.55,.24,0],beach:[2,-1.5],
+  mow:['#7FA453','#729848'],firs:1.3,firH:[3,560],firC:[.3,.06,.42,.18,.1],leafy:1.25,leafH:[.8,90],leafS:[17,15],leafK:.48,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>h>140&&h<700&&sl>14,rockC:[.09,.05,.42],clouds:.55,
+  course:[],fire:[[1050,-950],[-1250,-950],[-820,-2350]]},
+ /* Bergfracht: das Alpental, dazu drei Graspisten auf Almen in verschiedener Höhe. Die Fracht muss der Reihe nach hin, zum Schluss geht es zurück zum Platz */
+ fracht:{name:'Bergfracht',sub:'Fracht zu drei Almpisten fliegen und landen',L:{abend:{sun:[.087,.24,.996],sunC:0xFFB679,sunI:2.5,hemi:[0x8EA6D0,0x5E4A36,.36],gold:{t:0xF3CFA4,g:0xFFB873,s:0xE3D5C8,a:0xB4C3D6},hor:0xE3D5C8,mid:0x8FB1D8,top:0x3C6BAD,envG:0x6E7350,fog:[900,6800],tint:[1.05,1,.9]},tag:{sun:[-.52,.7,.49],sunC:0xFFF3DC,sunI:1.3,hemi:[0xB9D2F5,0x6A7550,.5],gold:{t:0xD9E8F4,g:0xFFF2D6,s:0xC9DDF0,a:0xB7D2EC},hor:0xC9DDF0,mid:0x5EA2E6,top:0x1C5FC0,envG:0x5E7D3A,fog:[1300,7600],tint:[1,1,1]}},water:-2.4,
+  pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
+  mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.3,.06,.42,.18,.1],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
+  course:[],strips:[['Seealm',-2350,-2150,1.5708,300,0],['Gratalm',-1250,-1360,1.5708,280,-.025],['Hochalm',1600,400,0,280,-.025]]},
  /* Waldbrand: bewaldete Hügel, in drei Tälern brennt es. Löschwasser gibt es im See nördlich der Bahn. Rauch legt sich als Dunst über das Land */
  waldbrand:{name:'Waldbrand',sub:'Wasser im See schöpfen und drei Brände löschen',L:{abend:{sun:[-.72,.21,-.66],sunC:0xFF9E58,sunI:2.4,hemi:[0x979BB2,0x5E4A36,.4],gold:{t:0xF2B987,g:0xFF9545,s:0xDAB9A0,a:0xA8A7B0},hor:0xD9B89C,mid:0x9AA5B6,top:0x4B6388,envG:0x6A6646,fog:[750,6000],tint:[1.07,.98,.86]},
    tag:{sun:[-.5,.68,-.53],sunC:0xFFEAC8,sunI:1.25,hemi:[0xC0C8D8,0x6A7050,.5],gold:{t:0xE4DCCC,g:0xFFE0B4,s:0xD9D2C4,a:0xC4CCD8},hor:0xDAD0BF,mid:0x8CAED6,top:0x3E6EB0,envG:0x5E7A3A,fog:[1000,7000],tint:[1.03,1,.94]}},water:-2.4,
@@ -527,7 +539,7 @@ function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=x
 function fbm(x,z){let a=.5,f=1,s=0;for(let i=0;i<5;i++){s+=a*vnoise(x*f,z*f);a*=.5;f*=2.03}return s}
 const RW={len:920,wid:46};          /* Bahn liegt auf der z-Achse, Mitte im Ursprung, Höhe 0 */
 /* ein See im Quertal des Alpentals, ein Weiher zwischen den Feldern; die anderen Plätze haben keinen */
-const LAKE=SID==='alpen'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='waldbrand'?{x:-180,z:-1500,rx:480,rz:150,y:-2.4}:SID==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
+const LAKE=SID==='alpen'||SID==='fracht'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='waldbrand'?{x:-180,z:-1500,rx:480,rz:150,y:-2.4}:SID==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
 const lakeD=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Math.sqrt(dx*dx+dz*dz)};
 /* einzelne Kuppen: Inseln vor der Küste, Tafelberge im Becken. x, z, Radius, Höhe, Form (1 rund, 0 mit flachem Dach) */
 const BUMPS=SID==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,2],[-1700,330,120,120,2],[-2700,900,520,210,1],[-1380,-1000,60,62,2]]:SID==='traeger'?[[-2500,-1500,520,230,1],[-2900,1500,440,170,1],[2700,-600,480,200,1],[-1250,-640,130,120,2],[-900,1650,110,95,2],[1500,900,140,130,2],[1300,-1500,90,80,2]]:SID==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
@@ -568,14 +580,22 @@ const TERR={
   const mesa=Math.max(sstep(.5,.57,f+(f2-.5)*.1)*basin,rim),top=250+400*sstep(.55,.8,f)+(f2-.5)*36;
   let h=(fbm(x/260+4,z/260+8)-.5)*24+basin*34*f2+mesa*top;
   for(const [bx,bz,rr,ht] of BUMPS){const d=Math.hypot(x-bx,z-bz)/rr*(.86+.28*fbm(x/140+bx,z/140));if(d<1)h=Math.max(h,ht*sstep(1,.74,d)+(f2-.5)*18)}
-  return h}}[SID];
+  return h}}[SID==='fracht'?'alpen':SID];      /* die Bergfracht spielt im Alpental */
+/* Almpisten: Lage, Richtung, Länge, Steigung. Die Höhe ist die des Geländes in der Mitte; ringsum wird es eben und läuft in sanften Böschungen aus */
+const STRIPS=(SC.strips||[]).map(([name,x,z,ang,len,sl],i)=>{const ax=Math.sin(ang),az=Math.cos(ang);let h=0;for(const k of [-.35,0,.35])h+=TERR(x+ax*len*k,z+az*len*k);return {i,name,x,z,ax,az,len,wid:28,sl,h:Math.max(h/3,3)}});
+const stripUV=(s,x,z)=>{const dx=x-s.x,dz=z-s.z;return [dx*s.ax+dz*s.az,dx*s.az-dz*s.ax]};
+function stripH(x,z,t){for(const s of STRIPS){const [u,v]=stripUV(s,x,z),d=Math.max(Math.abs(u)-s.len/2,Math.abs(v)-s.wid/2-12);if(d<180){const f=1-sstep(6,180,d);t+=(s.h+s.sl*clamp(u,-s.len/2-50,s.len/2+50)-t)*f}}return t}
+const almK=(x,z)=>{let k=0;for(const s of STRIPS){const [u,v]=stripUV(s,x,z),d=Math.max(Math.abs(u)-s.len/2,Math.abs(v)-s.wid/2-12);k=Math.max(k,1-sstep(30,200,d))}return k};
+const onStrip=(x,z)=>{for(const s of STRIPS){const [u,v]=stripUV(s,x,z);if(Math.abs(u)<s.len/2+3&&Math.abs(v)<s.wid/2+3)return s.i}return -1};
+/* Bäume bleiben der Piste fern, in Anflugrichtung öffnet sich eine Schneise */
+const stripD=(x,z)=>{let m=1e9;for(const s of STRIPS){const [u,v]=stripUV(s,x,z),au=Math.abs(u)-s.len/2;let d=Math.max(au,Math.abs(v)-s.wid/2);if(au>0&&au<520)d=Math.min(d,Math.max(0,Math.abs(v)-s.wid/2-au*.2)+au*.07);m=Math.min(m,Math.max(0,d))}return m};
 function ground(x,z){
   if(SC.ship)return onDeck(x,z)?0:TERR(x,z);
   /* um die Bahn herum ist es eben */
   const flat=1-sstep(85,215,Math.max(Math.abs(x)-RW.wid/2,Math.abs(z)-RW.len/2));
-  return TERR(x,z)*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
+  return (STRIPS.length?stripH(x,z,TERR(x,z)):TERR(x,z))*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
 }
-const onRunway=(x,z)=>SC.ship?onDeck(x,z):Math.abs(x)<RW.wid/2+2&&Math.abs(z)<RW.len/2+4;      /* auf dem Träger zählt das ganze Deck als Bahn */
+const onRunway=(x,z)=>SC.ship?onDeck(x,z):(Math.abs(x)<RW.wid/2+2&&Math.abs(z)<RW.len/2+4)||(STRIPS.length>0&&onStrip(x,z)>=0);      /* die Almpisten zählen auch */      /* auf dem Träger zählt das ganze Deck als Bahn */
 /* Wolkenschatten ziehen langsam über Tal, Platz und Bahn. Aus der Nähe bekommt der Boden eine zweite, feinere Körnung und ein leichtes Relief,
    damit Wiese und Fels nicht wie glatte Flächen wirken. */
 const CSU={uCs:{value:null},uCt:{value:0}};
@@ -662,7 +682,7 @@ const LIGHT={at:()=>1};
    for(let t=28;t<3200&&vis>0;t*=1.2){const d=h+5+t*tn-grid(H,x+dx*t,z+dz*t);vis=Math.min(vis,d*9/t+.5)}
    V[i]=clamp(vis,0,1);
    let m=0;for(let k=0;k<6;k++){const a=k*1.0472;m+=grid(H,x+Math.cos(a)*130,z+Math.sin(a)*130)}
-   c[i*3]=V[i];c[i*3+1]=1-clamp((m/6-h)/170,0,.42);c[i*3+2]=0}
+   c[i*3]=V[i];c[i*3+1]=1-clamp((m/6-h)/170,0,.42);c[i*3+2]=STRIPS.length?almK(x,z):0}      /* blau: Almwiese um die Pisten */
  LIGHT.at=(x,z)=>grid(V,x,z);
  g.setAttribute('color',new T.BufferAttribute(c,3));g.computeVertexNormals();grain.repeat.set(150,150);
  /* Am Handy rechnet das Gelände sein Licht an den Netzpunkten statt für jeden Bildpunkt; Farbe und Felskanten bleiben pro Bildpunkt */
@@ -676,7 +696,7 @@ const LIGHT={at:()=>1};
   f=f.replace('#include <color_fragment>',`vec2 P=vWp.xz;float hh=vWp.y;
    vec4 nA=texture2D(uNz,P/2300.0),nB=texture2D(uNz,P/410.0+0.37),nC=texture2D(uNz,P/83.0+0.11),nD=texture2D(uNz,P/34.0,0.8);
    float camD=distance(cameraPosition,vWp),tNear=1.0-smoothstep(60.0,520.0,camD),slope=1.0-normalize(vWn).y;
-   vec3 tc=mix(uGa,uGb,smoothstep(0.25,0.75,nA.r));tc=mix(tc,uGd,smoothstep(0.45,0.9,nB.r)*0.5);tc*=(0.9+0.2*nC.b)*uVeg;
+   vec3 tc=mix(uGa,uGb,smoothstep(0.25,0.75,nA.r));tc=mix(tc,uGd,smoothstep(0.45,0.9,nB.r)*0.5);tc*=(0.9+0.2*nC.b)*uVeg;vec3 gr=tc;
    float belt=smoothstep(uBelt.x,uBelt.y,hh)*(1.0-smoothstep(uBelt.z,uBelt.w,hh+(nB.g-0.5)*90.0));tc=mix(tc,uFo,belt*(uMix.x-0.05+uMix.x*nB.g));
    tc=mix(tc,uSc,smoothstep(uLv.x,uLv.y,hh+nB.g*90.0)*0.8);
    float rk=max(smoothstep(uRs.x,uRs.y,slope+(nB.b-0.5)*0.2+(nA.b-0.5)*0.1),smoothstep(uLv.z,uLv.w,hh+nB.r*90.0));
@@ -684,6 +704,7 @@ const LIGHT={at:()=>1};
    tc=mix(tc,rc,rk);
    float sn=smoothstep(uSnow.x,uSnow.y,hh+(nB.a-0.5)*150.0+(nA.a-0.5)*110.0)*(1.0-0.8*smoothstep(0.3,0.5,slope+(nB.g-0.5)*0.15));tc=mix(tc,uSn,sn);
    tc=mix(tc,uSh,max(step(length((P-uLake.xy)/uLake.zw),${SC.fields?'1.2':'1.6'}),uMix.w*(1.0-smoothstep(60.0,230.0,P.x+780.0+170.0*sin(P.y/900.0)+80.0*sin(P.y/310.0+1.3))))*smoothstep(uBeach.x,uBeach.y,hh+(nB.r-0.5)*uMix.w*3.0)*(1.0-rk));
+   tc=mix(tc,gr,vColor.b);
    {float fl=(1.0-smoothstep(10.0,34.0,hh))*(1.0-rk);vec2 cl=floor((P+(nB.gb-0.5)*130.0)/vec2(340.0,250.0));float pr=fract(sin(dot(cl,vec2(12.9898,78.233)))*43758.5453);
     tc=mix(tc,tc*mix(vec3(0.84,0.9,0.8),vec3(1.14,1.08,0.84),pr),fl*uMix.y);}
    float veg=(1.0-rk)*(1.0-sn);
@@ -935,7 +956,7 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
 /* ---------- Rundkurs aus zwölf Toren; je Flugplatz ein eigener Verlauf ---------- */
 const COURSE=SC.course;
 /* Abstand eines Punkts zur Kurslinie: dort bleibt der Wald licht */
-const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COURSE[i],b=COURSE[(i+1)%COURSE.length],dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz),0,1);m=Math.min(m,Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t))}return m};
+const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COURSE[i],b=COURSE[(i+1)%COURSE.length],dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz),0,1);m=Math.min(m,Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t))}return STRIPS.length?Math.min(m,stripD(x,z)):m};
 {const m=(c,r)=>new T.MeshStandardMaterial({color:c,roughness:r||.75}),red=m(0xD8412F),white=m(0xF3EFE6),yel=m(0xF4C61F),dark=m(0x2C2A27),conc=m(0xB7B2A6,.9);
  const add=(g,mat,x,y,z)=>{const o=new T.Mesh(g,mat);o.position.set(x,y,z);scene.add(o);return o};
  /* Tore: stehen quer zur Flugrichtung, auch am Hang; die Nummer zeigt die Reihenfolge */
@@ -977,7 +998,41 @@ function hit(px,py,pz,pr){
     for(const t of a){const k=(py-t[2])/t[3];if(k<0||k>1)continue;const dx=px-t[0],dz=pz-t[1],rr=t[4]*(1-k)+pr*.5;if(dx*dx+dz*dz<rr*rr)return t[5]||'baum'}}
   return null;
 }
-const HITTEXT={turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',hecke:'In die Hecke geflogen.',insel:'In die Insel des Trägers geflogen.',schlepper:'Einen Schlepper an Deck getroffen.',rumpf:'Gegen den Rumpf des Trägers geflogen.',kuh:'Eine Kuh gestreift. Sie grast schon wieder.',schaf:'Ein Schaf gestreift. Es blökt dir hinterher.',fels:'Gegen einen Felsen geflogen.',weidezaun:'Am Weidezaun hängen geblieben.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
+/* ---------- Almpisten: gemähte Bahn mit Randmarken, Windsack und Hütte; abgeladene Fracht steht danach neben der Hütte ---------- */
+const STRIPV=[];
+if(STRIPS.length){const std=(c,r,fs)=>new T.MeshStandardMaterial({color:c,roughness:r||.85,flatShading:!!fs});
+ const cv=document.createElement('canvas');cv.width=128;cv.height=1024;{const x=cv.getContext('2d');for(let i=0;i<8;i++){x.fillStyle=i%2?'#86AE57':'#97BE63';x.fillRect(i*16,0,16,1024)}
+  for(let i=0;i<5000;i++){x.fillStyle=Math.random()<.5?'rgba(60,90,30,.18)':'rgba(190,210,140,.16)';x.fillRect(Math.random()*128,Math.random()*1024,2,3)}
+  x.fillStyle='rgba(120,98,64,.55)';for(const cx of [40,88])x.fillRect(cx-5,0,10,1024);}      /* Radspuren im Gras */
+ const tex=new T.CanvasTexture(cv);tex.encoding=T.sRGBEncoding;tex.anisotropy=8;
+ const mOr=std(0xE8662C,.7),mWh=std(0xF3EFE6,.7),mWood=std(0x7A5636,.9),mRoof=std(0x8E3A2C,.8),mCrate=std(0xB58450,.9,true),mPole=std(0xECE8DF,.6);
+ for(const st of STRIPS){const ang=Math.atan2(st.ax,st.az),W=st.wid,L=st.len,at=(u,v)=>[st.x+st.ax*u+st.az*v,st.z+st.az*u-st.ax*v];
+  const g=new T.PlaneGeometry(W,L,4,Math.round(L/10));const q=g.attributes.position;
+  for(let i=0;i<q.count;i++){const v=q.getX(i),u=-q.getY(i),[x,z]=at(u,v);q.setXYZ(i,x,ground(x,z)+.25,z)}g.computeVertexNormals();
+  const m=new T.Mesh(g,new T.MeshStandardMaterial({map:tex,roughness:.95,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));m.receiveShadow=true;scene.add(m);
+  const put=(o,u,v,y,ry)=>{const [x,z]=at(u,v);o.position.set(x,ground(x,z)+y,z);o.rotation.y=ang+(ry||0);o.castShadow=true;o.receiveShadow=true;scene.add(o);return o};
+  /* Randmarken: abwechselnd orange und weiß, an den Enden eine Querreihe */
+  for(let u=-L/2;u<=L/2+.1;u+=L/8)for(const sd of [-1,1])put(new T.Mesh(new T.BoxGeometry(.9,.8,2.6),(Math.round(u/(L/8))&1)?mWh:mOr),u,sd*(W/2+1.5),.4);
+  for(const e of [-1,1])for(let v=-W/2+3;v<=W/2-3;v+=5.5)put(new T.Mesh(new T.BoxGeometry(2.8,.6,.9),mWh),e*(L/2+2),v,.3);
+  /* Hütte mit Satteldach und Namensschild zur Piste */
+  const hu=L/2-60,hv=W/2+26,hut=new T.Group();
+  {const b=new T.Mesh(new T.BoxGeometry(11,5,8),mWood);b.position.y=2.5;hut.add(b);
+   for(const sd of [-1,1]){const r=new T.Mesh(new T.BoxGeometry(12.4,.5,5.6),mRoof);r.position.set(0,6.55,sd*2.05);r.rotation.x=sd*.59;hut.add(r)}
+   const sh=new T.Shape();sh.moveTo(-4,0);sh.lineTo(4,0);sh.lineTo(0,2.7);sh.closePath();const gg=new T.ExtrudeGeometry(sh,{depth:11,bevelEnabled:false});gg.translate(0,0,-5.5);gg.rotateY(Math.PI/2);const gb=new T.Mesh(gg,mWood);gb.position.y=5;hut.add(gb);
+   const sc=document.createElement('canvas');sc.width=256;sc.height=64;const cx=sc.getContext('2d');cx.fillStyle='#F3EFE6';cx.fillRect(0,0,256,64);cx.fillStyle='#2C2A27';cx.font='700 40px system-ui,sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(st.name,128,35);
+   const nt=new T.CanvasTexture(sc);nt.encoding=T.sRGBEncoding;const sg=new T.Mesh(new T.PlaneGeometry(7,1.75),new T.MeshBasicMaterial({map:nt}));sg.position.set(0,3.6,-4.06);sg.rotation.y=Math.PI;hut.add(sg)}
+  put(hut,hu,hv,-.3,Math.PI/2*0);hut.rotation.y=ang+Math.PI/2;
+  {const [x,z]=at(hu,hv);COL.cyl.push({x,z,r:7,y0:ground(x,z)-1,y1:ground(x,z)+9,name:'huette'})}
+  /* Frachtkisten: erscheinen, sobald hier abgeladen ist */
+  const crates=new T.Group();for(let k=0;k<5;k++){const c=new T.Mesh(new T.BoxGeometry(1.7,1.5,1.7),mCrate);c.position.set((k%3)*1.9-1.9,.75+(k>2?1.5:0),k>2?.0:0);c.rotation.y=(k*.37)%.3;c.castShadow=true;crates.add(c)}
+  put(crates,hu-12,hv-8,0);crates.visible=false;
+  /* Windsack auf der anderen Seite */
+  const [wx,wz]=at(-L/2+40,-(W/2+16)),wy=ground(wx,wz);put(new T.Mesh(new T.CylinderGeometry(.25,.3,16,8),mPole),-L/2+40,-(W/2+16),8);
+  COL.cyl.push({x:wx,z:wz,r:.6,y0:wy,y1:wy+17,name:'windsack'});
+  const sock=new T.Group();sock.position.set(wx,wy+15.6,wz);scene.add(sock);const tl=new T.Group();sock.add(tl);
+  for(let i=0;i<5;i++){const r0=1.5-.16*i,r1=1.5-.16*(i+1),seg=new T.Mesh(new T.CylinderGeometry(r1,r0,1.9,14,1,true),new T.MeshStandardMaterial({color:i%2?0xF3EFE6:0xE8662C,side:T.DoubleSide,roughness:.9}));seg.rotation.x=Math.PI/2;seg.position.z=.95+i*1.9;tl.add(seg)}
+  STRIPV.push({i:st.i,crates,sock,tl})}}
+const HITTEXT={huette:'Gegen die Hütte geflogen.',turm:'Den Leuchtturm getroffen.',zaun:'In den Fangzaun geflogen.',windsack:'Den Windsack getroffen.',pylone:'An der Pylone hängen geblieben.',tor:'Am Tor hängen geblieben.',pfeiler:'Gegen einen Pfeiler geflogen.',baum:'In einen Baum geflogen.',hecke:'In die Hecke geflogen.',insel:'In die Insel des Trägers geflogen.',schlepper:'Einen Schlepper an Deck getroffen.',rumpf:'Gegen den Rumpf des Trägers geflogen.',kuh:'Eine Kuh gestreift. Sie grast schon wieder.',schaf:'Ein Schaf gestreift. Es blökt dir hinterher.',fels:'Gegen einen Felsen geflogen.',weidezaun:'Am Weidezaun hängen geblieben.',haus:'Ins Vereinsheim geflogen.',tisch:'In die Vorbereitung geflogen.',pilot:'Am Pilotenstand eingeschlagen.',auto:'Ein Auto auf dem Parkplatz getroffen.'};
 
 /* ---------- Felsen im Meer: Türme aus geschichtetem Gestein mit Simsen, Rissen und Überhängen. Jeder ist ein eigener, fein geteilter Körper;
    unten ein dunkler, nasser Saum mit Algen, oben heller Fels und etwas Grün. Um jeden großen stehen ein paar kleine Klippen. ---------- */
@@ -1421,7 +1476,7 @@ function reset(msg){
   if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0);p.outer.scale.set(1,1,1)});S.best=lbBest(P.def.id);S.last=null}
   camYaw=Math.PI;camPos.set(S.pos.x,S.pos.y+6,S.pos.z+30);if(msg)say(msg);
   if(P){S.rk=P.mounts.length;P.mounts.forEach(m=>{m.rocket.visible=true});RK.pool.forEach(r=>{r.on=false;r.g.visible=false});$('#b-fire').hidden=!S.rk;$('#b-fire').disabled=false;$('#i-r').textContent=S.rk;$('#b-ramp').hidden=!P.def.ramp;$('#b-ramp').setAttribute('aria-pressed','false');$('#b-drop').hidden=!P.def.tank}
-  S.tank=0;S.onW=0;FIRE.wt='';if(FIRE.on){FIRE.reset();S.last=null}      /* am Start wird nachgeladen */
+  S.tank=0;S.onW=0;S.load=0;FIRE.wt='';if(FIRE.on){FIRE.reset();S.last=null}if(FR.on){FR.reset();S.last=null}      /* am Start wird nachgeladen */
 }
 async function choose(id){
   const def=PLANES.find(p=>p.id===id);
@@ -1449,6 +1504,7 @@ const card=$('#card');
 {const box=$('#lights');for(const [id,nm,sb] of [['abend','Abendlicht','tiefe Sonne'],['tag','Tageslicht','blauer Himmel']]){const b=document.createElement('button'),sm=document.createElement('small');b.type='button';b.className='place';b.textContent=nm;sm.textContent=sb;b.appendChild(sm);b.setAttribute('aria-pressed',id===LID);
   b.addEventListener('click',()=>{if(id===LID)return;try{localStorage.setItem('lw-fliegen-licht',id)}catch(e){}$('#loadline').textContent=nm+' lädt …';location.search='?platz='+SID+'&licht='+id});box.appendChild(b)}}
 function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();
+  if(FR.on&&!FR.told){FR.told=true;setTimeout(()=>say('Bergfracht für '+STRIPS.map(s=>s.name).join(', ').replace(/, ([^,]*)$/,' und $1')+', in dieser Reihenfolge. Auf der Alm landen und anhalten, dann wird abgeladen',false,true),5200)}
   if(FIRE.on&&!FIRE.told){FIRE.told=true;setTimeout(()=>say(P&&P.def.tank?'Drei Waldbrände: im See nördlich der Bahn Wasser schöpfen, tief über dem Feuer abwerfen':'Drei Waldbrände: löschen kann nur die CL-215T',false,true),5200)}if(S.ground&&S.gs<1)say(pad.act?'RT für Vollgas, mit dem linken Stick geradeaus halten, dann rechts leicht ziehen':coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
 $('#b-help').addEventListener('click',()=>{view('help');$('#b-go').textContent=S.started?'Weiterfliegen':'Losfliegen';$('#b-go').focus()});
@@ -1677,6 +1733,25 @@ FIRE.update=(dt,warm)=>{
     o.g.attributes.position.needsUpdate=true;o.g.attributes.a.needsUpdate=true;o.g.attributes.s.needsUpdate=true;o.g.attributes.k.needsUpdate=true}
   if(P&&P.def.tank){const v=Math.round(S.tank*100)+' %';if(v!==FIRE.wt){FIRE.wt=v;$('#i-wt').textContent=v;$('#b-drop').disabled=S.tank<.05}}
 };
+/* ---------- Bergfracht: die Ladung der Reihe nach zu den Almen bringen. Landen, anhalten, dann wird abgeladen und die nächste Fracht kommt an Bord.
+   Zum Schluss geht es zurück auf die Bahn am Platz; erst dort steht die Uhr. ---------- */
+const FR={on:STRIPS.length>0,leg:0,t:0,done:false,un:0,told:false,wt:-9};
+FR.target=()=>FR.leg<STRIPS.length?STRIPS[FR.leg]:null;
+FR.reset=()=>{FR.leg=0;FR.t=0;FR.done=false;FR.un=0;S.load=FR.on?1:0;STRIPV.forEach(v=>{v.crates.visible=false})};
+if(FR.on)$('#fr-tip').hidden=false;
+FR.update=dt=>{if(!FR.on)return;
+  STRIPV.forEach(v=>{v.sock.rotation.y=WIND.ang+.07*Math.sin(WIND.t*2.3+v.i);v.tl.rotation.x=lerp(1.3,.07,clamp(WIND.speed/6.5,0,1))+.05*Math.sin(WIND.t*3.7+v.i)});
+  if(!(S.started&&card.hidden&&P&&!S.crashed)||FR.done)return;
+  FR.t+=dt;const tg=FR.target(),os=onStrip(S.pos.x,S.pos.z),here=tg?os===tg.i:Math.abs(S.pos.x)<RW.wid/2+2&&Math.abs(S.pos.z)<RW.len/2+4;
+  if(S.ground&&S.gs<1.2&&here){FR.un+=dt/(tg?2.5:1.2);
+    if(FR.un>=1){FR.un=0;
+      if(tg){STRIPV[tg.i].crates.visible=true;FR.leg++;chime(1);buzz(20);pad.rumble(.2,.4,200);const nx=FR.target();if(!nx)S.load=0;
+        say('Fracht für '+tg.name+' abgeladen. '+(nx?'Neue Ladung an Bord, weiter nach '+nx.name:'Zurück zum Flugplatz'),true)}
+      else{FR.done=true;S.load=0;const t=FR.t,rank=lbAdd(t);S.last=t;S.rank=rank;S.best=lbBest(P.def.id);chime(2);buzz([20,40,20]);
+        say('Alles zugestellt in '+fmtH(t)+(rank===1?'. Neue Bestzeit':rank?'. Platz '+rank:'')+(coarse?'':'. R startet einen neuen Auftrag'),true,true)}}}
+  else{FR.un=Math.max(0,FR.un-dt*2);
+    if(S.ground&&S.gs<1.2&&os>=0&&!here&&!STRIPV[os].crates.visible&&WIND.t-FR.wt>8){FR.wt=WIND.t;say('Falsche Alm: die Fracht gehört nach '+(tg?tg.name:'unten zum Flugplatz'))}}
+};
 function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);pad.rumble(clamp(sink*.22,.12,.9),.35,150);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
@@ -1785,7 +1860,7 @@ function rolling(dt){
   const CL=Math.min(CLA*(S.pitchG+AZ)*1.12,CLMAX*.97),CD=.048+.085*CL*CL+(S.pw<.12?.05*(1-S.pw/.12):0);
   /* Reibung: Räder rollen leicht, Rumpflander rutschen auf dem Bauch. Je mehr die Fläche trägt, desto weniger Last liegt am Boden */
   const wow=clamp(1-qd*CL/G,0,1),fr=(d.belly?(rw?2.3:3.1):(rw?.45:1.5))*wow+(S.thr<.03&&!d.belly?(rw?3.6:2.6)*wow:0);
-  let a=d.aT0*S.pw*Math.max(0,1-ua/d.vP)-Math.max(qd,0)*CD;
+  let a=d.aT0*S.pw*Math.max(0,1-ua/d.vP)/(1+.4*(S.tank||0)+.18*(S.load||0))-Math.max(qd,0)*CD;      /* mit Ladung beschleunigt es langsamer */
   if(S.gs<.05&&a<fr){a=0;S.gs=0}else a-=fr;                        /* erst wenn der Schub die Reibung überwindet, setzt sich das Modell in Bewegung */
   S.gs=Math.max(0,S.gs+a*dt);
   /* Fahrwerk federt, auf der Wiese rumpelt es. Der Federstahlbügel gibt weit nach und schwingt aus, ein Rumpf auf dem Bauch sitzt hart auf */
@@ -1887,7 +1962,7 @@ function flying(dt){
   acc.set(0,0,0).addScaledVector(rgt,Fx).addScaledVector(upv,Fy).addScaledVector(fwd,-Fz);
   if(V>1.5)acc.addScaledVector(va,-qd*CDb/V).addScaledVector(rgt,-qd*.9*beta);
   {const m=acc.length();if(m>12*G)acc.multiplyScalar(12*G/m)}
-  const ms=1/(1+.4*(S.tank||0));acc.multiplyScalar(ms);      /* volle Tanks: gut 40 Prozent mehr Masse, das Flugzeug wird träger und braucht mehr Fahrt */
+  const ms=1/(1+.4*(S.tank||0)+.18*(S.load||0));acc.multiplyScalar(ms);      /* volle Tanks: gut 40 Prozent mehr Masse, das Flugzeug wird träger und braucht mehr Fahrt */
   acc.y-=G;acc.addScaledVector(fwd,d.aT0*S.pw*Math.max(0,1-uf/d.vP)*ms);
   S.vel.addScaledVector(acc,dt);S.pos.addScaledVector(S.vel,dt);
   /* Drehung: Hebel der Flächenkräfte, dazu Dämpfung von Rumpf und Fläche, das Nachkippen der abgerissenen Fläche,
@@ -2261,6 +2336,7 @@ function frame(dt,still){
      if(FIRE.on){let t=null,bd=1e12;const lake=P.def.tank&&S.tank<.2&&FIRE.drop<=0;
        if(lake)t={x:LAKE.x,z:LAKE.z,y:WATER+50};else for(const z of FIRE.zones){if(z.out)continue;const d=(z.x-S.pos.x)**2+(z.z-S.pos.z)**2;if(d<bd){bd=d;t={x:z.x,z:z.z,y:z.y+95}}}
        mk.visible=!!t;if(t){mk.position.set(t.x,t.y+4*Math.sin(WIND.t*2.4),t.z);mk.scale.setScalar(2.4);mk.material.color.setHex(lake?0x6FC3F2:0xF4C61F)}}
+     else if(FR.on){const tg=FR.target();mk.visible=!FR.done;mk.position.set(tg?tg.x:0,(tg?tg.h:0)+70+4*Math.sin(WIND.t*2.4),tg?tg.z:0);mk.scale.setScalar(2.4)}
      else if(COL.gates.length){const g=COL.gates[S.next];mk.position.set(g.x,g.top+24+3*Math.sin(WIND.t*2.4),g.z)}else mk.visible=false;
      mk.rotation.y=WIND.t*1.6}
     if(FX.t<.45){FX.t+=dt;const k=clamp(FX.t/.4,0,1);flash.visible=true;flash.scale.setScalar(FX.size*(1+2.4*Math.sqrt(k)));flash.material.opacity=(1-k)*(1-k);glow.intensity=(1-k)*2.6}else if(flash.visible){flash.visible=false;glow.intensity=0}
@@ -2277,11 +2353,14 @@ function frame(dt,still){
       /* Stoppuhr: läuft ab Tor 1, bleibt nach dem letzten Tor auf der Rundenzeit stehen */
       if(FIRE.on){const run=!FIRE.done&&S.started,n=FIRE.burning();CK.el.classList.toggle('run',run);CK.t.textContent=FIRE.done?fmtH(FIRE.t):fmtT(FIRE.t);
         CK.g.textContent=FIRE.done?(S.rank?'Alles gelöscht · Platz '+S.rank:'Alles gelöscht'):(n===1?'1 Brand':n+' Brände')+(P.def.tank?' · Tank '+Math.round(S.tank*100)+' %':'');CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
+      else if(FR.on){const tg=FR.target(),run=!FR.done&&S.started,dk=Math.hypot((tg?tg.x:0)-S.pos.x,(tg?tg.z:0)-S.pos.z)/1000;CK.el.classList.toggle('run',run);CK.t.textContent=FR.done?fmtH(FR.t):fmtT(FR.t);
+        CK.g.textContent=FR.done?(S.rank?'Alles zugestellt · Platz '+S.rank:'Alles zugestellt'):FR.un>0?(tg?'Abladen ':'Abstellen ')+Math.round(FR.un*100)+' %':(tg?(FR.leg+1)+'/'+STRIPS.length+' '+tg.name:'Zurück zum Platz')+' · '+dk.toFixed(1).replace('.',',')+' km';
+        CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
       else{const run=S.lap0!==null;CK.el.classList.toggle('run',run);CK.t.textContent=run?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):'0:00,0';
        CK.g.textContent=run?'Tor '+(S.next+1)+'/'+COL.gates.length:S.last?(S.rank?'Platz '+S.rank:'Runde fertig'):coarse?'Tor 1':'Start an Tor 1';CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
       {const w=Math.round(WIND.speed*3.6),dg=(-(WIND.ang-Math.atan2(fwd.x,fwd.z))*180/Math.PI).toFixed(0);if(coarse){MI.w.textContent=w;MI.wa.style.transform='rotate('+dg+'deg)'}else if(GA.w){GA.w.textContent=w;GA.wa.setAttribute('transform','rotate('+dg+' 50 50)')}}}
   }
-  smoke(dt);FIRE.update(dt);audioUpdate(dt);
+  smoke(dt);FIRE.update(dt);FR.update(dt);audioUpdate(dt);
   if(!coarse||(QL.n&1)===0)renderer.shadowMap.needsUpdate=true;QL.n++;
   mirror();POST.render(dt,still||!S.started||!card.hidden);
 }
@@ -2402,10 +2481,10 @@ let last=0,raf=0;
 function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;pad.poll(dt);if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={FIRE,FP,LAKE,dropWater,pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
+window.__flug={FR,STRIPS,onStrip,FIRE,FP,LAKE,dropWater,pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
-if(SID==='waldbrand')first='loescher';      /* zum Waldbrand gehört die CL-215T */
+if(SID==='waldbrand')first='loescher';if(SID==='fracht')first='busch';      /* zur Bergfracht gehört das Buschflugzeug */      /* zum Waldbrand gehört die CL-215T */
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
 try{const q=new URLSearchParams(location.search).get('modell');if(PLANES.some(p=>p.id===q))first=q}catch(e){}
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
