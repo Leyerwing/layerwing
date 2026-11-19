@@ -270,6 +270,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 <div class="acts">
   <button class="act" id="b-fire" type="button" hidden>Raketen <b id="i-r">6</b><kbd>F</kbd></button>
   <button class="act" id="b-ramp" type="button" aria-pressed="false" hidden>Heckklappe<kbd>F</kbd></button>
+  <button class="act" id="b-cargo" type="button" hidden>Abwurf <b id="i-ab">3</b><kbd>F</kbd></button>
   <button class="act" id="b-drop" type="button" hidden>Wasser <b id="i-wt">0 %</b><kbd>F</kbd></button>
   <button class="act" id="b-smoke" type="button" aria-pressed="false">Rauch<kbd>Leer</kbd></button>
   <button class="act" id="b-snd" type="button" aria-pressed="true">Ton<kbd>M</kbd></button>
@@ -326,6 +327,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
       <div><dt>LB, Ansicht, Menü</dt><dd>Bestzeiten, neu starten, diese Hilfe öffnen und schließen</dd></div>
     </dl>
     <p id="pad-tip">Mit Controller fliegen: anschließen und eine Taste drücken.</p>
+    <p id="mis-tip" hidden></p>
     <p id="fr-tip" hidden>Bergfracht: Die Ladung muss der Reihe nach auf drei Almen. Auf der Graspiste landen und anhalten, dann wird abgeladen und die nächste Fracht kommt an Bord. Zum Schluss zurück auf die Bahn am Platz. Mit Ladung ist das Flugzeug schwerer. Bergauf landen bremst, der Windsack an jeder Alm zeigt den Wind. Der gelbe Wegweiser steht über dem nächsten Ziel.</p>
     <p id="fire-tip" hidden>Waldbrand löschen: Mit der CL-215T ohne Fahrwerk auf dem See aufsetzen, Flächen gerade, mit 60 bis 90 km/h. Gas halten, bis der Tank voll ist, dann bei gut 90 km/h abheben. Über dem Feuer tief abwerfen (F oder Knopf Wasser), etwa 20 bis 50 m hoch: Das Wasser fliegt noch ein Stück weiter, also kurz vor dem Brand auslösen. Aus großer Höhe verweht es. Der gelbe Wegweiser zeigt den nächsten Brand, der blaue den See.</p>
   </div>
@@ -354,7 +356,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
     <h2 id="board-h">Bestentabelle</h2>
     <p>Die Uhr läuft ab Tor 1 und stoppt nach Tor 12. Jeder Flugplatz hat seine eigene Tabelle.</p>
     <div class="tabs" id="board-tabs" role="group" aria-label="Modell wählen"></div>
-    <div class="board-wrap"><table class="board"><thead><tr><th scope="col">Platz</th><th scope="col">Name</th><th scope="col">Modell</th><th scope="col" class="num">Zeit</th><th scope="col" class="num">Datum</th></tr></thead><tbody id="board-rows"></tbody></table></div>
+    <div class="board-wrap"><table class="board"><thead><tr><th scope="col">Platz</th><th scope="col">Name</th><th scope="col">Modell</th><th scope="col" class="num" id="th-score">Zeit</th><th scope="col" class="num">Datum</th></tr></thead><tbody id="board-rows"></tbody></table></div>
     <p id="board-empty" hidden>Hier steht noch keine Zeit. Flieg den Rundkurs durch alle zwölf Tore, dann trägt sich deine Runde ein.</p>
     <p class="fine"><span id="board-src">Gespeichert auf diesem Gerät.</span> Du fliegst als <b id="board-me"></b>.</p>
     <div class="go"><button class="btn btn-primary" id="b-board-close" type="button">Weiterfliegen</button><button class="btn" id="b-name" type="button">Name ändern</button></div>
@@ -370,7 +372,7 @@ const T=window.THREE, $=s=>document.querySelector(s);
 const note=$('#note');let noteT=0;
 /* Am Handy erscheinen nur Meldungen, die man nicht ohnehin sieht: Absturz, Landung, Rundenzeit, Strömungsabriss */
 function say(text,good,hold){
-  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen|Brandherd|Tank|Alle Brände|Wasser schöpfen|Bergfracht|Fracht|Alles zugestellt|Falsche Alm)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
+  if(coarse){if(!hold&&!/^(Runde in|Butterweich|Sauber|Gelandet|Außenlandung|Strömungsabriss|Alle Raketen|Brandherd|Tank|Alle Brände|Wasser schöpfen|Bergfracht|Fracht|Alles zugestellt|Falsche Alm|Abwurf|Heckklappe fährt auf|Geländewagen|Schützenpanzer|Landung \d|Neben der Bahn|Punktlandung|Treffer|Alle Ziele|Zielschießen)/.test(text))return;text=text.replace(/ Gleich geht es am Start weiter\.$|: Nase runter und Gas rein$|\. Zurück zur Bahn rollen oder neu starten$/,'')}
   note.textContent=text;note.classList.toggle('good',!!good);note.classList.add('on');clearTimeout(noteT);if(!hold)noteT=setTimeout(()=>note.classList.remove('on'),3200)}
 if(!T||!window.DecompressionStream||!window.fetch){$('#loadline').textContent='Dein Browser kann die 3D-Ansicht nicht starten. Probier es mit einem aktuellen Chrome, Safari oder Firefox.';$('#b-go').disabled=true;return}
 
@@ -459,12 +461,6 @@ const SCENES={
   pal:[0x3F6A2B,0x5F8A3A,0x8E8C4C,0x294825,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[560,640],mix:[.45,.55,.24,0],beach:[2,-1.5],
   mow:['#7BA550','#6E9A47'],firs:1,firH:[3,360],firC:[.3,.06,.42,.18,.1],leafy:1,leafH:[.8,34],leafS:[17,15],leafK:.56,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>!(h<50||h>660)&&!(h<300&&sl<11),rockC:[.09,.05,.42],clouds:1,
   course:[],strips:[['Seealm',-2350,-2150,1.5708,300,0],['Gratalm',-1250,-1360,1.5708,280,-.025],['Hochalm',1600,400,0,280,-.025]]},
- /* Waldbrand: bewaldete Hügel, in drei Tälern brennt es. Löschwasser gibt es im See nördlich der Bahn. Rauch legt sich als Dunst über das Land */
- waldbrand:{name:'Waldbrand',sub:'Wasser im See schöpfen und drei Brände löschen',L:{abend:{sun:[-.72,.21,-.66],sunC:0xFF9E58,sunI:2.4,hemi:[0x979BB2,0x5E4A36,.4],gold:{t:0xF2B987,g:0xFF9545,s:0xDAB9A0,a:0xA8A7B0},hor:0xD9B89C,mid:0x9AA5B6,top:0x4B6388,envG:0x6A6646,fog:[750,6000],tint:[1.07,.98,.86]},
-   tag:{sun:[-.5,.68,-.53],sunC:0xFFEAC8,sunI:1.25,hemi:[0xC0C8D8,0x6A7050,.5],gold:{t:0xE4DCCC,g:0xFFE0B4,s:0xD9D2C4,a:0xC4CCD8},hor:0xDAD0BF,mid:0x8CAED6,top:0x3E6EB0,envG:0x5E7A3A,fog:[1000,7000],tint:[1.03,1,.94]}},water:-2.4,
-  pal:[0x46682B,0x66873A,0x958C4E,0x2A4523,0x8F8878,0x817A72,0x55504B,0xF1F4F8,0xB8AC88],belt:[22,75,330,470],lv:[300,430,430,540],rockS:[.23,.33],snow:[9000,9001],mix:[.45,.55,.24,0],beach:[2,-1.5],
-  mow:['#7FA453','#729848'],firs:1.3,firH:[3,560],firC:[.3,.06,.42,.18,.1],leafy:1.25,leafH:[.8,90],leafS:[17,15],leafK:.48,leafC:[.24,.08,.42,.27,.12],rocks:(h,sl)=>h>140&&h<700&&sl>14,rockC:[.09,.05,.42],clouds:.55,
-  course:[],fire:[[1050,-950],[-1250,-950],[-820,-2350]]},
  kueste:{name:'Küste',sub:'Strand, Meer, Inseln und ein Leuchtturm',L:{abend:{sun:[-.966,.213,-.259],sunC:0xFFB474,sunI:2.5,hemi:[0x92A8D1,0x665640,.36],gold:{t:0xF8D3A4,g:0xFFB066,s:0xE8D7C9,a:0xBAC7D9},hor:0xE8D7C9,mid:0x93B4D9,top:0x3F6DAD,envG:0x77795A,fog:[1000,7800],tint:[1.05,1,.9]},tag:{sun:[-.6,.68,.42],sunC:0xFFF1D8,sunI:1.3,hemi:[0xB7D0F3,0x80785C,.5],gold:{t:0xDCE9F3,g:0xFFF2D6,s:0xCCDEEF,a:0xB9D3EB},hor:0xCCDEEF,mid:0x62A5E6,top:0x1D60BE,envG:0x6F8048,fog:[1400,8600],tint:[1,1,1]}},water:-2.4,sea:true,
   pal:[0x4C7030,0x768C40,0xA2965A,0x30502A,0xA59A7C,0x8C8375,0x5E574E,0xF1F4F8,0xDCCB9C],belt:[70,150,380,520],lv:[9000,9001,9000,9001],rockS:[.2,.3],snow:[9000,9001],mix:[.5,.3,.3,1],beach:[4.2,1.2],
   mow:['#86A552','#7A9A4A'],firs:.42,firH:[26,340],firC:[.29,.06,.4,.17,.1],leafy:1.1,leafH:[9,70],leafS:[13,13],leafK:.52,leafC:[.22,.08,.4,.27,.12],rocks:(h,sl)=>h>2&&h<520&&sl>9,rockC:[.09,.06,.44],clouds:1.15,
@@ -473,10 +469,21 @@ const SCENES={
   pal:[0xB48A5C,0xC9A574,0xA6744A,0x8E7C50,0xAE7850,0xB5673F,0x86472E,0xE8D9BC,0xE4D6B8],belt:[-50,-40,9000,9001],lv:[45,170,9000,9001],rockS:[.15,.25],snow:[9000,9001],mix:[.16,0,.62,0],beach:[-900,-901],
   mow:['#C8AE80','#BFA476'],firs:0,firH:[0,0],firC:[.3,.06,.42,.18,.1],leafy:.75,leafH:[-30,70],leafS:[6,7],leafK:.47,leafC:[.17,.05,.24,.3,.1],rocks:(h,sl)=>h<120&&(sl>7||hash(h*7.3,sl*3.1)<.4),rockC:[.055,.34,.4],clouds:.55,cacti:coarse=>coarse?170:260,
   course:[[0,-600],[170,-1100],[540,-1500],[1000,-1380],[1280,-880],[1180,-320],[1360,240],[1060,760],[620,1080],[260,1240],[-40,1040],[-60,700]]}};
+SCENES.fracht.base='alpen';SCENES.waldbrand.plane='loescher';SCENES.fracht.plane='busch';
+/* Missionen auf bekannten Landschaften: gleiche Gegend, eigener Auftrag, eigene Bestenliste */
+SCENES.abwurf=Object.assign({},SCENES.wueste,{name:'Abwurf',sub:'Fahrzeuge am Fallschirm über der Station absetzen',base:'wueste',course:[],plane:'c160',unit:'pkt',pmax:300,
+  drop:{x:1300,z:650},flats:[[1300,650,300]],
+  tip:'Abwurf: Mit der C-160 zur Station östlich der Bahn fliegen. F öffnet die Heckklappe, jedes weitere F wirft ein Fahrzeug ab. Die Fallschirme treiben mit dem Wind: der orange Rauch in der Mitte zeigt, wohin. Gut 80 bis 150 m hoch und etwas gegen den Wind auslösen. Jeder Abwurf bringt bis zu 100 Punkte, je näher an der Mitte, desto mehr.'});
+SCENES.landung=Object.assign({},SCENES.felder,{name:'Punktlandung',sub:'So genau wie möglich auf der gelben Marke aufsetzen',base:'felder',course:[],unit:'m',spot:{z:0},
+  tip:'Punktlandung: Die gelbe Marke liegt quer über der Bahnmitte. Gewertet wird, wo die Räder zum ersten Mal aufsetzen: Abstand zur Marke und zur Mittellinie in Metern, dazu Aufschlag für hartes Aufsetzen und Hüpfer. Weniger ist besser, jede Landung zählt, die beste kommt in die Tabelle.'});
+SCENES.ziele=Object.assign({},SCENES.traeger,{name:'Zielschießen',sub:'Mit der F2 vom Träger starten und acht Ziele treffen',base:'traeger',course:[],plane:'f2',
+  targets:[[700,-1100],[-650,-1900],[1100,300],[300,1500],[-1500,200],[1500,900],[-2450,-1450],[2650,-620]],
+  tip:'Zielschießen: Acht Zielscheiben schwimmen rund um den Träger oder stehen auf den Inseln. Mit der F2 starten, F feuert eine Rakete. Sechs Raketen sind an Bord: auf dem Deck landen und stehen bleiben, dann wird nachgeladen. Die Uhr stoppt beim achten Treffer.'});
 /* Neu ist der Platz Felder: wer das Spiel schon kennt, landet einmal dort, danach gilt wieder der zuletzt geflogene Platz */
 let SID='felder';try{const sv=localStorage.getItem('lw-fliegen-platz');if(SCENES[sv]&&localStorage.getItem('lw-fliegen-neu')==='felder')SID=sv;localStorage.setItem('lw-fliegen-neu','felder')}catch(e){}
 try{const q=new URLSearchParams(location.search).get('platz');if(SCENES[q])SID=q}catch(e){}
 const LID='abend';      /* geflogen wird immer im Abendlicht */
+const BASE=SCENES[SID].base||SID;      /* die Landschaft, auf der ein Platz liegt */
 const SC=Object.assign(SCENES[SID],SCENES[SID].L[LID]),WATER=SC.water,DAY=LID==='tag';try{localStorage.setItem('lw-fliegen-platz',SID)}catch(e){}
 const HORIZON=SC.hor;
 const scene=new T.Scene();scene.background=new T.Color(HORIZON);scene.fog=new T.Fog(HORIZON,SC.fog[0],SC.fog[1]);
@@ -550,10 +557,10 @@ function vnoise(x,z){const xi=Math.floor(x),zi=Math.floor(z),xf=x-xi,zf=z-zi,u=x
 function fbm(x,z){let a=.5,f=1,s=0;for(let i=0;i<5;i++){s+=a*vnoise(x*f,z*f);a*=.5;f*=2.03}return s}
 const RW={len:920,wid:46};          /* Bahn liegt auf der z-Achse, Mitte im Ursprung, Höhe 0 */
 /* ein See im Quertal des Alpentals, ein Weiher zwischen den Feldern; die anderen Plätze haben keinen */
-const LAKE=SID==='alpen'||SID==='fracht'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='waldbrand'?{x:-180,z:-1500,rx:480,rz:150,y:-2.4}:SID==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
+const LAKE=BASE==='alpen'?{x:-1500,z:-2260,rx:430,rz:150,y:-2.4}:SID==='waldbrand'?{x:-180,z:-1500,rx:480,rz:150,y:-2.4}:BASE==='felder'?{x:-780,z:-860,rx:230,rz:125,y:-2.4}:{x:1e7,z:1e7,rx:1,rz:1,y:-2.4};
 const lakeD=(x,z)=>{const dx=(x-LAKE.x)/LAKE.rx,dz=(z-LAKE.z)/LAKE.rz;return Math.sqrt(dx*dx+dz*dz)};
 /* einzelne Kuppen: Inseln vor der Küste, Tafelberge im Becken. x, z, Radius, Höhe, Form (1 rund, 0 mit flachem Dach) */
-const BUMPS=SID==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,2],[-1700,330,120,120,2],[-2700,900,520,210,1],[-1380,-1000,60,62,2]]:SID==='traeger'?[[-2500,-1500,520,230,1],[-2900,1500,440,170,1],[2700,-600,480,200,1],[-1250,-640,130,120,2],[-900,1650,110,95,2],[1500,900,140,130,2],[1300,-1500,90,80,2]]:SID==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
+const BUMPS=BASE==='kueste'?[[-2150,-900,420,150,1],[-1830,-1640,150,95,2],[-1700,330,120,120,2],[-2700,900,520,210,1],[-1380,-1000,60,62,2]]:BASE==='traeger'?[[-2500,-1500,520,230,1],[-2900,1500,440,170,1],[2700,-600,480,200,1],[-1250,-640,130,120,2],[-900,1650,110,95,2],[1500,900,140,130,2],[1300,-1500,90,80,2]]:BASE==='wueste'?[[-760,-640,230,250,0],[-1050,500,300,330,0],[330,-1960,210,280,0],[1780,-760,260,300,0],[640,430,120,190,0]]:[];
 /* Deck des Trägers von oben: Bug im Norden, wohin gestartet wird */
 /* Schräg nach Backbord ausgestellt wie bei einem echten Träger, an Steuerbord die Ausbuchtung für die Insel */
 const DECK=[[-46,-640],[52,-640],[96,-560],[128,-330],[128,430],[104,610],[-70,610],[-112,470],[-150,160],[-150,-150],[-112,-420],[-70,-600]];
@@ -591,9 +598,12 @@ const TERR={
   const mesa=Math.max(sstep(.5,.57,f+(f2-.5)*.1)*basin,rim),top=250+400*sstep(.55,.8,f)+(f2-.5)*36;
   let h=(fbm(x/260+4,z/260+8)-.5)*24+basin*34*f2+mesa*top;
   for(const [bx,bz,rr,ht] of BUMPS){const d=Math.hypot(x-bx,z-bz)/rr*(.86+.28*fbm(x/140+bx,z/140));if(d<1)h=Math.max(h,ht*sstep(1,.74,d)+(f2-.5)*18)}
-  return h}}[SID==='fracht'?'alpen':SID];      /* die Bergfracht spielt im Alpental */
+  return h}}[BASE];
 /* Almpisten: Lage, Richtung, Länge, Steigung. Die Höhe ist die des Geländes in der Mitte; ringsum wird es eben und läuft in sanften Böschungen aus */
 const STRIPS=(SC.strips||[]).map(([name,x,z,ang,len,sl],i)=>{const ax=Math.sin(ang),az=Math.cos(ang);let h=0;for(const k of [-.35,0,.35])h+=TERR(x+ax*len*k,z+az*len*k);return {i,name,x,z,ax,az,len,wid:28,sl,h:Math.max(h/3,3)}});
+/* eingeebnete Kreise, etwa für die Station in der Wüste: innen eben auf Geländehöhe der Mitte, außen sanfte Böschung */
+const FLATS=(SC.flats||[]).map(([x,z,r])=>({x,z,r,h:TERR(x,z)}));
+function flatH(x,z,t){for(const f of FLATS){const d=Math.hypot(x-f.x,z-f.z)-f.r;if(d<220)t+=(f.h-t)*(1-sstep(0,220,d))}return t}
 const stripUV=(s,x,z)=>{const dx=x-s.x,dz=z-s.z;return [dx*s.ax+dz*s.az,dx*s.az-dz*s.ax]};
 function stripH(x,z,t){for(const s of STRIPS){const [u,v]=stripUV(s,x,z),d=Math.max(Math.abs(u)-s.len/2,Math.abs(v)-s.wid/2-12);if(d<180){const f=1-sstep(6,180,d);t+=(s.h+s.sl*clamp(u,-s.len/2-50,s.len/2+50)-t)*f}}return t}
 const almK=(x,z)=>{let k=0;for(const s of STRIPS){const [u,v]=stripUV(s,x,z),d=Math.max(Math.abs(u)-s.len/2,Math.abs(v)-s.wid/2-12);k=Math.max(k,1-sstep(30,200,d))}return k};
@@ -604,7 +614,8 @@ function ground(x,z){
   if(SC.ship)return onDeck(x,z)?0:TERR(x,z);
   /* um die Bahn herum ist es eben */
   const flat=1-sstep(85,215,Math.max(Math.abs(x)-RW.wid/2,Math.abs(z)-RW.len/2));
-  return (STRIPS.length?stripH(x,z,TERR(x,z)):TERR(x,z))*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
+  let t=TERR(x,z);if(STRIPS.length)t=stripH(x,z,t);if(FLATS.length)t=flatH(x,z,t);
+  return t*(1-flat)-10*(1-sstep(.75,1.25,lakeD(x,z)));
 }
 const onRunway=(x,z)=>SC.ship?onDeck(x,z):(Math.abs(x)<RW.wid/2+2&&Math.abs(z)<RW.len/2+4)||(STRIPS.length>0&&onStrip(x,z)>=0);      /* die Almpisten zählen auch */      /* auf dem Träger zählt das ganze Deck als Bahn */
 /* Wolkenschatten ziehen langsam über Tal, Platz und Bahn. Aus der Nähe bekommt der Boden eine zweite, feinere Körnung und ein leichtes Relief,
@@ -967,7 +978,7 @@ const TREE=new Map();                             /* Bäume in einem Raster, dam
 /* ---------- Rundkurs aus zwölf Toren; je Flugplatz ein eigener Verlauf ---------- */
 const COURSE=SC.course;
 /* Abstand eines Punkts zur Kurslinie: dort bleibt der Wald licht */
-const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COURSE[i],b=COURSE[(i+1)%COURSE.length],dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz),0,1);m=Math.min(m,Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t))}return STRIPS.length?Math.min(m,stripD(x,z)):m};
+const courseDist=(x,z)=>{let m=1e9;for(let i=0;i<COURSE.length;i++){const a=COURSE[i],b=COURSE[(i+1)%COURSE.length],dx=b[0]-a[0],dz=b[1]-a[1],t=clamp(((x-a[0])*dx+(z-a[1])*dz)/(dx*dx+dz*dz),0,1);m=Math.min(m,Math.hypot(x-a[0]-dx*t,z-a[1]-dz*t))}if(STRIPS.length)m=Math.min(m,stripD(x,z));for(const f of FLATS)m=Math.min(m,Math.max(0,Math.hypot(x-f.x,z-f.z)-f.r+40));return m};
 {const m=(c,r)=>new T.MeshStandardMaterial({color:c,roughness:r||.75}),red=m(0xD8412F),white=m(0xF3EFE6),yel=m(0xF4C61F),dark=m(0x2C2A27),conc=m(0xB7B2A6,.9);
  const add=(g,mat,x,y,z)=>{const o=new T.Mesh(g,mat);o.position.set(x,y,z);scene.add(o);return o};
  /* Tore: stehen quer zur Flugrichtung, auch am Hang; die Nummer zeigt die Reihenfolge */
@@ -1192,7 +1203,7 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
      if(Math.abs(ground(x+12,z)-ground(x-12,z))+Math.abs(ground(x,z+12)-ground(x,z-12))>3.2)return false;
      if(SC.sea&&x+780+170*Math.sin(z/900)+80*Math.sin(z/310+1.3)<260)return false;
      if(FLD.on){const l=landuse(x,z);if(l[0]!==0||l[1]<34)return false}return true};
-   const spots=[],cand=[];if(SID!=='wueste'&&!SC.ship)for(let k=0;k<5000&&cand.length<160;k++){const x=(hash(k,81.3)-.5)*3400,z=(hash(k,83.9)-.5)*3800;if(ok(x,z)&&ok(x+40,z+25)&&ok(x-35,z-30))cand.push([x,z])}
+   const spots=[],cand=[];if(BASE!=='wueste'&&!SC.ship)for(let k=0;k<5000&&cand.length<160;k++){const x=(hash(k,81.3)-.5)*3400,z=(hash(k,83.9)-.5)*3800;if(ok(x,z)&&ok(x+40,z+25)&&ok(x-35,z-30))cand.push([x,z])}
    /* die Herden stehen so nah am Platz wie möglich, aber mit Abstand zueinander */
    cand.sort((p,q)=>Math.hypot(p[0],p[1])-Math.hypot(q[0],q[1]));for(const [x,z] of cand){if(spots.length<6&&spots.every(q=>Math.hypot(q[0]-x,q[1]-z)>380))spots.push([x,z])}
    const furMat=shaded(new Tree({vertexColors:true,roughness:.88}));
@@ -1241,7 +1252,7 @@ const MOTE={uT:{value:0},uC:{value:new T.Vector3()},uPx:{value:800}};
    const tk=(Math.floor(x/120)+64)*256+Math.floor(z/120)+64;if(!TREE.has(tk))TREE.set(tk,[]);TREE.get(tk).push([x,z,h-1,s,s*.1])}
   split(ki,m)}
  /* Felsbrocken: weiter oben überall, weiter unten nur an steilen Stellen */
- {const NR=460,ri=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:SID==='wueste'?0xffffff:0x8C867D,flatShading:true,roughness:1}),NR);let m=0,tr=0;
+ {const NR=460,ri=new T.InstancedMesh(new T.DodecahedronGeometry(1,0),new T.MeshStandardMaterial({color:BASE==='wueste'?0xffffff:0x8C867D,flatShading:true,roughness:1}),NR);let m=0,tr=0;
   while(m<NR&&tr<30000){tr++;const x=(hash(tr,31.7)-.5)*7400,z=(hash(tr,47.3)-.5)*7600,h=ground(x,z);if(h<WATER+1||courseDist(x,z)<45||(Math.abs(x)<200&&Math.abs(z)<680))continue;
    const sl=Math.abs(ground(x+10,z)-ground(x-10,z))+Math.abs(ground(x,z+10)-ground(x,z-10));if(!SC.rocks(h,sl))continue;
    const s=1.6+hash(tr,5.5)*hash(tr,8.8)*7;d.position.set(x,h+s*.22,z);d.scale.set(s*(.8+hash(tr,1.3)*.7),s*(.45+hash(tr,2.9)*.5),s*(.8+hash(tr,7.1)*.7));d.rotation.set(hash(tr,3.3)*6,hash(tr,4.4)*6,hash(tr,6.6)*6);d.updateMatrix();ri.setMatrixAt(m,d.matrix);
@@ -1487,13 +1498,13 @@ function reset(msg){
   if(P){P.parts.forEach(p=>{p.outer.position.copy(p.c);p.outer.rotation.set(0,0,0);p.outer.scale.set(1,1,1)});S.best=lbBest(P.def.id);S.last=null}
   camYaw=Math.PI;camPos.set(S.pos.x,S.pos.y+6,S.pos.z+30);if(msg)say(msg);
   if(P){S.rk=P.mounts.length;P.mounts.forEach(m=>{m.rocket.visible=true});RK.pool.forEach(r=>{r.on=false;r.g.visible=false});$('#b-fire').hidden=!S.rk;$('#b-fire').disabled=false;$('#i-r').textContent=S.rk;$('#b-ramp').hidden=!P.def.ramp;$('#b-ramp').setAttribute('aria-pressed','false');$('#b-drop').hidden=!P.def.tank}
-  S.tank=0;S.onW=0;S.load=0;FIRE.wt='';if(FIRE.on){FIRE.reset();S.last=null}if(FR.on){FR.reset();S.last=null}      /* am Start wird nachgeladen */
+  S.tank=0;S.onW=0;S.load=0;FIRE.wt='';if(FIRE.on){FIRE.reset();S.last=null}if(FR.on){FR.reset();S.last=null}if(MIS){MIS.reset();S.last=null;S.rank=0}      /* am Start wird nachgeladen */
 }
 async function choose(id){
   const def=PLANES.find(p=>p.id===id);
   document.querySelectorAll('#models .chip,#planes .place').forEach(b=>b.setAttribute('aria-pressed',b.dataset.id===id));
   $('#loadline').textContent='Modell lädt …';
-  try{const M=await build(def);if(P)craft.remove(P.fit);P=M;craft.add(M.fit);reset();if(def.rockets&&S.started)say('Die F2 trägt sechs Raketen: Feuer mit '+(coarse?'dem Knopf Raketen':'F'));if(def.ramp&&S.started)say('Die C-160 öffnet ihre Heckklappe mit '+(coarse?'dem Knopf Heckklappe':'F'));if(def.tank&&S.started)say('Wasser schöpfen: mit Fahrt auf dem See aufsetzen. Abwerfen mit '+(coarse?'dem Knopf Wasser':'F'));if(FIRE.on&&!def.tank&&S.started)say('Löschen kann nur die CL-215T');$('#loadline').textContent='';try{localStorage.setItem('lw-fliegen-modell',id)}catch(e){}}
+  try{const M=await build(def);if(P)craft.remove(P.fit);P=M;craft.add(M.fit);reset();if(def.rockets&&S.started)say('Die F2 trägt sechs Raketen: Feuer mit '+(coarse?'dem Knopf Raketen':'F'));if(def.ramp&&S.started)say('Die C-160 öffnet ihre Heckklappe mit '+(coarse?'dem Knopf Heckklappe':'F'));if(def.tank&&S.started)say('Wasser schöpfen: mit Fahrt auf dem See aufsetzen. Abwerfen mit '+(coarse?'dem Knopf Wasser':'F'));if(FIRE.on&&!def.tank&&S.started)say('Löschen kann nur die CL-215T');if(MIS&&MIS.need&&def.id!==MIS.need&&S.started)say(MIS.needMsg);$('#loadline').textContent='';try{localStorage.setItem('lw-fliegen-modell',id)}catch(e){}}
   catch(e){$('#loadline').textContent='Das Modell konnte nicht geladen werden. Lade die Seite neu.';say('Das Modell konnte nicht geladen werden.',false,true)}
 }
 PLANES.forEach(p=>{const b=document.createElement('button');b.className='chip';b.type='button';b.dataset.id=p.id;b.textContent=p.name;b.setAttribute('aria-pressed','false');b.addEventListener('click',()=>{choose(p.id);b.blur()});$('#models').appendChild(b);
@@ -1522,6 +1533,7 @@ const LOS=(()=>{try{return new URLSearchParams(location.search).get('los')==='1'
 /* nach dem automatischen Start fehlt dem Ton die Erlaubnis: die erste Berührung oder Taste schaltet ihn frei */
 for(const ev of ['pointerdown','keydown'])addEventListener(ev,()=>{if(SND.on&&S.started)audioInit()},{once:true,capture:true});
 function start(){if(!LB.name){askName();return}immersive();view(HOME);card.hidden=true;S.started=true;canvas.focus();if(SND.on)audioInit();
+  if(MIS&&!MIS.told){MIS.told=true;setTimeout(()=>say(MIS.brief(),false,true),5200)}
   if(FR.on&&!FR.told){FR.told=true;setTimeout(()=>say('Bergfracht für '+STRIPS.map(s=>s.name).join(', ').replace(/, ([^,]*)$/,' und $1')+', in dieser Reihenfolge. Auf der Alm landen und anhalten, dann wird abgeladen',false,true),5200)}
   if(FIRE.on&&!FIRE.told){FIRE.told=true;setTimeout(()=>say(P&&P.def.tank?'Drei Waldbrände: im See nördlich der Bahn Wasser schöpfen, tief über dem Feuer abwerfen':'Drei Waldbrände: löschen kann nur die CL-215T',false,true),5200)}if(S.ground&&S.gs<1)say(pad.act?'RT für Vollgas, mit dem linken Stick geradeaus halten, dann rechts leicht ziehen':coarse?'Gas am linken Knüppel hochschieben, dann rechts leicht ziehen':'Vollgas mit W, mit A und D geradeaus halten, dann ziehen')}
 $('#b-go').addEventListener('click',start);
@@ -1539,7 +1551,7 @@ window.addEventListener('keydown',e=>{
   if(!card.hidden){if(k==='Escape'&&S.started)start();return}
   if(STEER.includes(k))e.preventDefault();
   keys[k]=true;if(STEER.includes(k))pad.act=false;if(e.repeat)return;
-  if(k==='r')reset('Zurück am Start');else if(k==='c')$('#b-cam').click();else if(k==='h')$('#b-help').click();else if(k===' ')toggleSmoke();else if(k==='m')toggleSound();else if(k==='f'){if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}else if(k==='b')openBoard();
+  if(k==='r')reset('Zurück am Start');else if(k==='c')$('#b-cam').click();else if(k==='h')$('#b-help').click();else if(k===' ')toggleSmoke();else if(k==='m')toggleSound();else if(k==='f'){if(AB.on)AB.drop();else if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}else if(k==='b')openBoard();
   else if((k==='a'||k==='d')&&P&&!P.def.yaw&&!S.ground)say('Die F2 hat kein Seitenruder: Kurven fliegst du mit Quer und Höhe');
 });
 window.addEventListener('keyup',e=>{const k=e.key.length===1?e.key.toLowerCase():e.key;keys[k]=false});
@@ -1623,7 +1635,7 @@ function fire(){
 }
 function detonate(r,air){
   r.on=false;r.g.visible=false;
-  const h=ground(r.pos.x,r.pos.z),low=r.pos.y-h<4,wet=h<LAKE.y;
+  const h=ground(r.pos.x,r.pos.z),sea=SC.ship?WATER:LAKE.y,low=r.pos.y-Math.max(h,sea)<4,wet=h<sea;if(ZS.on)ZS.blast(r.pos);
   if(!wet)burst(air?10:18,1,air?6:9,air?3:7,r.pos);if(low)burst(wet?10:16,wet?0:2,13,wet?9:3,r.pos);
   FX.t=0;FX.size=air?4:7;flash.position.copy(r.pos);flash.position.y+=.8;glow.position.copy(r.pos);glow.position.y+=1.5;
   boom(clamp(.75-r.pos.distanceTo(S.pos)/900,.3,.75));
@@ -1641,8 +1653,9 @@ function rockets(dt){
     while(r.acc>step){r.acc-=step;const i=SM.i=(SM.i+1)%SM.n;SM.pos[i*3]=r.pos.x-r.dir.x*1.1;SM.pos[i*3+1]=r.pos.y-r.dir.y*1.1;SM.pos[i*3+2]=r.pos.z-r.dir.z*1.1;SM.age[i]=SM.life*.42;SM.kind[i]=3;
       SM.vel[i*3]=WIND.v.x*.5+(Math.random()-.5)*.9;SM.vel[i*3+1]=(Math.random()-.5)*.9;SM.vel[i*3+2]=WIND.v.z*.5+(Math.random()-.5)*.9}
     const h=ground(r.pos.x,r.pos.z);
-    if(r.pos.y<=Math.max(h,LAKE.y)+.1){r.pos.y=Math.max(h,LAKE.y)+.1;detonate(r,false)}
-    else if(r.t>.12&&hit(r.pos.x,r.pos.y,r.pos.z,.5))detonate(r,false);
+    const fl=Math.max(h,SC.ship?WATER:LAKE.y);
+    if(r.pos.y<=fl+.1){r.pos.y=fl+.1;detonate(r,false)}
+    else if(r.t>.12&&(hit(r.pos.x,r.pos.y,r.pos.z,.5)||(ZS.on&&ZS.near(r.pos))))detonate(r,false);
     else if(r.t>5||Math.hypot(r.pos.x,r.pos.z)>5600)detonate(r,true)}
 }
 /* Aufsetzen: Reifen quietschen und qualmen kurz auf Asphalt, auf der Wiese staubt es; Rumpflander schaben */
@@ -1670,7 +1683,8 @@ const FP=(()=>{
      'if(vk<0.5){c=mix(vec3(0.2,0.19,0.18),vec3(0.52,0.5,0.48),smoothstep(0.0,0.55,va));al=0.5*smoothstep(0.0,0.05,va)*(1.0-va);}'+
      'else if(vk<1.5){c=vec3(0.92,0.92,0.91);al=0.5*smoothstep(0.0,0.06,va)*(1.0-va)*(1.0-va);}'+
      'else if(vk<2.5){c=vec3(0.84,0.89,0.93);al=0.62*(1.0-0.5*va);}'+
-     'else{c=vec3(0.9,0.93,0.95);al=0.45*(1.0-va)*(1.0-va);}'+
+     'else if(vk<3.5){c=vec3(0.9,0.93,0.95);al=0.45*(1.0-va)*(1.0-va);}'+
+     'else{c=mix(vec3(1.0,0.5,0.16),vec3(0.98,0.72,0.5),smoothstep(0.0,0.7,va));al=0.55*smoothstep(0.0,0.05,va)*(1.0-va);}'+
      'c=mix(c*uTint,uFc,vf*0.85);gl_FragColor=vec4(c,sf*al*(1.0-0.5*vf));}'}));
   haze.pts.renderOrder=3;
   const put=(o,x,y,z,vx,vy,vz,life,s0,s1,k,m)=>{const i=o.i=(o.i+1)%o.n;o.pos[i*3]=x;o.pos[i*3+1]=y;o.pos[i*3+2]=z;o.vel[i*3]=vx;o.vel[i*3+1]=vy;o.vel[i*3+2]=vz;o.age[i]=0;o.life[i]=life;o.s0[i]=s0;o.s1[i]=s1;o.k[i]=k;o.m[i]=m||0;return i};
@@ -1734,7 +1748,7 @@ FIRE.update=(dt,warm)=>{
   {const o=FP.flame;let live=0;for(let i=0;i<o.n;i++){if(o.age[i]>=o.life[i]){o.a[i]=1;continue}live++;o.age[i]+=dt;const a=Math.min(1,o.age[i]/o.life[i]);o.a[i]=a;o.s[i]=o.s0[i]+(o.s1[i]-o.s0[i])*a;
     const k=1-Math.min(1,1.4*dt);o.vel[i*3]*=k;o.vel[i*3+2]*=k;o.vel[i*3+1]+=2.5*dt;o.pos[i*3]+=o.vel[i*3]*dt;o.pos[i*3+1]+=o.vel[i*3+1]*dt;o.pos[i*3+2]+=o.vel[i*3+2]*dt}o.live=live}
   {const o=FP.haze;let live=0;for(let i=0;i<o.n;i++){if(o.age[i]>=o.life[i]){o.a[i]=1;continue}live++;o.age[i]+=dt;const kd=o.k[i],v=o.vel,j=i*3;
-    if(kd<1.5){const r=Math.min(1,.25*dt);v[j]+=(WIND.v.x*1.3-v[j])*r;v[j+2]+=(WIND.v.z*1.3-v[j+2])*r;v[j+1]+=(3.6-v[j+1])*Math.min(1,.13*dt)}
+    if(kd<1.5||kd>3.5){const r=Math.min(1,.25*dt);v[j]+=(WIND.v.x*1.3-v[j])*r;v[j+2]+=(WIND.v.z*1.3-v[j+2])*r;v[j+1]+=(3.6-v[j+1])*Math.min(1,.13*dt)}
     else if(kd<2.5){v[j+1]-=G*dt;const r=Math.min(1,.3*dt);v[j]+=(WIND.v.x-v[j])*r;v[j+2]+=(WIND.v.z-v[j+2])*r}
     else{const r=1-Math.min(1,1.3*dt);v[j]*=r;v[j+2]*=r;v[j+1]=v[j+1]*r-3*dt}
     o.pos[j]+=v[j]*dt;o.pos[j+1]+=v[j+1]*dt;o.pos[j+2]+=v[j+2]*dt;
@@ -1770,6 +1784,152 @@ FR.update=dt=>{if(!FR.on)return;
   else{FR.un=Math.max(0,FR.un-dt*2);
     if(S.ground&&S.gs<1.2&&os>=0&&!here&&!STRIPV[os].crates.visible&&WIND.t-FR.wt>8){FR.wt=WIND.t;say('Falsche Alm: die Fracht gehört nach '+(tg?tg.name:'unten zum Flugplatz'))}}
 };
+/* ---------- Missionen: Abwurf, Punktlandung, Zielschießen. Jede hat Aufbau, Ablauf, Anzeige und Wegweiser; MIS ist die des aktuellen Platzes ---------- */
+const MSTD=(c,r,fs)=>new T.MeshStandardMaterial({color:c,roughness:r==null?.85:r,flatShading:!!fs});
+const MFLAT=c=>new T.MeshStandardMaterial({color:c,roughness:.95,polygonOffset:true,polygonOffsetFactor:-3,polygonOffsetUnits:-3});
+const mPut=(m,x,y,z,ry)=>{m.position.set(x,y,z);if(ry)m.rotation.y=ry;m.traverse(o=>{if(o.isMesh){o.castShadow=true;o.receiveShadow=true}});scene.add(m);return m};
+const fmtM=v=>v.toFixed(1).replace('.',',')+' m';
+const fmtS=v=>SC.unit==='m'?fmtM(v):SC.unit==='pkt'?Math.round(SC.pmax-v)+' Pkt':fmtH(v);      /* Wertung je Platz: Zeit, Meter oder Punkte */
+/* Fahrzeuge für den Abwurf und als Kulisse */
+const VEH=(()=>{const ol=MSTD(0x5E6238,.8,true),ol2=MSTD(0x4D5130,.85,true),dk=MSTD(0x232527,.7),gl=MSTD(0x2E3A40,.25),wd=MSTD(0x9B7448,.9,true);
+  const box=(g,w,h,d,m,x,y,z)=>{const b=new T.Mesh(new T.BoxGeometry(w,h,d),m);b.position.set(x,y,z);g.add(b);return b};
+  const jeep=pal=>{const g=new T.Group(),y0=pal?.3:0;if(pal)box(g,2.7,.3,4.8,wd,0,.15,0);
+    box(g,2.1,1,4.3,ol,0,y0+1.05,0);box(g,2,.55,1.7,ol,0,y0+1.8,.45);box(g,1.9,.6,.08,gl,0,y0+1.9,-.45);box(g,2.15,.12,4.4,ol2,0,y0+1.56,0);
+    for(const [x,z] of [[-1.08,1.4],[1.08,1.4],[-1.08,-1.4],[1.08,-1.4]]){const w=new T.Mesh(new T.CylinderGeometry(.48,.48,.38,14),dk);w.rotation.z=Math.PI/2;w.position.set(x,y0+.48,z);g.add(w)}
+    const sp=new T.Mesh(new T.CylinderGeometry(.44,.44,.3,12),dk);sp.position.set(0,y0+1.2,2.25);sp.rotation.x=Math.PI/2;g.add(sp);return g};
+  const tank=pal=>{const g=new T.Group(),y0=pal?.35:0;if(pal)box(g,3.9,.35,7.4,wd,0,.17,0);
+    box(g,3.3,1.15,6.6,ol,0,y0+1.2,0);box(g,3.3,.5,1.3,ol,0,y0+.95,-3.5).rotation.x=-.6;
+    for(const sd of [-1,1]){box(g,.7,1.05,6.9,dk,sd*1.75,y0+.6,0);box(g,.78,.12,7.1,ol2,sd*1.75,y0+1.2,0)}
+    const t=box(g,2.4,.85,2.8,ol2,0,y0+2.2,.4);const b=new T.Mesh(new T.CylinderGeometry(.13,.16,4.2,10),dk);b.rotation.x=Math.PI/2;b.position.set(0,y0+2.25,-2.9);g.add(b);
+    box(g,.7,.35,.7,ol,.6,y0+2.8,.9);return g};
+  return {jeep,tank}})();
+
+/* ===== Abwurf: Station in der Wüste, drei Fahrzeuge an Fallschirmen ===== */
+const AB={on:!!SC.drop,need:'c160',needMsg:'Abwerfen kann nur die C-160',loads:[],left:0,sum:0,done:false,told:false,last:-9,smk:0,
+  kinds:[['Geländewagen',VEH.jeep,7.5,1],['Geländewagen',VEH.jeep,7.5,1],['Schützenpanzer',VEH.tank,9.5,3]]};
+if(AB.on){const D=SC.drop;D.y=ground(D.x,D.z);
+  /* Zielfeld: Ringe auf dem Sand, ein Kreuz in der Mitte, dort steigt orange Rauch auf */
+  const ring=(r,w,c)=>{const g=new T.RingGeometry(r-w/2,r+w/2,96);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,MFLAT(c));m.position.set(D.x,D.y+.12,D.z);m.receiveShadow=true;scene.add(m)};
+  ring(10,2.4,0xE8662C);ring(30,1.6,0xF2EEE4);ring(60,1.6,0xF2EEE4);ring(100,1.8,0xE8662C);
+  for(const a of [.785,-.785]){const g=new T.PlaneGeometry(24,3.2);g.rotateX(-Math.PI/2);g.rotateY(a);const m=new T.Mesh(g,MFLAT(0xF2EEE4));m.position.set(D.x,D.y+.14,D.z);scene.add(m)}
+  /* Lager östlich des Zielfelds: Zelte, Container, Wachturm, Zaun, Fahnenmast, abgestellte Fahrzeuge */
+  const cx=D.x+190,cz=D.z,tent=MSTD(0xB9A57C,.95),tent2=MSTD(0x9E8B62,.95),cont=[MSTD(0x6B7046,.7),MSTD(0x8C7A58,.7),MSTD(0x5A6470,.7)],steel=MSTD(0x77797A,.6),wh=MSTD(0xEDE8DC,.7);
+  for(let i=0;i<4;i++){const g=new T.Group(),L=11,sh=new T.Shape();sh.moveTo(-3.6,0);sh.lineTo(3.6,0);sh.lineTo(2.6,2.4);sh.lineTo(0,3.4);sh.lineTo(-2.6,2.4);sh.closePath();
+    const eg=new T.ExtrudeGeometry(sh,{depth:L,bevelEnabled:false});eg.translate(0,0,-L/2);const m=new T.Mesh(eg,i%2?tent:tent2);g.add(m);
+    const x=cx-20+i*13,z=cz-48;mPut(g,x,ground(x,z),z);COL.cyl.push({x,z,r:5,y0:ground(x,z),y1:ground(x,z)+3.6,name:'lager'})}
+  for(let i=0;i<5;i++){const x=cx+30+(i%3)*8.5,z=cz+30+Math.floor(i/3)*16,m=new T.Mesh(new T.BoxGeometry(6,6.2,14),cont[i%3]);mPut(m,x,ground(x,z)+3.1,z);COL.cyl.push({x,z,r:6,y0:ground(x,z),y1:ground(x,z)+6.4,name:'lager'})}
+  {const x=cx-40,z=cz+40,y=ground(x,z),g=new T.Group();for(const [a,b] of [[-1.6,-1.6],[1.6,-1.6],[-1.6,1.6],[1.6,1.6]]){const l=new T.Mesh(new T.CylinderGeometry(.18,.22,14,6),steel);l.position.set(a,7,b);g.add(l)}
+    const hut=new T.Mesh(new T.BoxGeometry(5,3,5),tent2);hut.position.y=15.5;g.add(hut);const rf=new T.Mesh(new T.ConeGeometry(4.2,2,4),steel);rf.rotation.y=Math.PI/4;rf.position.y=18;g.add(rf);mPut(g,x,y,z);COL.cyl.push({x,z,r:3.6,y0:y,y1:y+19,name:'turm'})}
+  {const x=cx-10,z=cz+8,y=ground(x,z),p=new T.Mesh(new T.CylinderGeometry(.12,.15,16,8),wh);mPut(p,x,y+8,z);const fc=document.createElement('canvas');fc.width=64;fc.height=40;const fx=fc.getContext('2d');fx.fillStyle='#E8662C';fx.fillRect(0,0,64,40);fx.fillStyle='#F2EEE4';fx.fillRect(0,14,64,12);
+    const fm=new T.Mesh(new T.PlaneGeometry(4,2.5),new T.MeshStandardMaterial({map:new T.CanvasTexture(fc),side:T.DoubleSide,roughness:.9}));fm.position.set(x+2,y+14.6,z);scene.add(fm);AB.flag=fm;COL.cyl.push({x,z,r:.5,y0:y,y1:y+16,name:'fahne'})}
+  for(let k=0;k<44;k++){const a=k/44*Math.PI*2,x=cx+Math.cos(a)*72,z=cz+Math.sin(a)*92;if(Math.cos(a)<-.9)continue;const p=new T.Mesh(new T.BoxGeometry(.25,2.4,.25),steel);mPut(p,x,ground(x,z)+1.2,z)}
+  [[VEH.jeep(),cx+12,cz-14,.4],[VEH.jeep(),cx+18,cz-12,.5],[VEH.tank(),cx+40,cz-10,-.2],[VEH.tank(),cx+52,cz-6,-.25]].forEach(([g,x,z,r])=>{mPut(g,x,ground(x,z),z,r);COL.cyl.push({x,z,r:3.6,y0:ground(x,z),y1:ground(x,z)+3,name:'lager'})});
+}
+/* Fallschirm: Kappe aus Bahnen, Fangleinen zur Last */
+AB.chute=(R,n)=>{const g=new T.Group(),cs=[];
+  for(let k=0;k<n;k++){const sg=new T.SphereGeometry(R,16,6,0,Math.PI*2,0,Math.PI*.42),col=[],p=sg.attributes.position;
+    for(let i=0;i<p.count;i++){const a=Math.atan2(p.getZ(i),p.getX(i)),st=Math.floor((a+Math.PI)/(Math.PI*2)*8)%2;col.push(...(st?[.92,.9,.84]:[.86,.42,.17]))}
+    sg.setAttribute('color',new T.Float32BufferAttribute(col,3));sg.translate(0,-R*.72,0);
+    const c=new T.Mesh(sg,new T.MeshStandardMaterial({vertexColors:true,side:T.DoubleSide,roughness:.9}));c.castShadow=true;c.position.set(n>1?(k-1)*R*1.7:0,0,0);c.rotation.z=n>1?(1-k)*.25:0;g.add(c);cs.push(c)}
+  const lg=new T.BufferGeometry();lg.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(n*8*6),3));const ln=new T.LineSegments(lg,new T.LineBasicMaterial({color:0x3A3A36,transparent:true,opacity:.75}));ln.frustumCulled=false;
+  return {g,cs,ln,R,n}};
+AB.reset=()=>{for(const l of AB.loads){scene.remove(l.g);scene.remove(l.ch.g);scene.remove(l.ch.ln)}AB.loads=[];AB.left=AB.kinds.length;AB.sum=0;AB.done=false;AB.last=-9;S.load=AB.left*.5;
+  if(P){$('#b-cargo').hidden=!P.def.ramp;$('#b-ramp').hidden=true;$('#i-ab').textContent=AB.left}};
+AB.drop=()=>{
+  if(!P||S.crashed||!card.hidden||!S.started)return;
+  if(!P.def.ramp){say(AB.needMsg);return}
+  if(AB.left<=0){say(AB.done?'Alle Fahrzeuge sind abgesetzt. R startet einen neuen Abwurf':'Keine Fracht mehr an Bord');return}
+  if(S.ground){say('Abwerfen geht nur in der Luft');return}
+  if(S.rampA<.55){if(!S.ramp){S.ramp=1;servo(2.3);say('Heckklappe fährt auf. Gleich noch einmal F zum Abwerfen')}else say('Die Heckklappe ist noch nicht ganz offen');return}
+  if(S.clock-AB.last<1.4)return;AB.last=S.clock;
+  const [name,mk,vt,nc]=AB.kinds[AB.kinds.length-AB.left],g=mk(true),ch=AB.chute(nc>1?6.5:7.5,nc);
+  fwd.set(0,0,-1).applyQuaternion(S.Q);
+  const pos=new T.Vector3(0,(-48-P.def.pivot[1])*K,(820-P.def.pivot[0])*K).applyQuaternion(S.Q).add(S.pos);      /* Rampenkante hinten am Rumpf */
+  const vel=S.vel.clone().addScaledVector(fwd,-3);vel.y-=1;
+  g.position.copy(pos);g.rotation.y=Math.atan2(-fwd.x,-fwd.z)+Math.PI;scene.add(g);ch.g.visible=false;ch.g.scale.setScalar(.05);scene.add(ch.g);scene.add(ch.ln);
+  AB.loads.push({name,g,ch,pos,vel,vt,t:0,open:0,st:0,yaw:g.rotation.y});AB.left--;S.load=AB.left*.5;$('#i-ab').textContent=AB.left;
+  clack();buzz(25);pad.rumble(.4,.6,250);say(name+' ist raus');
+  if(!AB.left)setTimeout(()=>{if(S.ramp&&!AB.left){S.ramp=0;servo(2.3)}},2500)};
+$('#b-cargo').addEventListener('click',()=>AB.drop());
+AB.update=dt=>{
+  const D=SC.drop;
+  /* orange Rauch zeigt den Wind, die Fahne weht mit */
+  AB.smk+=dt*(coarse?3:6);while(AB.smk>=1){AB.smk--;FP.put(FP.haze,D.x+(Math.random()-.5)*2,D.y+1.5,D.z+(Math.random()-.5)*2,WIND.v.x*.3,3+Math.random()*2,WIND.v.z*.3,9+Math.random()*4,3,22+Math.random()*10,4)}
+  if(AB.flag){AB.flag.rotation.y=WIND.ang+Math.PI/2+.12*Math.sin(WIND.t*5)}
+  for(const l of AB.loads){if(l.st===2){if(l.col<1){l.col=Math.min(1,l.col+dt/2.2);l.ch.g.rotation.x=l.col*1.35;l.ch.g.position.y=l.gy+l.ch.R*.9*(1-l.col)+.6;l.ch.g.scale.y=Math.max(.15,1-l.col*.85)}continue}
+    l.t+=dt;const v=l.vel;
+    if(l.st===0){v.y-=G*dt;v.multiplyScalar(1-.05*dt);if(l.t>1.1){l.st=1;l.ch.g.visible=true}}
+    else{l.open=Math.min(1,l.open+dt/1.4);const o=l.open,k=Math.min(1,.9*o*dt);v.x+=(WIND.v.x-v.x)*k;v.z+=(WIND.v.z-v.z)*k;v.y+=(-l.vt-v.y)*Math.min(1,2.2*o*dt);v.y-=G*(1-o)*dt}
+    l.pos.addScaledVector(v,dt);l.g.position.copy(l.pos);l.g.rotation.z=.07*Math.sin(l.t*1.6)*l.open;l.g.rotation.x=.05*Math.sin(l.t*1.2+1)*l.open;
+    const L=l.ch.R*2.1,sc=.05+.95*Math.min(1,l.open*1.15);l.ch.g.position.set(l.pos.x,l.pos.y+L,l.pos.z);l.ch.g.rotation.y=l.yaw;l.ch.g.scale.setScalar(sc);
+    /* Fangleinen vom Rand jeder Kappe zur Last */
+    {l.ch.g.updateMatrixWorld(true);const a=l.ch.ln.geometry.attributes.position,q=new T.Vector3();let j=0;for(const c of l.ch.cs)for(let i=0;i<8;i++){const an=i/8*Math.PI*2;q.set(Math.cos(an)*l.ch.R*.93,-l.ch.R*.72+l.ch.R*.17,Math.sin(an)*l.ch.R*.93);c.localToWorld(q);a.setXYZ(j++,q.x,q.y,q.z);a.setXYZ(j++,l.pos.x+(i<4?1:-1)*.8,l.pos.y+2.2,l.pos.z+(i%4<2?1:-1)*1.4)}a.needsUpdate=true}
+    const gy=ground(l.pos.x,l.pos.z);
+    if(l.pos.y<=gy){l.pos.y=gy;l.g.position.copy(l.pos);l.st=2;l.col=0;l.gy=gy;l.g.rotation.set(0,l.yaw,0);scene.remove(l.ch.ln);
+      const d=Math.hypot(l.pos.x-D.x,l.pos.z-D.z),broke=l.open<.75;
+      if(broke){burst(16,1,8,6,l.pos);boom(.4);l.g.rotation.z=.5;l.g.rotation.x=.3;l.d=100;say(l.name+' zerschellt: zu tief abgeworfen, der Schirm war noch nicht offen',false)}
+      else{burst(10,2,5,2,l.pos);l.d=Math.min(100,d);const pt=Math.round(100-l.d);say(l.name+' gelandet: '+(d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km')+' von der Mitte, '+pt+' Punkte',pt>=60)}
+      AB.sum+=l.d;
+      if(!AB.left&&AB.loads.every(q=>q.st===2)&&!AB.done){AB.done=true;const t=AB.sum,rank=lbAdd(Math.max(.01,t));S.last=t;S.rank=rank;S.best=lbBest(P.def.id);chime(2);buzz([20,40,20]);
+        setTimeout(()=>say('Abwurf beendet: '+Math.round(300-t)+' von 300 Punkten'+(rank===1?'. Neuer Bestwert':rank?'. Platz '+rank:'')+(coarse?'':'. R startet einen neuen Abwurf'),true,true),1600)}}}
+};
+AB.hud=CK=>{const run=!AB.done&&S.started,dk=Math.hypot(SC.drop.x-S.pos.x,SC.drop.z-S.pos.z)/1000,pts=Math.round(AB.loads.filter(l=>l.st===2).reduce((m,l)=>m+100-l.d,0));CK.el.classList.toggle('run',run);
+  CK.t.textContent=pts+' Pkt';const n=AB.kinds.length;
+  CK.g.textContent=AB.done?(S.rank?'Abwurf fertig · Platz '+S.rank:'Abwurf fertig'):AB.left?'Fracht '+(n-AB.left+1)+'/'+n+' · Station '+dk.toFixed(1).replace('.',',')+' km':'Fallschirme in der Luft';
+  CK.b.textContent=S.best!=null?'Bestwert '+P.def.name+' '+fmtS(S.best):''};
+AB.mark=()=>AB.done?null:{x:SC.drop.x,y:SC.drop.y+85,z:SC.drop.z};
+AB.brief=()=>'Abwurf: drei Fahrzeuge zur Station östlich der Bahn bringen. F öffnet die Klappe, F wirft ab. Der orange Rauch zeigt den Wind';
+
+/* ===== Punktlandung: gelbe Marke quer über der Bahnmitte ===== */
+const LW={on:!!SC.spot,need:null,first:null,told:false,n:0,lastV:null};
+if(LW.on){const z0=SC.spot.z,y0=ground(0,z0)+.05;
+  const bar=(w,d,c,z)=>{const g=new T.PlaneGeometry(w,d);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,MFLAT(c));m.position.set(0,y0+.03,z);m.receiveShadow=true;scene.add(m)};
+  bar(RW.wid-6,3,0xF4C61F,z0);for(const dz of [-25,-10,10,25])bar(RW.wid-14,.7,0xF2EEE4,z0+dz);
+  const cone=MSTD(0xE8662C,.6),wh=MSTD(0xF2EEE4,.6);
+  for(const sd of [-1,1]){const x=sd*(RW.wid/2+5),g=new T.Group(),c=new T.Mesh(new T.ConeGeometry(.9,2.4,14),cone);c.position.y=1.2;g.add(c);const b=new T.Mesh(new T.CylinderGeometry(.55,.68,.5,14),wh);b.position.y=1.2;g.add(b);mPut(g,x,ground(x,z0),z0)}}
+LW.reset=()=>{LW.first=null;LW.lastV=null};
+LW.touch=sink=>{if(!LW.first&&S.air>4)LW.first={x:S.pos.x,z:S.pos.z,sink,dz:Math.sign(fwd.z)||-1}};
+LW.land=()=>{const f=LW.first;LW.first=null;if(!f)return;
+  if(!onRunway(f.x,f.z)){say('Neben der Bahn aufgesetzt: diese Landung zählt nicht');return}
+  const along=(f.z-SC.spot.z)*f.dz,lat=-f.x*f.dz,pen=Math.max(0,f.sink-.8)*5+S.bounces*10,v=Math.round((Math.hypot(along,lat)+pen)*10)/10;LW.n++;LW.lastV=v;
+  const ab=Math.abs(along),pos=ab<.5?'genau auf der Marke':fmtM(ab)+(along<0?' vor':' hinter')+' der Marke',sd=Math.abs(lat)<.5?'':', '+fmtM(Math.abs(lat))+(lat<0?' links':' rechts');
+  let rank=0;const better=S.best==null||v<S.best;if(better){rank=lbAdd(Math.max(.01,v));S.best=lbBest(P.def.id);S.rank=rank}S.last=v;
+  if(better)chime(v<3?2:1);
+  say('Landung '+LW.n+': '+pos+sd+', Sinken '+f.sink.toFixed(1).replace('.',',')+' m/s'+(S.bounces?', '+S.bounces+(S.bounces>1?' Hüpfer':' Hüpfer'):'')+'. Wertung '+fmtM(v)+(better?(rank===1?'. Neuer Bestwert':' · persönlicher Bestwert'):''),v<5,true)};
+LW.update=dt=>{if(!S.ground&&S.air<1)LW.first=null};
+LW.hud=CK=>{CK.el.classList.toggle('run',false);CK.t.textContent=LW.lastV!=null?fmtM(LW.lastV):'– m';
+  CK.g.textContent=LW.lastV!=null?'Letzte Landung'+(S.rank?' · Platz '+S.rank:''):coarse?'Auf der Marke landen':'Gelbe Marke in der Bahnmitte';CK.b.textContent=S.best!=null?'Bestwert '+P.def.name+' '+fmtM(S.best):''};
+LW.mark=()=>S.ground&&S.gs<2&&LW.lastV==null?null:{x:0,y:ground(0,SC.spot.z)+40,z:SC.spot.z};
+LW.brief=()=>'Punktlandung: auf der gelben Marke in der Bahnmitte aufsetzen. Gewertet wird der Abstand beim ersten Bodenkontakt';
+
+/* ===== Zielschießen: acht Zielscheiben rund um den Träger ===== */
+const ZS={on:!!SC.targets,need:'f2',needMsg:'Schießen kann nur die F2: sie trägt die Raketen',list:[],t:0,done:false,told:false,hits:0};
+if(ZS.on){const cv=document.createElement('canvas');cv.width=cv.height=256;{const x=cv.getContext('2d');for(let i=5;i>0;i--){x.fillStyle=i%2?'#D8322A':'#F4F0E6';x.beginPath();x.arc(128,128,i*25,0,Math.PI*2);x.fill()}x.fillStyle='#F4F0E6';x.fillRect(0,0,256,3);}
+  const tx=new T.CanvasTexture(cv);tx.encoding=T.sRGBEncoding;const face=new T.MeshStandardMaterial({map:tx,roughness:.8,side:T.DoubleSide}),orng=MSTD(0xE8662C,.7),dk=MSTD(0x2A2C2E,.7),wd=MSTD(0x8B6A44,.9,true);
+  SC.targets.forEach(([x,z],i)=>{const gh=ground(x,z),sea=gh<WATER+.5,y=sea?WATER:gh,g=new T.Group();
+    if(sea){const r=new T.Mesh(new T.BoxGeometry(18,1.8,18),orng);r.position.y=.5;g.add(r);const k=new T.Mesh(new T.BoxGeometry(18.4,.5,18.4),dk);k.position.y=-.2;g.add(k)}
+    else for(const sd of [-1,1]){const l=new T.Mesh(new T.BoxGeometry(.6,8,.6),wd);l.position.set(sd*6,4,0);g.add(l)}
+    const b=new T.Mesh(new T.PlaneGeometry(16,16),face);b.position.y=sea?9.6:13;g.add(b);
+    const p=new T.Mesh(new T.CylinderGeometry(.12,.12,7,6),dk);p.position.set(8.5,sea?4.6:3.5,8.5);g.add(p);const fl=new T.Mesh(new T.PlaneGeometry(2.4,1.4),new T.MeshStandardMaterial({color:0xE8662C,side:T.DoubleSide}));fl.position.set(9.7,sea?7.4:6.3,8.5);g.add(fl);
+    const yaw=Math.atan2(x,z);mPut(g,x,y,z,yaw);ZS.list.push({x,z,y,g,b,sea,yaw,cy:y+(sea?9.6:13),dead:false,dt:0,ph:i*1.3})})}
+ZS.reset=()=>{ZS.t=0;ZS.done=false;ZS.hits=0;for(const t of ZS.list){t.dead=false;t.dt=0;t.g.visible=true;t.b.rotation.x=0;t.g.position.y=t.y}};
+ZS.near=p=>{for(const t of ZS.list)if(!t.dead&&Math.abs(p.y-t.cy)<11&&Math.hypot(p.x-t.x,p.z-t.z)<10)return true;return false};
+ZS.blast=p=>{for(const t of ZS.list){if(t.dead)continue;if(Math.hypot(p.x-t.x,p.y-t.cy,p.z-t.z)<18){t.dead=true;ZS.hits++;burst(18,0,10,8,new T.Vector3(t.x,t.cy,t.z));
+    const left=ZS.list.length-ZS.hits;if(left){chime(1);say('Treffer! Noch '+left+(left===1?' Ziel':' Ziele'),true)}
+    else if(!ZS.done){ZS.done=true;const tt=ZS.t,rank=lbAdd(tt);S.last=tt;S.rank=rank;S.best=lbBest(P.def.id);chime(2);buzz([20,40,20]);say('Alle Ziele getroffen in '+fmtH(tt)+(rank===1?'. Neue Bestzeit':rank?'. Platz '+rank:'')+(coarse?'':'. R startet eine neue Runde'),true,true)}}}};
+ZS.update=dt=>{
+  if(S.started&&card.hidden&&P&&!S.crashed&&!ZS.done)ZS.t+=dt;
+  for(const t of ZS.list){if(t.dead){if(t.dt<1){t.dt=Math.min(1,t.dt+dt/1.6);t.b.rotation.x=t.dt*1.45;if(t.sea)t.g.position.y=t.y-t.dt*3}
+      if(Math.random()<dt*(coarse?2:4))FP.put(FP.haze,t.x+(Math.random()-.5)*4,t.y+3,t.z+(Math.random()-.5)*4,WIND.v.x*.5,6+Math.random()*3,WIND.v.z*.5,10+Math.random()*5,8,40,0);continue}
+    if(t.sea){t.g.position.y=t.y+.35*Math.sin(WIND.t*1.3+t.ph);t.g.rotation.z=.03*Math.sin(WIND.t*1.1+t.ph)}}};
+ZS.hud=CK=>{const run=!ZS.done&&S.started,n=ZS.list.length;let d=1e12;for(const t of ZS.list)if(!t.dead)d=Math.min(d,Math.hypot(t.x-S.pos.x,t.z-S.pos.z));CK.el.classList.toggle('run',run);
+  CK.t.textContent=ZS.done?fmtH(ZS.t):fmtT(ZS.t);CK.g.textContent=ZS.done?(S.rank?'Alle Ziele · Platz '+S.rank:'Alle Ziele getroffen'):'Ziele '+ZS.hits+'/'+n+(d<1e11?' · '+(d/1000).toFixed(1).replace('.',',')+' km':'')+(P.mounts.length?' · '+S.rk+(coarse?' R.':' Raketen'):'');
+  CK.b.textContent=S.best!=null?'Bestzeit '+P.def.name+' '+fmtH(S.best):''};
+ZS.mark=()=>{let b=null,d=1e12;for(const t of ZS.list){if(t.dead)continue;const q=(t.x-S.pos.x)**2+(t.z-S.pos.z)**2;if(q<d){d=q;b=t}}return b?{x:b.x,y:b.cy+40,z:b.z}:null};
+ZS.brief=()=>'Zielschießen: acht Zielscheiben rund um den Träger. F feuert, auf dem Deck wird nachgeladen. Die Uhr läuft';
+
+const MIS=AB.on?AB:LW.on?LW:ZS.on?ZS:null;
+if(MIS&&SC.tip){$('#mis-tip').textContent=SC.tip;$('#mis-tip').hidden=false}
 function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);pad.rumble(clamp(sink*.22,.12,.9),.35,150);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
@@ -1843,10 +2003,10 @@ function openBoard(){
   if(!LB.name){askName();return}
   const tabs=$('#board-tabs');tabs.textContent='';
   for(const [id,name] of [['all','Alle']].concat(PLANES.map(q=>[q.id,q.name]))){const b=document.createElement('button');b.type='button';b.className='tab';b.textContent=name;b.setAttribute('aria-pressed',LB.filter===id?'true':'false');b.addEventListener('click',()=>{LB.filter=id;openBoard()});tabs.appendChild(b)}
-  const shared=netOn()&&!!LB.net,rows=$('#board-rows'),list=(shared?LB.net:LB.list).filter(e=>here(e)&&(LB.filter==='all'||e.m===LB.filter));rows.textContent='';$('#board-h').textContent='Bestentabelle '+SC.name;
+  const shared=netOn()&&!!LB.net,rows=$('#board-rows'),list=(shared?LB.net:LB.list).filter(e=>here(e)&&(LB.filter==='all'||e.m===LB.filter));rows.textContent='';$('#board-h').textContent='Bestentabelle '+SC.name;$('#th-score').textContent=SC.unit==='m'?'Abstand':SC.unit==='pkt'?'Punkte':'Zeit';
   list.slice(0,shared?50:25).forEach((e,i)=>{const tr=document.createElement('tr'),pl=PLANES.find(q=>q.id===e.m),cell=(t,c)=>{const td=document.createElement('td');td.textContent=t;if(c)td.className=c;tr.appendChild(td)};
     if(e.n.toLowerCase()===LB.name.toLowerCase())tr.classList.add('me');if(LB.fresh&&(e===LB.fresh||(e.m===LB.fresh.m&&e.t===LB.fresh.t&&e.n===LB.fresh.n)))tr.classList.add('new');
-    cell(i+1+'.');cell(e.n);cell(pl?pl.name:e.m);cell(fmtH(e.t),'num t');cell(e.d?new Date(e.d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'}):'','num');rows.appendChild(tr)});
+    cell(i+1+'.');cell(e.n);cell(pl?pl.name:e.m);cell(fmtS(e.t),'num t');cell(e.d?new Date(e.d).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit',year:'2-digit'}):'','num');rows.appendChild(tr)});
   $('#board-src').textContent=shared?(LB.err?'Gemeinsame Liste, zuletzt geladener Stand: gerade keine Verbindung.':'Gemeinsame Liste aller Piloten.'):netOn()?(LB.err?'Keine Verbindung zur gemeinsamen Liste. Du siehst die Zeiten von diesem Gerät.':'Gemeinsame Liste wird geladen …'):'Gespeichert auf diesem Gerät.';
   if(netOn())netLoad().then(ok=>{if(ok&&!card.hidden&&!$('#v-board').hidden)openBoard()});
   $('#board-empty').hidden=list.length>0;document.querySelector('.board-wrap').hidden=!list.length;$('#board-me').textContent=LB.name;
@@ -1926,7 +2086,7 @@ function flying(dt){
   /* Thermik: über dunklem, trockenem Boden (Acker, Weg, Fels) steigt warme Luft, über Wasser und feuchter Wiese sinkt sie. Am Tag kräftig, am Abend
      nur noch schwach. Spürbar wird sie erst ein Stück über dem Boden; die Blasen ziehen langsam mit dem Wind. */
   if(S.ti===0){const px=S.pos.x,pz=S.pos.z,gh=ground(px,pz);let th;
-    if(SC.sea&&gh<WATER)th=-.2;else if(gh<WATER||lakeD(px,pz)<1.25)th=-.75;else if(FLD.on){const t=landuse(px,pz)[0];th=t===3?1:t===4?.6:t===1?.3:t===2?.05:-.15}else th=SID==='wueste'?.45:-.05;
+    if(SC.sea&&gh<WATER)th=-.2;else if(gh<WATER||lakeD(px,pz)<1.25)th=-.75;else if(FLD.on){const t=landuse(px,pz)[0];th=t===3?1:t===4?.6:t===1?.3:t===2?.05:-.15}else th=BASE==='wueste'?.45:-.05;
     th+=(vnoise((px+WIND.t*3)/260,(pz+WIND.t*7)/260)-.5)*1.3;S.th=lerp(S.th||0,th,.07)}
   va.y-=(S.th||0)*(DAY?2:.8)*clamp((agl-8)/55,0,1)*Math.exp(-Math.max(agl,0)/650);
   const V=va.length();
@@ -2031,6 +2191,7 @@ function flying(dt){
     if(sink>(P.def.belly?4.3:4.6)){crash('Zu hart aufgesetzt.');return}      /* ein gefedertes Fahrwerk verzeiht etwas mehr */
     if(side>5){crash('Quer zur Flugrichtung aufgesetzt.');return}
     /* zu schnell gesunken: das Fahrwerk wirft das Modell zurück in die Luft. Der Federbügel federt stärker als ein Rumpf, der auf dem Bauch aufschlägt */
+    if(LW.on)LW.touch(sink);
     if(sink>1.9&&S.bounces<3){S.vel.y=sink*(P.sprung?.44:.3);S.bounces++;S.w.set(-bank*2.5,0,0);S.cmp=clamp(sink*.09,0,Math.min(.34,P.trv));touchdown(sink);say('Gehüpft: Höhenruder ruhig halten');return}
     /* aufgesetzt: Schräglage und Drehung bleiben erhalten, das Fahrwerk muss sie abfangen. Wer schiebend aufsetzt, bekommt einen Ruck zur Seite */
     S.bankG=bank;S.bankV=clamp(S.w.x,-2,2)+clamp(S.vel.dot(rgt),-5,5)*.2;
@@ -2039,6 +2200,7 @@ function flying(dt){
     if(S.air>4){
       if(onRunway(S.pos.x,S.pos.z)){S.landings++;S.landed=true;say((S.bounces?'Gelandet, mit Hüpfer.':sink<1.1?'Butterweich gelandet.':'Sauber gelandet.')+' Landung Nr. '+S.landings,true)}
       else say(coarse?'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder neu starten':'Außenlandung auf der Wiese. Zurück zur Bahn rollen oder R drücken',true);
+      if(LW.on)LW.land();
     }
     return;
   }
@@ -2058,7 +2220,7 @@ const pad={act:false,seen:false,ui:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[]
 {const dz=(v,z)=>Math.abs(v)<z?0:(v-Math.sign(v)*z)/(1-z),ex=v=>.5*v+.5*v*v*v,bv=(g,i)=>{const b=i>=0&&g.buttons[i];return b?(b.value||(b.pressed?1:0)):0};
  const get=()=>{let l;try{l=navigator.getGamepads?navigator.getGamepads():[]}catch(e){return null}let best=null;
    for(const g of l){if(!g||!g.connected||g.axes.length<4)continue;if(g.index===pad.idx)return g;if(!best||(g.mapping==='standard'&&best.mapping!=='standard'))best=g}return best};
- const PADK={'b-fire':'B','b-ramp':'B','b-drop':'B','b-smoke':'A','b-snd':'X','b-cam':'Y','b-reset':'Ansicht','b-board':'LB','b-help':'Menü'},
+ const PADK={'b-fire':'B','b-ramp':'B','b-drop':'B','b-cargo':'B','b-smoke':'A','b-snd':'X','b-cam':'Y','b-reset':'Ansicht','b-board':'LB','b-help':'Menü'},
   ICON={Ansicht:'<svg viewBox="0 0 12 12" aria-hidden="true"><rect x="1.2" y="1.5" width="6.6" height="5.4" rx="1"/><path d="M4.4 9.9h5.4a1 1 0 0 0 1-1V5.2"/></svg>',Menü:'<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 3.2h8M2 6h8M2 8.8h8"/></svg>'};
  const padUI=on=>{if(pad.ui===on)return;pad.ui=on;document.body.classList.toggle('pad-on',on);
    for(const id in PADK){const k=$('#'+id+' kbd'),v=PADK[id];if(k.dataset.key===undefined)k.dataset.key=k.textContent;
@@ -2073,7 +2235,7 @@ const pad={act:false,seen:false,ui:false,x:0,y:0,r:0,g:0,idx:-1,dev:null,prev:[]
      if(!pad.seen){pad.seen=true;$('#pad-keys').hidden=false;$('#pad-tip').hidden=true;if(card.hidden)say('Controller erkannt: rechter Stick Quer und Höhe, linker Stick Seite, RT mehr Gas, LT weniger')}}
    pad.dev=g;pad.x=x;pad.y=y;pad.r=r;pad.g=gas;
    if(!card.hidden){if((hA||hM)&&$('#v-who').hidden)start();return}
-   if(hA)toggleSmoke();if(hB){if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}if(hY)$('#b-cam').click();if(hX)toggleSound();if(hL)openBoard();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
+   if(hA)toggleSmoke();if(hB){if(AB.on)AB.drop();else if(P&&P.def.ramp)toggleRamp();else if(P&&P.def.tank)dropWater();else fire()}if(hY)$('#b-cam').click();if(hX)toggleSound();if(hL)openBoard();if(hV)reset('Zurück am Start');if(hM)$('#b-help').click()};
  pad.poll=dt=>{poll0(dt);padUI(pad.act)};
  pad.rumble=(strong,weak,ms)=>{if(!pad.act||!pad.dev)return;try{const a=pad.dev.vibrationActuator;if(a&&a.playEffect)a.playEffect('dual-rumble',{duration:ms,strongMagnitude:strong,weakMagnitude:weak}).catch(()=>{})}catch(e){}};
  window.addEventListener('gamepaddisconnected',()=>{pad.act=false;pad.dev=null;pad.idx=-1;pad.x=pad.y=pad.r=pad.g=0})}
@@ -2355,6 +2517,7 @@ function frame(dt,still){
        if(lake)t={x:LAKE.x,z:LAKE.z,y:WATER+50};else for(const z of FIRE.zones){if(z.out)continue;const d=(z.x-S.pos.x)**2+(z.z-S.pos.z)**2;if(d<bd){bd=d;t={x:z.x,z:z.z,y:z.y+95}}}
        mk.visible=!!t;if(t){mk.position.set(t.x,t.y+4*Math.sin(WIND.t*2.4),t.z);mk.scale.setScalar(2.4);mk.material.color.setHex(lake?0x6FC3F2:0xF4C61F)}}
      else if(FR.on){const tg=FR.target();mk.visible=!FR.done;mk.position.set(tg?tg.x:0,(tg?tg.h:0)+70+4*Math.sin(WIND.t*2.4),tg?tg.z:0);mk.scale.setScalar(2.4)}
+     else if(MIS){const t=MIS.mark();mk.visible=!!t;if(t){mk.position.set(t.x,t.y+4*Math.sin(WIND.t*2.4),t.z);mk.scale.setScalar(2.4)}}
      else if(COL.gates.length){const g=COL.gates[S.next];mk.position.set(g.x,g.top+24+3*Math.sin(WIND.t*2.4),g.z)}else mk.visible=false;
      mk.rotation.y=WIND.t*1.6}
     if(FX.t<.45){FX.t+=dt;const k=clamp(FX.t/.4,0,1);flash.visible=true;flash.scale.setScalar(FX.size*(1+2.4*Math.sqrt(k)));flash.material.opacity=(1-k)*(1-k);glow.intensity=(1-k)*2.6}else if(flash.visible){flash.visible=false;glow.intensity=0}
@@ -2374,11 +2537,12 @@ function frame(dt,still){
       else if(FR.on){const tg=FR.target(),run=!FR.done&&S.started,dk=Math.hypot((tg?tg.x:0)-S.pos.x,(tg?tg.z:0)-S.pos.z)/1000;CK.el.classList.toggle('run',run);CK.t.textContent=FR.done?fmtH(FR.t):fmtT(FR.t);
         CK.g.textContent=FR.done?(S.rank?'Alles zugestellt · Platz '+S.rank:'Alles zugestellt'):FR.un>0?(tg?'Abladen ':'Abstellen ')+Math.round(FR.un*100)+' %':(tg?(FR.leg+1)+'/'+STRIPS.length+' '+tg.name:'Zurück zum Platz')+' · '+dk.toFixed(1).replace('.',',')+' km';
         CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
+      else if(MIS)MIS.hud(CK);
       else{const run=S.lap0!==null;CK.el.classList.toggle('run',run);CK.t.textContent=run?fmtT(S.clock-S.lap0):S.last?fmtH(S.last):'0:00,0';
        CK.g.textContent=run?'Tor '+(S.next+1)+'/'+COL.gates.length:S.last?(S.rank?'Platz '+S.rank:'Runde fertig'):coarse?'Tor 1':'Start an Tor 1';CK.b.textContent=S.best?'Bestzeit '+P.def.name+' '+fmtH(S.best):''}
       {const w=Math.round(WIND.speed*3.6),dg=(-(WIND.ang-Math.atan2(fwd.x,fwd.z))*180/Math.PI).toFixed(0);if(coarse){MI.w.textContent=w;MI.wa.style.transform='rotate('+dg+'deg)'}else if(GA.w){GA.w.textContent=w;GA.wa.setAttribute('transform','rotate('+dg+' 50 50)')}}}
   }
-  smoke(dt);FIRE.update(dt);FR.update(dt);audioUpdate(dt);
+  smoke(dt);FIRE.update(dt);FR.update(dt);if(MIS)MIS.update(dt);audioUpdate(dt);
   if(!coarse||(QL.n&1)===0)renderer.shadowMap.needsUpdate=true;QL.n++;
   mirror();POST.render(dt,still||!S.started||!card.hidden);
 }
@@ -2499,10 +2663,10 @@ let last=0,raf=0;
 function loop(t){raf=requestAnimationFrame(loop);const raw=(t-last)/1000||.016,dt=Math.min(.05,raw);last=t;pad.poll(dt);if(S.started&&card.hidden)QL.feel(raw,t/1000);frame(dt)}
 document.addEventListener('visibilitychange',()=>{if(document.hidden){cancelAnimationFrame(raf);raf=0}else if(!raf){last=performance.now();raf=requestAnimationFrame(loop)}});
 /* für Tests: Zustand lesen und Zeit von Hand weiterdrehen */
-window.__flug={FR,STRIPS,onStrip,FIRE,FP,LAKE,dropWater,pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
+window.__flug={AB,LW,ZS,MIS,FR,STRIPS,onStrip,FIRE,FP,LAKE,dropWater,pad,landuse,POST,REFL,tipDip,NET,LB,netLoad,QL,PAPI,fire,RK,S,keys,WIND,COL,TREE,hit,scene,cam,renderer,tick:dt=>{updateWind(dt);if(P)step(dt)},draw:dt=>frame(dt,true),run:dt=>frame(dt),ground,get plane(){return P},
   state:()=>{const f=new T.Vector3(0,0,-1).applyQuaternion(S.Q),u=new T.Vector3(0,1,0).applyQuaternion(S.Q);return {x:+S.pos.x.toFixed(1),y:+S.pos.y.toFixed(1),z:+S.pos.z.toFixed(1),v:+S.va.toFixed(1),vy:+S.vel.y.toFixed(1),thr:+S.thr.toFixed(2),nose:+(Math.asin(clamp(f.y,-1,1))*57.3).toFixed(0),upY:+u.y.toFixed(2),alpha:+(S.alpha*57.3).toFixed(1),stall:+S.stalled.toFixed(2),ground:S.ground,crashed:+S.crashed.toFixed(1),landings:S.landings,agl:+(S.pos.y-ground(S.pos.x,S.pos.z)).toFixed(1)}}};
 let first='bf1';try{const s=localStorage.getItem('lw-fliegen-modell');if(PLANES.some(p=>p.id===s))first=s}catch(e){}
-if(SID==='waldbrand')first='loescher';if(SID==='fracht')first='busch';      /* zur Bergfracht gehört das Buschflugzeug */      /* zum Waldbrand gehört die CL-215T */
+if(SC.plane)first=SC.plane;      /* zur Bergfracht gehört das Buschflugzeug */      /* zum Waldbrand gehört die CL-215T */
 /* von der Startseite kommt das Modell in der Adresse mit: fliegen.html?modell=f2 */
 try{const q=new URLSearchParams(location.search).get('modell');if(PLANES.some(p=>p.id===q))first=q}catch(e){}
 updateWind(0);cam.position.copy(camPos);cam.lookAt(0,2,300);
@@ -2511,7 +2675,7 @@ if(coarse){const top=document.querySelector('.top'),tl=document.createElement('d
   $('#menu-places').appendChild($('#places'));$('#menu-models').appendChild($('#planes'));$('#models').hidden=true;$('#planes-h').hidden=$('#places-h').hidden=true;for(const id of ['b-cam','b-smoke','b-snd','b-board','b-help'])$('#menu-acts').appendChild($('#'+id));
   if(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen){const b=document.createElement('button');b.type='button';b.className='act';b.id='b-full';b.textContent='Vollbild';b.setAttribute('aria-pressed','false');
    b.addEventListener('click',()=>fullscreen(!fsOn()));for(const t of ['fullscreenchange','webkitfullscreenchange'])document.addEventListener(t,()=>{b.setAttribute('aria-pressed',fsOn()?'true':'false');setTimeout(resize,200)});$('#menu-acts').appendChild(b)}
-  $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#spec').appendChild($('#b-drop'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
+  $('#spec').appendChild($('#b-fire'));$('#spec').appendChild($('#b-ramp'));$('#spec').appendChild($('#b-drop'));$('#spec').appendChild($('#b-cargo'));$('#v-menu').insertBefore($('#loadline'),document.querySelector('#v-menu .mlink'));$('#b-help').firstChild.textContent='Steuerung'}
 $('#b-menu').addEventListener('click',()=>{$('#b-go2').textContent=S.started?'Weiterfliegen':'Losfliegen';view('menu')});
 $('#b-go2').addEventListener('click',start);
 lbLoad();if(!LB.name)askName();else if(coarse)view('menu');      /* beim ersten Start zuerst nach dem Namen fragen */
