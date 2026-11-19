@@ -140,6 +140,15 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 .board td.t{font-weight:700}
 .board tr.me td{color:var(--accent)}
 .board tr.new td{background:rgba(244,198,31,.14)}
+.aim{position:fixed;left:0;top:0;z-index:4;width:46px;height:46px;margin:-23px 0 0 -23px;border:2px solid rgba(255,255,255,.9);border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.25);pointer-events:none;will-change:transform;transition:border-color .12s,width .12s,height .12s}
+.aim::before,.aim::after{content:"";position:absolute;background:rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(0,0,0,.25)}
+.aim::before{left:50%;top:-9px;width:2px;height:7px;margin-left:-1px}
+.aim::after{top:50%;right:-9px;width:7px;height:2px;margin-top:-1px}
+.aim i{position:absolute;left:50%;top:50%;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.aim small{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%);font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.7);white-space:nowrap;font-variant-numeric:tabular-nums}
+.aim.far{border-style:dashed;opacity:.7}
+.aim.lock{border-color:#F4C61F;box-shadow:0 0 0 1px rgba(0,0,0,.35),0 0 14px rgba(244,198,31,.55)}.aim.lock i{background:#E8402C}.aim.lock::before,.aim.lock::after{background:#F4C61F}
+.aim.empty{opacity:.35}
 .clock{position:fixed;top:66px;right:max(16px,env(safe-area-inset-right));display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:12px;padding:9px 16px 10px;background:var(--panel);border:1px solid var(--panel-line);border-radius:16px;font-variant-numeric:tabular-nums}
 .clock b{font-size:24px;font-weight:700;letter-spacing:-.02em}
 .clock.run b{color:var(--accent)}
@@ -265,6 +274,7 @@ kbd.k{display:inline-block;min-width:26px;text-align:center;font:inherit;font-si
 </div>
 
 <div class="mini" id="mini" aria-label="Fahrt, Höhe, Wind"><span><b id="m-v">0</b>km/h</span><span><b id="m-h">0</b>m</span><span><i class="warr" id="m-wa" aria-hidden="true">↑</i><b id="m-w">0</b>Wind</span></div>
+<div class="aim" id="aim" hidden aria-hidden="true"><i></i><small id="aim-d"></small></div>
 <div class="clock" id="clock" aria-label="Stoppuhr"><b id="ck-t">0:00,0</b><span id="ck-g">Tor 1/12</span><small id="ck-b"></small></div>
 
 <div class="acts">
@@ -1806,7 +1816,7 @@ const VEH=(()=>{const ol=MSTD(0x5E6238,.8,true),ol2=MSTD(0x4D5130,.85,true),dk=M
 
 /* ===== Abwurf: Station in der Wüste, drei Fahrzeuge an Fallschirmen ===== */
 const AB={on:!!SC.drop,need:'c160',needMsg:'Abwerfen kann nur die C-160',loads:[],left:0,sum:0,done:false,told:false,last:-9,smk:0,
-  kinds:[['Geländewagen',VEH.jeep,7.5,1],['Geländewagen',VEH.jeep,7.5,1],['Schützenpanzer',VEH.tank,9.5,3]]};
+  kinds:[['Geländewagen',VEH.jeep,7.5,1,[2.3,.95,1.9]],['Geländewagen',VEH.jeep,7.5,1,[2.3,.95,1.9]],['Schützenpanzer',VEH.tank,9.5,3,[3.2,1.6,3.1]]]};
 if(AB.on){const D=SC.drop;D.y=ground(D.x,D.z);
   /* Zielfeld: Ringe auf dem Sand, ein Kreuz in der Mitte, dort steigt orange Rauch auf */
   const ring=(r,w,c)=>{const g=new T.RingGeometry(r-w/2,r+w/2,96);g.rotateX(-Math.PI/2);const m=new T.Mesh(g,MFLAT(c));m.position.set(D.x,D.y+.12,D.z);m.receiveShadow=true;scene.add(m)};
@@ -1826,14 +1836,37 @@ if(AB.on){const D=SC.drop;D.y=ground(D.x,D.z);
   [[VEH.jeep(),cx+12,cz-14,.4],[VEH.jeep(),cx+18,cz-12,.5],[VEH.tank(),cx+40,cz-10,-.2],[VEH.tank(),cx+52,cz-6,-.25]].forEach(([g,x,z,r])=>{mPut(g,x,ground(x,z),z,r);COL.cyl.push({x,z,r:3.6,y0:ground(x,z),y1:ground(x,z)+3,name:'lager'})});
 }
 /* Fallschirm: Kappe aus Bahnen, Fangleinen zur Last */
-AB.chute=(R,n)=>{const g=new T.Group(),cs=[];
-  for(let k=0;k<n;k++){const sg=new T.SphereGeometry(R,16,6,0,Math.PI*2,0,Math.PI*.42),col=[],p=sg.attributes.position;
-    for(let i=0;i<p.count;i++){const a=Math.atan2(p.getZ(i),p.getX(i)),st=Math.floor((a+Math.PI)/(Math.PI*2)*8)%2;col.push(...(st?[.92,.9,.84]:[.86,.42,.17]))}
-    sg.setAttribute('color',new T.Float32BufferAttribute(col,3));sg.translate(0,-R*.72,0);
-    const c=new T.Mesh(sg,new T.MeshStandardMaterial({vertexColors:true,side:T.DoubleSide,roughness:.9}));c.castShadow=true;c.position.set(n>1?(k-1)*R*1.7:0,0,0);c.rotation.z=n>1?(1-k)*.25:0;g.add(c);cs.push(c)}
-  const lg=new T.BufferGeometry();lg.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(n*8*6),3));const ln=new T.LineSegments(lg,new T.LineBasicMaterial({color:0x3A3A36,transparent:true,opacity:.75}));ln.frustumCulled=false;
-  return {g,cs,ln,R,n}};
-AB.reset=()=>{for(const l of AB.loads){scene.remove(l.g);scene.remove(l.ch.g);scene.remove(l.ch.ln)}AB.loads=[];AB.left=AB.kinds.length;AB.sum=0;AB.done=false;AB.last=-9;S.load=AB.left*.5;
+/* Fallschirm wie ein Lastenschirm: 16 Bahnen orange und weiß, unten ein dunklerer Saum, oben das Scheitelloch.
+   Die Fangleinen laufen vom Saum zu einem Verbindungsstück, von dort vier Gurte zu den Ecken der Last */
+AB.tex=(()=>{const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');
+  for(let i=0;i<16;i++){x.fillStyle=i%2?'#F2EDE2':'#E4622B';x.fillRect(i*32,0,32,128)}
+  const gr=x.createLinearGradient(0,0,0,128);gr.addColorStop(0,'rgba(255,255,255,.12)');gr.addColorStop(.55,'rgba(0,0,0,0)');gr.addColorStop(.86,'rgba(0,0,0,.05)');gr.addColorStop(.9,'rgba(40,30,20,.45)');gr.addColorStop(1,'rgba(40,30,20,.45)');x.fillStyle=gr;x.fillRect(0,0,512,128);
+  x.fillStyle='rgba(70,45,30,.4)';for(let i=0;i<=16;i++)x.fillRect(i*32-1,0,2,128);
+  for(const y of [40,80])x.fillRect(0,y,512,1.5);      /* Querbänder */
+  const t=new T.CanvasTexture(c);t.encoding=T.sRGBEncoding;t.anisotropy=4;return t})();
+AB.canopy=R=>{const pr=[[.9,-.1],[1,.03],[.99,.17],[.92,.33],[.79,.47],[.6,.58],[.37,.65],[.13,.69]].map(([r,y])=>new T.Vector2(r*R,y*R));
+  const g=new T.LatheGeometry(pr,48),p=g.attributes.position;
+  for(let i=0;i<p.count;i++){const x=p.getX(i),z=p.getZ(i),a=Math.atan2(z,x),f=1+.05*Math.abs(Math.sin(8*a))*(1-.4*clamp(p.getY(i)/(R*.69),0,1));p.setX(i,x*f);p.setZ(i,z*f)}      /* zwischen den Leinen bauchen die Bahnen aus */
+  g.computeVertexNormals();const m=new T.Mesh(g,new T.MeshStandardMaterial({map:AB.tex,side:T.DoubleSide,roughness:.82}));m.castShadow=true;return m};
+AB.chute=(R,n,att)=>{const g=new T.Group(),cs=[],L=R*2.3;
+  for(let k=0;k<n;k++){const c=AB.canopy(R);c.userData.home=new T.Vector3(n>1?(k-1)*R*2.05:0,L*(n>1&&k!==1?.9:1.04),n>1&&k!==1?R*.35*(k-1):0);c.userData.tilt=n>1?(1-k)*.36:0;c.position.copy(c.userData.home);c.rotation.z=c.userData.tilt;g.add(c);cs.push(c)}
+  const segs=n*16+n*4,lg=new T.BufferGeometry();lg.setAttribute('position',new T.Float32BufferAttribute(new Float32Array(segs*6),3));
+  const ln=new T.LineSegments(lg,new T.LineBasicMaterial({color:0x4A453C,transparent:true,opacity:.8}));ln.frustumCulled=false;g.add(ln);
+  return {g,cs,ln,R,n,L,att}};
+/* Kappen aufblasen, atmen lassen und die Leinen nachführen; alles im Raum der Schirmgruppe, die über der Last hängt */
+AB.pose=(l,dt)=>{const ch=l.ch,e=1-Math.pow(1-Math.min(1,l.open*1.1),3),q=new T.Vector3(),a=ch.ln.geometry.attributes.position;let j=0;
+  ch.g.position.set(l.pos.x,l.pos.y+ch.att[0],l.pos.z);ch.g.rotation.set(l.g.rotation.x*.5,l.yaw,l.g.rotation.z*.5);
+  ch.cs.forEach((c,k)=>{const b=l.open>=1?.035*Math.sin(l.t*2.3+k*1.7):0,sx=(.08+.92*e)*(1+b),sy=(1.9-.9*e)*(1-b*1.2);c.scale.set(sx,sy,sx);
+    c.position.copy(c.userData.home).multiplyScalar(.55+.45*e);c.rotation.z=c.userData.tilt*e;c.updateMatrix();
+    const cf=new T.Vector3(c.position.x*.22,ch.L*.3,0);
+    for(let i=0;i<16;i++){const an=i/16*Math.PI*2;q.set(Math.cos(an)*ch.R*.9,-.1*ch.R,Math.sin(an)*ch.R*.9).applyMatrix4(c.matrix);a.setXYZ(j++,q.x,q.y,q.z);a.setXYZ(j++,cf.x,cf.y,cf.z)}
+    for(const [sx2,sz2] of [[1,1],[-1,1],[1,-1],[-1,-1]]){a.setXYZ(j++,cf.x,cf.y,cf.z);a.setXYZ(j++,sx2*ch.att[1],0,sz2*ch.att[2])}});
+  a.needsUpdate=true};
+/* nach der Landung fällt die Kappe in Windrichtung neben die Last und sinkt zusammen */
+AB.collapse=(l,dt)=>{if(l.col>=1)return;l.col=Math.min(1,l.col+dt/2.4);const c=l.col,ch=l.ch;ch.ln.visible=c<.35;
+  ch.g.position.set(l.pos.x,l.gy+ch.att[0]*(1-c)+.2*c,l.pos.z);ch.g.rotation.set(0,WIND.ang,0);
+  ch.cs.forEach(m=>{m.position.set(m.userData.home.x*(1+.15*c),ch.L*(1-c)+.5*c,ch.R*1.2*c);m.rotation.x=c*.18;m.rotation.z=m.userData.tilt*(1-c);m.scale.set(1+.3*c,Math.max(.09,1-.91*c),1+.3*c)})};      /* flach ausgebreitet im Sand */
+AB.reset=()=>{for(const l of AB.loads){scene.remove(l.g);scene.remove(l.ch.g)}AB.loads=[];AB.left=AB.kinds.length;AB.sum=0;AB.done=false;AB.last=-9;S.load=AB.left*.5;
   if(P){$('#b-cargo').hidden=!P.def.ramp;$('#b-ramp').hidden=true;$('#i-ab').textContent=AB.left}};
 AB.drop=()=>{
   if(!P||S.crashed||!card.hidden||!S.started)return;
@@ -1842,11 +1875,11 @@ AB.drop=()=>{
   if(S.ground){say('Abwerfen geht nur in der Luft');return}
   if(S.rampA<.55){if(!S.ramp){S.ramp=1;servo(2.3);say('Heckklappe fährt auf. Gleich noch einmal F zum Abwerfen')}else say('Die Heckklappe ist noch nicht ganz offen');return}
   if(S.clock-AB.last<1.4)return;AB.last=S.clock;
-  const [name,mk,vt,nc]=AB.kinds[AB.kinds.length-AB.left],g=mk(true),ch=AB.chute(nc>1?6.5:7.5,nc);
+  const [name,mk,vt,nc,att]=AB.kinds[AB.kinds.length-AB.left],g=mk(true),ch=AB.chute(nc>1?6.8:8,nc,att);
   fwd.set(0,0,-1).applyQuaternion(S.Q);
   const pos=new T.Vector3(0,(-48-P.def.pivot[1])*K,(820-P.def.pivot[0])*K).applyQuaternion(S.Q).add(S.pos);      /* Rampenkante hinten am Rumpf */
   const vel=S.vel.clone().addScaledVector(fwd,-3);vel.y-=1;
-  g.position.copy(pos);g.rotation.y=Math.atan2(-fwd.x,-fwd.z)+Math.PI;scene.add(g);ch.g.visible=false;ch.g.scale.setScalar(.05);scene.add(ch.g);scene.add(ch.ln);
+  g.position.copy(pos);g.rotation.y=Math.atan2(-fwd.x,-fwd.z)+Math.PI;scene.add(g);ch.g.visible=false;scene.add(ch.g);
   AB.loads.push({name,g,ch,pos,vel,vt,t:0,open:0,st:0,yaw:g.rotation.y});AB.left--;S.load=AB.left*.5;$('#i-ab').textContent=AB.left;
   clack();buzz(25);pad.rumble(.4,.6,250);say(name+' ist raus');
   if(!AB.left)setTimeout(()=>{if(S.ramp&&!AB.left){S.ramp=0;servo(2.3)}},2500)};
@@ -1856,16 +1889,14 @@ AB.update=dt=>{
   /* orange Rauch zeigt den Wind, die Fahne weht mit */
   AB.smk+=dt*(coarse?3:6);while(AB.smk>=1){AB.smk--;FP.put(FP.haze,D.x+(Math.random()-.5)*2,D.y+1.5,D.z+(Math.random()-.5)*2,WIND.v.x*.3,3+Math.random()*2,WIND.v.z*.3,9+Math.random()*4,3,22+Math.random()*10,4)}
   if(AB.flag){AB.flag.rotation.y=WIND.ang+Math.PI/2+.12*Math.sin(WIND.t*5)}
-  for(const l of AB.loads){if(l.st===2){if(l.col<1){l.col=Math.min(1,l.col+dt/2.2);l.ch.g.rotation.x=l.col*1.35;l.ch.g.position.y=l.gy+l.ch.R*.9*(1-l.col)+.6;l.ch.g.scale.y=Math.max(.15,1-l.col*.85)}continue}
+  for(const l of AB.loads){if(l.st===2){AB.collapse(l,dt);continue}
     l.t+=dt;const v=l.vel;
     if(l.st===0){v.y-=G*dt;v.multiplyScalar(1-.05*dt);if(l.t>1.1){l.st=1;l.ch.g.visible=true}}
     else{l.open=Math.min(1,l.open+dt/1.4);const o=l.open,k=Math.min(1,.9*o*dt);v.x+=(WIND.v.x-v.x)*k;v.z+=(WIND.v.z-v.z)*k;v.y+=(-l.vt-v.y)*Math.min(1,2.2*o*dt);v.y-=G*(1-o)*dt}
     l.pos.addScaledVector(v,dt);l.g.position.copy(l.pos);l.g.rotation.z=.07*Math.sin(l.t*1.6)*l.open;l.g.rotation.x=.05*Math.sin(l.t*1.2+1)*l.open;
-    const L=l.ch.R*2.1,sc=.05+.95*Math.min(1,l.open*1.15);l.ch.g.position.set(l.pos.x,l.pos.y+L,l.pos.z);l.ch.g.rotation.y=l.yaw;l.ch.g.scale.setScalar(sc);
-    /* Fangleinen vom Rand jeder Kappe zur Last */
-    {l.ch.g.updateMatrixWorld(true);const a=l.ch.ln.geometry.attributes.position,q=new T.Vector3();let j=0;for(const c of l.ch.cs)for(let i=0;i<8;i++){const an=i/8*Math.PI*2;q.set(Math.cos(an)*l.ch.R*.93,-l.ch.R*.72+l.ch.R*.17,Math.sin(an)*l.ch.R*.93);c.localToWorld(q);a.setXYZ(j++,q.x,q.y,q.z);a.setXYZ(j++,l.pos.x+(i<4?1:-1)*.8,l.pos.y+2.2,l.pos.z+(i%4<2?1:-1)*1.4)}a.needsUpdate=true}
+    AB.pose(l,dt);
     const gy=ground(l.pos.x,l.pos.z);
-    if(l.pos.y<=gy){l.pos.y=gy;l.g.position.copy(l.pos);l.st=2;l.col=0;l.gy=gy;l.g.rotation.set(0,l.yaw,0);scene.remove(l.ch.ln);
+    if(l.pos.y<=gy){l.pos.y=gy;l.g.position.copy(l.pos);l.st=2;l.col=0;l.gy=gy;l.g.rotation.set(0,l.yaw,0);
       const d=Math.hypot(l.pos.x-D.x,l.pos.z-D.z),broke=l.open<.75;
       if(broke){burst(16,1,8,6,l.pos);boom(.4);l.g.rotation.z=.5;l.g.rotation.x=.3;l.d=100;say(l.name+' zerschellt: zu tief abgeworfen, der Schirm war noch nicht offen',false)}
       else{burst(10,2,5,2,l.pos);l.d=Math.min(100,d);const pt=Math.round(100-l.d);say(l.name+' gelandet: '+(d<1000?Math.round(d)+' m':(d/1000).toFixed(1).replace('.',',')+' km')+' von der Mitte, '+pt+' Punkte',pt>=60)}
@@ -1930,6 +1961,24 @@ ZS.brief=()=>'Zielschießen: acht Zielscheiben rund um den Träger. F feuert, au
 
 const MIS=AB.on?AB:LW.on?LW:ZS.on?ZS:null;
 if(MIS&&SC.tip){$('#mis-tip').textContent=SC.tip;$('#mis-tip').hidden=false}
+/* Zielpunkt der Raketen: die Flugbahn der nächsten Rakete wird mit derselben Rechnung wie im Flug vorausberechnet.
+   Der Kreis sitzt dort, wo sie aufschlägt; liegt dort eine Zielscheibe, wird er gelb. Trifft sie in fünf Sekunden nichts, zeigt ein gestrichelter Kreis die Richtung */
+const AIM={el:$('#aim'),d:$('#aim-d'),p:new T.Vector3(),v:new T.Vector3(),dir:new T.Vector3(),q:new T.Vector3(),far:new T.Vector3()};
+function aimUpdate(){const el=AIM.el;
+  if(!P||!P.mounts.length||S.crashed||!S.started||!card.hidden||S.ground){if(!el.hidden)el.hidden=true;return}
+  fwd.set(0,0,-1).applyQuaternion(S.Q);const p=AIM.p.copy(S.pos),v=AIM.v.copy(S.vel).addScaledVector(fwd,7),dir=AIM.dir.copy(fwd);v.y+=1.2;p.y-=.5;
+  let t=0,hitG=false,lock=false;const dt=1/30;
+  for(;t<5;t+=dt){const burn=t<1.1;if(burn)v.addScaledVector(dir,95*dt);v.y-=G*(burn?.15:.7)*dt;v.multiplyScalar(1-.05*dt);p.addScaledVector(v,dt);dir.copy(v).normalize();
+    if(t<3)AIM.far.copy(p);
+    const fl=Math.max(ground(p.x,p.z),SC.ship?WATER:LAKE.y);if(p.y<=fl){p.y=fl;hitG=true;break}
+    if(ZS.on&&ZS.near(p)){hitG=lock=true;break}}
+  if(hitG&&ZS.on&&!lock)for(const tg of ZS.list)if(!tg.dead&&Math.hypot(p.x-tg.x,p.z-tg.z)<16){lock=true;break}
+  const w=hitG?p:AIM.far,q=AIM.q.copy(w).project(cam);
+  if(q.z>1||Math.abs(q.x)>1.05||Math.abs(q.y)>1.05){el.hidden=true;return}
+  const r=canvas.getBoundingClientRect();el.hidden=false;
+  el.style.transform='translate('+(r.left+(q.x+1)/2*r.width).toFixed(1)+'px,'+(r.top+(1-q.y)/2*r.height).toFixed(1)+'px)';
+  el.classList.toggle('lock',lock);el.classList.toggle('far',!hitG);el.classList.toggle('empty',S.rk<=0);
+  const dd=hitG?p.distanceTo(S.pos):0;AIM.d.textContent=hitG?(dd<1000?Math.round(dd)+' m':(dd/1000).toFixed(1).replace('.',',')+' km'):''}
 function touchdown(sink){const rw=onRunway(S.pos.x,S.pos.z),sp=S.vel.length(),k=clamp(.25+sink*.25+sp*.012,.2,1);pad.rumble(clamp(sink*.22,.12,.9),.35,150);
   chirp(k,P.def.belly||!rw);burst(P.def.belly?9:5,rw&&!P.def.belly?0:2,1.5+sp*.12,.8)}
 function crash(text,inAir){
@@ -2544,7 +2593,7 @@ function frame(dt,still){
   }
   smoke(dt);FIRE.update(dt);FR.update(dt);if(MIS)MIS.update(dt);audioUpdate(dt);
   if(!coarse||(QL.n&1)===0)renderer.shadowMap.needsUpdate=true;QL.n++;
-  mirror();POST.render(dt,still||!S.started||!card.hidden);
+  aimUpdate();mirror();POST.render(dt,still||!S.started||!card.hidden);
 }
 /* ---------- Filmbild: Das Bild entsteht erst in einem Zwischenspeicher und wird dann wie von einer Filmkamera nachbearbeitet.
    Bewegungsunschärfe: aus der Tiefe jedes Bildpunkts und der Kamerabewegung seit dem letzten Bild ergibt sich, wie weit er gewandert ist; entlang dieser
